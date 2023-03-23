@@ -92,6 +92,7 @@ class celeryViewSet(ViewSet):
                 ctext = request.data['context']
                 
                 context = {
+                    "message": message,
                     "title": ctext['title'],
                     "company": ctext['company'],
                     "site_url": ctext['site_url'],
