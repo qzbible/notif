@@ -89,12 +89,31 @@ class celeryViewSet(ViewSet):
                 # path = "mail/accounts/confirm_change_p_w.html"
                 path_txt = "mail/planification/celery.txt"
 
+                ctext = request.data['context']
+                
                 context = {
-                    'receiver': 'Prenom Nom',
-                    'site_url': 'klivar.com',
-                    'message':message,
-                    'site_name': 'Klivar'
+                    "title": ctext['title'],
+                    "company": ctext['company'],
+                    "site_url": ctext['site_url'],
+                    "adress":ctext['adress'],
+                    "code_postal":ctext['code_postal'],
+                    "soret":ctext['soret'],
+                    "numero_tva":ctext['numero_tva'],
+                    "code_ape":ctext['code_ape'],
+                    "effectif":ctext['effectif'],
+                    "ville": ctext['ville'],
+                    "pays": ctext['pays'],
+                    "site_name": ctext['site_name'],
+
                 }
+                # context = {
+                #     'company': 'OASIS CENTER',
+                #     'site_url': 'klivar.com',
+                #     'adress':message,
+                #     'site_name': 'Klivar'
+                # }
+                
+                
                 html_content = render_to_string(
                     path,
                     context

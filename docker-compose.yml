@@ -1,18 +1,17 @@
 version: '3.8'
-services:
-    
 
-  # rabbitmq:
-  #   image: rabbitmq:3.7-management
-  #   container_name: rabbitmq_mail
-  #   restart: always
-  #   env_file:
-  #     - ./live.env
-  #   ports:
-  #     - "21001:5672"
-  #     - "21002:15672"
-  #   networks:
-  #     - application_celery
+services:
+  rabbitmq_mail:
+    image: rabbitmq:3.7-management
+    container_name: rabbitmq_mail
+    restart: always
+    env_file:
+      - ./live.env
+    ports:
+      - "21001:5674"
+      - "21002:15674"
+    networks:
+      - application_celery
 
   application_celery:
     container_name: application_celery
@@ -29,6 +28,29 @@ services:
       - application_celery
     env_file:
       - ./db.env
+
+  postgres_celery:
+    container_name: postgres_celery
+    image: postgres:14.4
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ziyouma}
+      POSTGRES_DB: ${POSTGRES_DB:-celery}
+      PGDATA: /data/postgres
+    volumes:
+       - postgres_celery:/data/celery
+    ports:
+      - "5436:5436"
+    networks:
+      - application_celery
+    restart: always
+networks:
+  application_celery:
+    driver: bridge
+
+volumes:
+  application_celery:
+  postgres_celery:
 
   # db_mailing:
   #   container_name: postgres_mailing
