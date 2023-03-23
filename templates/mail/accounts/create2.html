@@ -1,0 +1,95 @@
+{% extends "mail/base.html" %}
+
+{% block content %}
+<div class="klivar_police" style="border-style: groove; border: 1px solid  #4F0A84; padding: 10px; box-shadow: 5px 3px 7px #844F0A;
+    border-top-right-radius: 20px; border-top-left-radius: 20px;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="650" bgcolor="white"
+        style="border-radius:5px; border: 2px solid #3F840A;">
+        <tbody style="border-radius: 100px; border-style: groove; border: 2px solid  white;">
+            <tr>
+                <td align="center">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="col-650" width="650">
+                        <tbody>
+                            <tr>
+                                <td align="center" style="background-color: white; 
+                                            width:100%; height: 80px;border-top-left-radius: 20px;
+                                                border-top-right-radius: 20px;">
+
+                                    <a href="#" style="text-decoration: none;">
+                                        {% load static %}
+                                        <!-- img src="{% static 'img/logo.png' %}" alt="Klivar" style="height: 90%; width: 10%;"-->
+                                        <img src="https://klivar.com/shield.png" alt="Klivar" style="height: 90%; width: 10%;">
+                                        <h2 style="color:white; 
+                                                    font-weight:bold; padding-top:30px">
+                                            <strong>{{ site_name }}</strong> Vous souhaite la Bienvenue!
+                                        </h2>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height: 100px;">
+                <td align="center" style="border: none;  
+                            padding-right: 20px;padding-left:20px">
+
+                    <p align="left" style="color:#4F0A84;font-size:20px;">
+                        Bienvenue {{ receiver }},
+                        <p style="height: 20px;"></p>
+                        <span style="font-size: 30px;">Merci d’avoir rejoint 
+                            <strong><a style="color: #3F840A;" href="{{ site_url }}">{{ site_name }}</a></strong>.
+                            Votre plateforme de traitaiment des données à caractère personnelles. 
+                            Nous sommes heureux de vous savoir parmis nous.
+                        </span>
+                           
+                        <p style="height: 20px;"></p>
+
+                    </p>
+
+                </td>
+            </tr>
+
+            <tr style="display: inline-block;">
+                <td style="height: 150px; 
+                        padding-bottom: 20px; 
+                        border: none;
+                        width: 650px; " align="center">
+                    
+                    <p style="height: 20px;"></p>
+                    
+                    <a href="{{ site_url }}" title="Visitez notre site internet" style="padding:10px;" >
+                        <button href="{{ site_url }}" style="background-color: #840A7C;
+                            border: none;
+                            border-radius:4px; 
+                            height: 35px;
+                            
+                            color: white;
+                            font-size: 15;">
+                            Commencez maintenant !
+                        </button>
+                    </a>
+                    <p style="height: 40px;"></p>
+                    <hr align="center" width="650" style="background-color: #3F840A;height: 2px;border-top-left-radius: 10px; border-top-right-radius:10px;">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" width="650" bgcolor="white" style="border-radius: 30px;">
+                        <tbody>
+                            <tr style="background-color: #fff; font-weight: bold; font-style: italic;">
+                                <!--td align="left" style="width:60%"><img src="https://klivar.com/shield.png" alt="Klivar" style="height: 60%; width: 8%;">
+                                    <a style="color: #3F840A; top:15px; right: 5px;position:relative;" href="{{ site_url }}">{{ site_name }}</a>
+                                </td-->
+                                <td align="center"> &copy; 
+                                    <span id="copyright">
+                                        {% now "Y" %}
+                                    </span>
+                                by <a style="color: #3F840A;" href="{{ site_url }}">{{ site_name }}</a> </td>
+                            </tr >
+                        </tbody>
+                    </table>
+                    <!--p style="color:#120A84;" align="right">
+                        Cordialement, L’équipe du {{ site_name }}
+                    </p-->
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

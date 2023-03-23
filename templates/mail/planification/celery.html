@@ -1,0 +1,78 @@
+{% extends "mail/base.html" %}
+
+{% block content %}
+<div class="klivar_police" style="border-style: groove; border: 1px solid  #4F0A84; padding: 10px; box-shadow: 5px 3px 7px #844F0A;
+    border-top-right-radius: 20px; border-top-left-radius: 20px;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="650" bgcolor="white"
+        style="border-radius: 30px;">
+        <tbody style="border-radius: 100px;">
+            <tr>
+                <td align="center">
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="col-650" width="650">
+                        <tbody>
+                            <tr>
+                                <td align="center" style="background-color: #4F0A84; 
+                                            height: 80px;border-top-left-radius: 20px;
+                                                border-top-right-radius: 20px;">
+
+                                    <a href="#" style="text-decoration: none;">
+                                        {% load static %}
+                                        <!-- img src="{% static 'img/logo.png' %}" alt="Klivar" style="height: 90%; width: 10%;"-->
+                                        <img src="https://klivar.com/shield.png" alt="Klivar" style="height: 90%; width: 10%;">
+                                        <h2 style="color:white; 
+                                                    font-weight:bold; padding-top:30px">
+                                            Teste Klivar a ete effecter sur <strong>{{ site_name }}</strong> !
+                                        </h2>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr style="height: 100px;">
+                <td align="center" style="border: none;  
+                            padding-right: 20px;padding-left:20px">
+
+                    <p style="color:#4F0A84;">
+                        Vous recevez ce message parce qu’un teste Klivar a été effecter sur
+                        <a style="color: #3F840A;" href="{{ site_url }}">{{ site_name }}</a>.
+                        <p style="height: 20px;"></p>
+
+                    </p>
+
+                </td>
+            </tr>
+
+            <tr style="display: inline-block;">
+                <td style="height: 150px; 
+                        padding-bottom: 20px; 
+                        border: none;
+                        width: 650px; " align="center">
+                    <h3 style="color:#120A84">
+                        ATTENTION
+                    </h3>
+                    <p style="color:#120A84">
+                        Si vous ne connaissez pas cette application, IGNOREZ et EFFACEZ ce courriel immédiatement !
+                        Continuez uniquement si vous connaissez cette application !
+                    </p>
+                    <p style="height: 20px;"></p>
+                    <p style="color:#120A84">
+                        Cliquez ou recopiez simplement le lien et complétez le reste du formulaire :
+                    </p>
+                    <a href="{{ site_url }}" title="Visitez notre site internet" style="padding:10px;" >
+                        <button href="{{ site_url }}" style="background-color: #840A7C;
+                            border: none;
+                            border-radius:4px; 
+                            height: 35px;
+                            
+                            color: white;
+                            font-size: 17;">
+                            Visitez notre site internet
+                        </button>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

@@ -1,0 +1,8 @@
+Bienvenue sur {{ site_name }}!
+                                        
+Bienvenue {{ receiver }},
+d’avoir rejoint {{ site_url }} {{ site_name }}
+notre plateforme de traitaiment des données à caractère personnelles.
+
+{{ site_url }}Commencez maintenant !
+Cordialement, L’équipe du {{ site_name }}

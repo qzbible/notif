@@ -1,0 +1,71 @@
+version: '3.8'
+services:
+    
+
+  # rabbitmq:
+  #   image: rabbitmq:3.7-management
+  #   container_name: rabbitmq_mail
+  #   restart: always
+  #   env_file:
+  #     - ./live.env
+  #   ports:
+  #     - "21001:5672"
+  #     - "21002:15672"
+  #   networks:
+  #     - application_celery
+
+  application_celery:
+    container_name: application_celery
+    build:
+      context: .
+    restart: always
+    volumes:
+      - .:/code
+    expose:
+      - 9081
+    ports:
+      - 8081:9081
+    networks:
+      - application_celery
+    env_file:
+      - ./db.env
+
+  # db_mailing:
+  #   container_name: postgres_mailing
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ziyouma}
+  #     POSTGRES_DB: ${POSTGRES_DB:-klivar}
+  #     PGDATA: /data/postgres_mailing
+  #   volumes:
+  #      - db_mailing:/data/postgres_mailing
+  #   ports:
+  #     - "5432:5432"
+  #   networks:
+  #     - db_mailing
+  #   restart: always
+
+  # pgadmin_mail:
+  #   container_name: pgadmin_container
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-landry@ziyouma.org}
+  #     PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
+  #   volumes:
+  #      - pgadmin_mail:/var/lib/pgadmin_mail
+
+  #   ports:
+  #     - "${PGADMIN_PORT:-5050}:80"
+  #   networks:
+  #     - db_mailing
+  #   restart: always
+
+# networks:
+#   db_mailing:
+#     driver: bridge
+# 
+# volumes:
+#   db_mailing:
+#   pgadmin_mail:

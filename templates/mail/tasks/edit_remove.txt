@@ -1,0 +1,19 @@
+Affectation de tâche sur {{ site_name }}
+
+{{ site_name }} a ajouté cette tâche à {{ projet }} à {{ created_at }}
+
+{{ site_name }} vous l'a attribué à {{ created_at }}
+
+L'attribution de la tâche a été supprimée à {{ created_at }}
+
+Nouveau
+
+{{ site_name }} a ajouté cette tâche à {{ projet }}  à {{ created_at }}
+
+Répondre sur {{ site_name }}
+
+Marquer comme terminé
+
+Collaborateurs
+
+
