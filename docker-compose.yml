@@ -17,6 +17,8 @@ services:
     container_name: application_celery
     build:
       context: .
+    command: /start
+
     restart: always
     volumes:
       - .:/code
@@ -28,6 +30,9 @@ services:
       - application_celery
     env_file:
       - ./db.env
+    depends_on:
+      - postgres_celery
+         
 
   postgres_celery:
     container_name: postgres_celery
@@ -38,9 +43,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-celery}
       PGDATA: /data/postgres
     volumes:
-       - postgres_celery:/data/celery
+       - postgres_data:/data/celery
     ports:
-      - "5436:5436"
+      - "5432:5432"
     networks:
       - application_celery
     restart: always
@@ -50,7 +55,7 @@ networks:
 
 volumes:
   application_celery:
-  postgres_celery:
+  postgres_data:
 
   # db_mailing:
   #   container_name: postgres_mailing

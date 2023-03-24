@@ -20,7 +20,7 @@ from django.template.loader import render_to_string
 from django_celery_beat.models import PeriodicTask, IntervalSchedule, CrontabSchedule
 from django_celery_beat import querysets, validators
 import uuid
-
+from datetime import datetime
 
 class celeryViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
@@ -70,86 +70,87 @@ class celeryViewSet(ViewSet):
 
         try:
             # list of dates
-            start_times = request.data['start_time']
+            # start_times = request.data['start_time']
             one_off = True
-            for start_time in start_times:
-                # destinator = request.data['destinator'] # 'email1', email2
-                object = request.data['object']
-                message = request.data['message']
-                # sch_time = request.data['schedul']
-                destinator = request.data['destinator']
-                # unitime = request.data['unitime']
-                # unitime = unitime.upper()
+            # for start_time in start_times:
 
-                # one_off = request.data['one_off']
+            # destinator = request.data['destinator'] # 'email1', email2
+            object = request.data['object']
+            message = request.data['message']
+            # sch_time = request.data['schedul']
+            destinator = request.data['destinator']
+            # unitime = request.data['unitime']
+            # unitime = unitime.upper()
 
-                # path = "mail/planification/celery2.html"
-                path = "mail/accounts/create.html"
-                # path = "mail/accounts/change_pass_word.html"
-                # path = "mail/accounts/confirm_change_p_w.html"
-                path_txt = "mail/planification/celery.txt"
+            # one_off = request.data['one_off']
 
-                ctext = request.data['context']
-                
-                context = {
-                    "message": message,
-                    "title": ctext['title'],
-                    "company": ctext['company'],
-                    "site_url": ctext['site_url'],
-                    "adress":ctext['adress'],
-                    "code_postal":ctext['code_postal'],
-                    "soret":ctext['soret'],
-                    "numero_tva":ctext['numero_tva'],
-                    "code_ape":ctext['code_ape'],
-                    "effectif":ctext['effectif'],
-                    "ville": ctext['ville'],
-                    "pays": ctext['pays'],
-                    "site_name": ctext['site_name'],
+            # path = "mail/planification/celery2.html"
+            path = "mail/accounts/create.html"
+            # path = "mail/accounts/change_pass_word.html"
+            # path = "mail/accounts/confirm_change_p_w.html"
+            path_txt = "mail/planification/celery.txt"
 
-                }
-                # context = {
-                #     'company': 'OASIS CENTER',
-                #     'site_url': 'klivar.com',
-                #     'adress':message,
-                #     'site_name': 'Klivar'
-                # }
+            ctext = request.data['context']
+            
+            context = {
+                "message": message,
+                "title": ctext['title'],
+                "company": ctext['company'],
+                "site_url": ctext['site_url'],
+                "adress":ctext['adress'],
+                "code_postal":ctext['code_postal'],
+                "soret":ctext['soret'],
+                "numero_tva":ctext['numero_tva'],
+                "code_ape":ctext['code_ape'],
+                "effectif":ctext['effectif'],
+                "ville": ctext['ville'],
+                "pays": ctext['pays'],
+                "site_name": ctext['site_name'],
+
+            }
+            # context = {
+            #     'company': 'OASIS CENTER',
+            #     'site_url': 'klivar.com',
+            #     'adress':message,
+            #     'site_name': 'Klivar'
+            # }
+            
+            
+            html_content = render_to_string(
+                path,
+                context
+            )
+            
+            text_content = render_to_string(
+                path_txt,
+                context
+            )
+            
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=30,
+                # period=unitime,
+                period=IntervalSchedule.SECONDS,
+            )
+            PeriodicTask.objects.update_or_create(
+                task="mailing.utils.send_mail",
+                # name="send_email",
+                name = uuid.uuid4().hex[:10].lower(),
+                args=json.dumps([destinator, object, text_content, html_content]),
                 
-                
-                html_content = render_to_string(
-                    path,
-                    context
-                )
-                
-                text_content = render_to_string(
-                    path_txt,
-                    context
-                )
-                
-                schedule, created = IntervalSchedule.objects.get_or_create(
-                    every=30,
-                    # period=unitime,
-                    period=IntervalSchedule.SECONDS,
-                )
-                PeriodicTask.objects.update_or_create(
-                    task="mailing.utils.send_mail",
-                    # name="send_email",
-                    name = uuid.uuid4().hex[:10].lower(),
-                    args=json.dumps([destinator, object, text_content, html_content]),
-                    
-                    one_off = one_off,
-                    start_time = start_time,
-                    # last_run_at = "2023-02-28T11:19:00+01:00", + every= 1s ==> envoie le mail at 2023-02-28T11:20:00+01:00
-                    # --> last_run_at = "2023-02-28T13:49:00+01:00",
-                    # -->expires = "2023-02-28T21:46:00+01:00",
-                    # --> total_run_count = 2,
-                    # kwargs=json.dumps({
-                    #    'be_careful': True,
-                    #}),
-                    defaults=dict(
-                        interval=schedule,
-                        expire_seconds=60,
-                    ),
-                )
+                one_off = one_off,
+                start_time = datetime.now(),
+                # last_run_at = "2023-02-28T11:19:00+01:00", + every= 1s ==> envoie le mail at 2023-02-28T11:20:00+01:00
+                # --> last_run_at = "2023-02-28T13:49:00+01:00",
+                # -->expires = "2023-02-28T21:46:00+01:00",
+                # --> total_run_count = 2,
+                # kwargs=json.dumps({
+                #    'be_careful': True,
+                #}),
+                defaults=dict(
+                    interval=schedule,
+                    expire_seconds=60,
+                ),
+            )
 
             
             return Response(
