@@ -12,12 +12,17 @@
                                         
                                                         <tr>
                                                             <td style="font-size:36px; line-height:40px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; text-align:center; padding-bottom: 15px;">
-                                                                <strong>Modification de votre mot de passe</strong>
+                                                                <strong>{{ title }}</strong>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td   style="font-size:16px; color:#0f0f0f; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; text-align:center; padding-bottom: 25px;">
-                                                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor officia qui obcaecati voluptates saepe. Maiores totam expedita veniam neque labore suscipit rem officia tenetur minus cupiditate ut, amet, explicabo magnam!
+                                                                Vous recevez ce message parce qu’une réinitialisation du mot de passe de votre compte utilisateur a été initiée sur <strong><a style="color: #3F840A;" href="{{ site_url }}">{{ site_name }} </a></strong> 
+                                                                <p style="color:#a12e2e; text-transform:uppercase;"><strong>NB </strong> Cette demande s'expire dans 24h</p>
+                                                                <p style="text-transform:uppercase;">Attention</p>
+                                                                <p style="color:#0c0c0c;">
+                                                                    Si vous n’avez pas initier une réinitialisation du mot de passe de votre compte utilisateur <strong><a style="color: #3F840A;" href="{{ site_url }}"> {{ site_name }} </a>IGNOREZ et EFFACEZ ce courriel immédiatement !</strong>
+                                                                </p>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -27,7 +32,7 @@
                                                                     <tr>
                                                                         <td class="btn-16 c-white l-white" bgcolor="#4F0A84" style="font-size:16px; line-height:20px; mso-padding-alt:15px 35px; font-family:'PT Sans', Arial, sans-serif; text-align:center; font-weight:bold; text-transform:uppercase; border-radius:25px; min-width:auto !important; color:#ffffff;">
                                                                             <a href="{{ site_url }}" target="_blank" class="link c-white" style="display: block; padding: 15px 35px; text-decoration:none; color:#ffffff;">
-                                                                                <span   style="text-decoration:none; color:#ffffff;">Modifier le mot de passe</span>
+                                                                                <span   style="text-decoration:none; color:#ffffff;">{{ button }}</span>
                                                                             </a>
                                                                         </td>
                                                                     </tr>

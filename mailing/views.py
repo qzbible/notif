@@ -240,7 +240,8 @@ class celeryViewSet(ViewSet):
                 'message':'Bad token or ' + str(id)
             }
             return Response(datas, status=status.HTTP_401_UNAUTHORIZED)
-        
+
+
 class complateRegisterViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
@@ -355,4 +356,227 @@ class complateRegisterViewSet(ViewSet):
                 status=status.HTTP_400_BAD_REQUEST)
         
 
+class initChangePassViewSet(ViewSet):
+    parser_classes = (MultiPartParser, JSONParser,)
+
+    success = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "your request was do successfully success")),
+                ("status", openapi.Schema(type=openapi.TYPE_STRING,example = "success")),
+                ("code", openapi.Schema(type=openapi.TYPE_INTEGER, example = status.HTTP_201_CREATED)),
+            )),
+            required=['results']
+    )
+
+    request_body = openapi.Schema(
+        description="Cette partie decris le corp de l'API. il faut",
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("object", openapi.Schema(type=openapi.TYPE_STRING, example = "mail object (Demande de permission)")),
+                ("message", openapi.Schema(type=openapi.TYPE_STRING, example = "Body of mail (your text)")),
+                ("destinator", openapi.Schema(type=openapi.TYPE_STRING, example = "Emails adress of destinators",pattern=["loren@gmail.com","ipsum@klblogs.com"])),
+                # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+                ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example = ["2023-03-22T10:12:00+01:00","2023-03-22T10:13:00+01:00"])),
+            )),
+            required=['results']
+    )
+
+    bad_token = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "Bad token or ...")),
+                ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example = 401)),
+            )),
+            required=['results']
+    )
+
+    @swagger_auto_schema(
+        operation_description="This API create celery task ",
+        request_body=request_body,
+        responses={
+            status.HTTP_201_CREATED:success,
+            401: bad_token ,
+            400: 'Params error'
+        }
+    )
+    def create(self, request):
+
+        try:
+            one_off = True
+            # destinator = request.data['destinator'] # 'email1', email2
+            object = request.data['object']
+            destinator = request.data['destinator']
+            
+            path = "mail/accounts/init_change_pass_word.html"
+            path_txt = "mail/planification/celery.txt"
+
+            ctext = request.data['context']
+            context = {
+                "button":ctext['button'],
+                "title": ctext['title'],
+                "site_url": ctext['site_url'],
+                "site_name": ctext['site_name'],
+
+            }
+            
+            html_content = render_to_string(
+                path,
+                context
+            )
+            
+            text_content = render_to_string(
+                path_txt,
+                context
+            )
+            
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=30,
+                # period=unitime,
+                period=IntervalSchedule.SECONDS,
+            )
+            PeriodicTask.objects.update_or_create(
+                task="mailing.utils.send_mail",
+                # name="send_email",
+                name = uuid.uuid4().hex[:10].lower(),
+                args=json.dumps([destinator, object, text_content, html_content]),
+                
+                one_off = one_off,
+                start_time = datetime.now(),
+                defaults=dict(
+                    interval=schedule,
+                    expire_seconds=60,
+                ),
+            )
+
+            
+            return Response(
+                {
+                    'message': 'New schedule is succefull run',
+                    'status': 'success',
+                    'code': status.HTTP_201_CREATED,
+                },
+                status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {
+                    'message': 'Bad parameters',
+                    'status': 'Failed',
+                    'error': str(e),
+                    'code': status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        
+
+class changePassViewSet(ViewSet):
+    parser_classes = (MultiPartParser, JSONParser,)
+
+    success = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "your request was do successfully success")),
+                ("status", openapi.Schema(type=openapi.TYPE_STRING,example = "success")),
+                ("code", openapi.Schema(type=openapi.TYPE_INTEGER, example = status.HTTP_201_CREATED)),
+            )),
+            required=['results']
+    )
+
+    request_body = openapi.Schema(
+        description="Cette partie decris le corp de l'API. il faut",
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("object", openapi.Schema(type=openapi.TYPE_STRING, example = "mail object (Demande de permission)")),
+                ("message", openapi.Schema(type=openapi.TYPE_STRING, example = "Body of mail (your text)")),
+                ("destinator", openapi.Schema(type=openapi.TYPE_STRING, example = "Emails adress of destinators",pattern=["loren@gmail.com","ipsum@klblogs.com"])),
+                # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+                ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example = ["2023-03-22T10:12:00+01:00","2023-03-22T10:13:00+01:00"])),
+            )),
+            required=['results']
+    )
+
+    bad_token = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "Bad token or ...")),
+                ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example = 401)),
+            )),
+            required=['results']
+    )
+
+    @swagger_auto_schema(
+        operation_description="This API create celery task ",
+        request_body=request_body,
+        responses={
+            status.HTTP_201_CREATED:success,
+            401: bad_token ,
+            400: 'Params error'
+        }
+    )
+    def create(self, request):
+
+        try:
+            one_off = True
+            # destinator = request.data['destinator'] # 'email1', email2
+            object = request.data['object']
+            destinator = request.data['destinator']
+            
+            path = "mail/accounts/end_change_pass_word.html"
+            path_txt = "mail/planification/celery.txt"
+
+            ctext = request.data['context']
+            context = {
+                "title": ctext['title'],
+                "site_url": ctext['site_url'],
+                "site_name": ctext['site_name'],
+            }
+            
+            html_content = render_to_string(
+                path,
+                context
+            )
+            
+            text_content = render_to_string(
+                path_txt,
+                context
+            )
+            
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=30,
+                # period=unitime,
+                period=IntervalSchedule.SECONDS,
+            )
+            PeriodicTask.objects.update_or_create(
+                task="mailing.utils.send_mail",
+                # name="send_email",
+                name = uuid.uuid4().hex[:10].lower(),
+                args=json.dumps([destinator, object, text_content, html_content]),
+                
+                one_off = one_off,
+                start_time = datetime.now(),
+                defaults=dict(
+                    interval=schedule,
+                    expire_seconds=60,
+                ),
+            )
+
+            
+            return Response(
+                {
+                    'message': 'New schedule is succefull run',
+                    'status': 'success',
+                    'code': status.HTTP_201_CREATED,
+                },
+                status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {
+                    'message': 'Bad parameters',
+                    'status': 'Failed',
+                    'error': str(e),
+                    'code': status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+        
 
