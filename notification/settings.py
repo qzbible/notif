@@ -101,8 +101,9 @@ DATABASES = {
         'NAME': 'celery',
         'USER': 'postgres',
         'PASSWORD': 'ziyouma',
-        # 'HOST': 'postgres_celery:5436',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'HOST': 'postgres_celery',
+        # 'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        # 'PORT': 5432,
         'PORT': 5432,
     }
 }
