@@ -6,6 +6,7 @@ from .views import *
 
 router = routers.DefaultRouter()
 router.register(r'sendmail', celeryViewSet, basename="sendmail")
+router.register(r'complateRegister', complateRegisterViewSet, basename="complateRegister")
 
 
 # Wire up our API using automatic URL routing.
