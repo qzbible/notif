@@ -1,0 +1,148 @@
+{% extends "mail/base.html" %}
+
+{% block content %}                 
+    <!-- Container -->
+                            <!-- Main -->
+                            
+                                        <!-- Section - Intro -->
+                                        
+                                                    <tr>
+                                                        <td style="font-size:15px; color:#000; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
+                                                            <button type="button" style="font-size: 0; border: 1px solid #840A7C; background:#4F0A84; width: 15px; height: 15px; border-radius: 4px;"></button><strong>&nbsp; &nbsp;Tache : </strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-16 lh-26 a-center pb-25" style="font-size:15px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-left: 5%; padding-bottom: 25px;">
+                                                            {{ task }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="font-size:15px; color:#000; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
+                                                            <button type="button" style="font-size: 0; border: 1px solid #840A7C; background:#4F0A84; width: 15px; height: 15px; border-radius: 4px;"></button><strong>&nbsp; &nbsp;Description : </strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-16 lh-26 a-center pb-25" style="font-size:15px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-left: 5%; padding-bottom: 25px;">
+                                                            {{ description|truncatechars:100}}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="font-size:15px; color:#000; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
+                                                            <button type="button" style="font-size: 0; border: 1px solid #840A7C; background:#4F0A84; width: 15px; height: 15px; border-radius: 4px;"></button><strong>&nbsp; &nbsp;Echeance: </strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-16 lh-26 a-center pb-25" style="font-size:15px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-left: 5%; padding-bottom: 25px;">
+                                                            -Debut {{ begin |date:"l-M-Y" }} <br />
+                                                            -fin {{ end |date:"l-M-Y" }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="font-size:15px; color:#000; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
+                                                            <button type="button" style="font-size: 0; border: 1px solid #840A7C; background:#4F0A84; width: 15px; height: 15px; border-radius: 4px;"></button><strong>&nbsp; &nbsp;Pieces jointes : </strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-16 lh-26 a-center pb-25" style="font-size:15px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-left: 5%; padding-bottom: 25px;">
+                                                            <a href="{{ doc_link}}">{{ doc_name }}</a>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="font-size:15px; color:#000; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
+                                                            <button type="button" style="font-size: 0; border: 1px solid #840A7C; background:#4F0A84; width: 15px; height: 15px; border-radius: 4px;"></button><strong>&nbsp; &nbsp;Projet : </strong>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="text-16 lh-26 a-center pb-25" style="font-size:15px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; padding-left: 5%; padding-bottom: 25px;">
+                                                            {{ project }}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <!-- Button -->
+                                                            <table border="0" cellspacing="30" cellpadding="0" style="min-width: 200px;">
+                                                                <tr>
+                                                                    <!--td class="gradient pt-10" style="border-radius: 10px; padding-top: 10px;" bgcolor="#f3189e"-->
+                                                                    <td class="gradient" bgcolor="#4F0A84" style="font-size:15px; line-height:20px; mso-padding-alt:15px 35px; border-radius: 12px 12px 0 0; min-width:auto !important; color:#ffffff;">
+                                                                        <a href="{{ site_url }}" target="_blank" class="link c-white" style="display: block; padding: 10px 25px; text-decoration:none; color:#ffffff;">
+                                                                            <span class="link c-white" style="text-decoration:none; color:#ffffff;">Repondre sur Klivar</span>
+                                                                        </a>
+                                                                    </td>
+                                                                    <td class="buton_white" bgcolor="#ffffff" style="font-size:15px; line-height:20px; border-radius: 12px 12px 0 0; min-width:auto !important; color:#050505;">
+                                                                        <a href="{{ site_url }}" target="_blank" class="link c-white" style="display: block; padding: 10px 25px; text-decoration:none; color:#050505;">
+                                                                            <span class="link c-white" style="text-decoration:none; color:#050505;">Marquer comme terminee</span>
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                            <!-- END Button -->
+                                                        </td>
+                                                    </tr>
+                                                    
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <!-- END Section - Intro -->
+
+                                    <!-- Section - Order Details -->
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td class="pb-50" style="padding-bottom: 20px;">
+                                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                    <tr>
+                                                        <td class="pb-30" style="padding-bottom: 30px;">
+                                                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                                <tr>
+                                                                    <th class="column-top" valign="top" width="230" style="font-size:0pt; line-height:0pt; padding:0; margin:0; font-weight:normal; vertical-align:top;">
+                                                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                                            {% if collaborateurs %}
+                                                                                {% with nbre_col=collaborateurs|length %}    
+                                                                                    <tr>
+                                                                                        <td style="font-size:15px; line-height:24px; color:#282828; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important; padding-bottom: 1px;">
+                                                                                            <button type="button" style="font-size: 0; border: 1px solid #840A7C; background:#4F0A84; width: 15px; height: 15px; border-radius: 4px;"></button>
+                                                                                            {% if nbre_col > 1 %}
+                                                                                                <strong>&nbsp;  &nbsp; collaborateurs {{ nbre_col }}</strong>
+                                                                                            {% else %}
+                                                                                                <strong>&nbsp;  &nbsp; collaborateurs {{ nbre_col }}</strong>
+                                                                                            {% endif %} 
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    {% for collaborator in collaborateurs %}
+                                                                                        <tr>
+                                                                                            <td class="text-15" style="font-size:16px; line-height:20px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important;">
+                                                                                                {{ collaborator }}
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    {% endfor %}
+                                                                                {% endwith %}
+                                                                            {% else %}
+                                                                                <tr>
+                                                                                    <td class="text-16" style="font-size:16px; line-height:20px; color:#6e6e6e; font-family:'PT Sans', Arial, sans-serif; text-align:left; min-width:auto !important;">
+                                                                                        Aucun
+                                                                                    </td>
+                                                                                </tr>
+                                                                            {% endif %} 
+                                                                        </table>
+                                                                    </th>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <!-- END Section - Order Details -->
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- END Main -->
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<!-- END Container -->              
+{% endblock %}

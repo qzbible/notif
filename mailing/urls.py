@@ -10,6 +10,7 @@ router.register(r'complateregister', complateRegisterViewSet, basename="complate
 router.register(r'initchangepass', initChangePassViewSet, basename="initchangepass")
 router.register(r'endchangepass', changePassViewSet, basename="endchangepass")
 router.register(r'task', taskView, basename="task")
+router.register(r'affectation', affectationView, basename="affectation")
 
 
 # Wire up our API using automatic URL routing.
