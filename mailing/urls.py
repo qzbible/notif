@@ -9,9 +9,10 @@ router.register(r'sendmail', celeryViewSet, basename="sendmail")
 router.register(r'complateregister', complateRegisterViewSet, basename="complateregister")
 router.register(r'initchangepass', initChangePassViewSet, basename="initchangepass")
 router.register(r'endchangepass', changePassViewSet, basename="endchangepass")
+router.register(r'task', taskView, basename="task")
 
 
-# Wire up our API using automatic URL routing. changePassViewSet
+# Wire up our API using automatic URL routing.
 urlpatterns = [
     path('', include(router.urls)),
 ]
