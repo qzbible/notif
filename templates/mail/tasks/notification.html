@@ -1,0 +1,66 @@
+{% extends "mail/base.html" %}
+
+{% block content %}                 
+    <!-- Container -->
+                            <!-- Main -->
+                            
+                                        <!-- Section - Intro -->
+                                        
+                                                    <tr>
+                                                        <td style="font-size:15px; line-height:30px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; padding-bottom: 1px;">
+                                                            <strong>Hello.</strong>
+                                                            <p>
+                                                                Vous avez recus une notification dans le cadre du projet {{ project }} particulierement a la tache {{ task }}<br>
+                                                                Traite ce dossier et envoyer nous les sources
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <!-- Button -->
+                                                            <table border="0" cellspacing="0" cellpadding="0" style="min-width: 200px;">
+                                                                <tr>
+                                                                    <!--td class="gradient pt-10" style="border-radius: 10px; padding-top: 10px;" bgcolor="#f3189e"-->
+                                                                    <td bgcolor="#4F0A84" style="background-color: #840A7C; font-size:17px; line-height:21px; border-radius: 12px 12px 0 0; min-width:auto !important; color:#ffffff;">
+                                                                            <p style="display: block; padding: 5px 5px; text-decoration:none; color:#ffffff;">
+                                                                            <span class="link c-white" style="text-decoration:none; color:#ffffff;">Donnez votre avis !</span><br>
+                                                                            Repondez directement a cet e-mail pour ajouter un commentaire ou mettez vos collegues en copie pour les ajouter en temps que
+                                                                                collaborateurs. Pour ne plus recevoir ce type de notifications, il vous suffit de quitter cette tache.</p>
+                                                                        
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                            <!-- END Button -->
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <!-- END Section - Intro -->
+
+                                    <!-- Section - Separator Line -->
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td style="padding-bottom: 20px;">
+                                                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                    <tr>
+                                                        <td class="img" height="1" bgcolor="#ebebeb" style="font-size:0pt; line-height:0pt; text-align:left;">&nbsp;</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <!-- END Section - Separator Line -->
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- END Main -->
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<!-- END Container -->              
+{% endblock %}

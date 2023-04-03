@@ -1,0 +1,12 @@
+
+DOMAIN=locahost:8083
+DJANGO_SECRET_KEY=RZOLRPXO4CoPkvo1wyH0tbGcT6jTG0PaDzAvtUFX6lTEbILrxgPJ3Lnb3m6dZk0a
+DJANGO_SECURE_SSL_REDIRECT=True
+CELERY_TIMEZONE = Africa/Douala
+CELERY_RESULT_BACKEND_DB = f'db+mysql+pymysql://root:ziyouma@db/pseudo_mysql'
+CELERY_BROKER_URL = f'amqp://root:ziyouma@localhost:5672'
+EMAIL_HOST = smtp.gmail.com
+EMAIL_PORT = 587
+EMAIL_HOST_USER = landry.ziyouma@gmail.com
+EMAIL_HOST_PASSWORD = ypsyzkiidjakjdqb
+ 

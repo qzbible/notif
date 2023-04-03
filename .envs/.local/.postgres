@@ -1,0 +1,8 @@
+
+ENGINE=django.db.backends.postgresql_psycopg2
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=ziyouma
+POSTGRES_DB=klivar-db
+POSTGRES_HOST=postgres_celery
+POSTGRES_PORT=5432
+PGDATA: /data/postgres

@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -92,20 +95,20 @@ WSGI_APPLICATION = 'notification.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # },
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'celery',
-        'USER': 'postgres',
-        'PASSWORD': 'ziyouma',
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
-        'PORT': 5432,
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': os.getenv("ENGINE", "django.db.backends.sqlite3"),
+        # Or path to database file if using sqlite3.
+        'NAME': os.getenv("POSTGRES_DB", BASE_DIR / "db.sqlite3"),
+        'USER': os.getenv("POSTGRES_USER", "user"),
+        'PASSWORD': os.getenv("POSTGRES_PASSWORD", "password"),
+        # 'HOST':'db',
+        # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'HOST': os.getenv("POSTGRES_HOST", "localhost"),
+        # Set to empty string for default.
+        'PORT':  os.getenv("POSTGRES_PORT", "5432"),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

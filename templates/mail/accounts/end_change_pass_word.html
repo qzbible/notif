@@ -1,0 +1,56 @@
+{% extends "mail/base.html" %}
+
+{% block content %}
+
+                                    
+    <!-- Container -->
+    
+                            
+                            <!-- Main -->
+                            
+                                        <!-- Section - Intro -->
+                                        
+                                                        <tr>
+                                                            <td style="font-size:36px; line-height:40px; color:#282828; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; text-align:center; padding-bottom: 15px;">
+                                                                <strong>{{ title }}</strong>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td   style="font-size:16px; color:#0f0f0f; font-family:'PT Sans', Arial, sans-serif; min-width:auto !important; line-height: 26px; text-align:center; padding-bottom: 25px;">
+                                                                Votre mot de passe <strong><a style="color: #3F840A;" href="{{ site_url }}">{{ site_name }} </a></strong> a été modifie avec success.
+                                                                 
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- END Section - Intro -->
+    
+                                        <!-- Section - Separator Line -->
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td style="padding-bottom: 20px;">
+                                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                                        <tr>
+                                                            <td class="img" height="1" bgcolor="#ebebeb" style="font-size:0pt; line-height:0pt; text-align:left;">&nbsp;</td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- END Section - Separator Line -->
+                                    </td>
+                                </tr>
+                            </table>
+                            <!-- END Main -->
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <!-- END Container -->
+                                    
+                                    
+{% endblock %}
