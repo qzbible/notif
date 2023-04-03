@@ -1,0 +1,5 @@
+Dont delete this directory
+This folder receives the files (Attachments) then deletes them after sending the email
+
+Ne supprimez pas ce dossier
+Ce dossier acceuil les fichiers (Pieces Jointes) puis les suppriment apres l'envoie du mail
