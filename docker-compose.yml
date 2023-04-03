@@ -1,7 +1,5 @@
-version: '3.8'
+version: "3.8"
 services:
-    
-
   # rabbitmq:
   #   image: rabbitmq:3.7-management
   #   container_name: rabbitmq_mail
@@ -61,11 +59,10 @@ services:
   #   networks:
   #     - db_mailing
   #   restart: always
-
 # networks:
 #   db_mailing:
 #     driver: bridge
-# 
+#
 # volumes:
 #   db_mailing:
 #   pgadmin_mail:
