@@ -1,7 +1,7 @@
 __pycache__/
 *.sqlite3
 *.pyc
-media/
+
 docker-images/
 oracle-volume/
 # These are some examples of commonly ignored file patterns.
