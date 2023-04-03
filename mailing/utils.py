@@ -20,6 +20,9 @@ from celery import shared_task
 
 from datetime import datetime, timedelta
 
+from urllib.request import urlopen
+import uuid
+
 app = Celery('send_mail', broker='pyamqp://root@localhost//')
 
 @shared_task
@@ -260,3 +263,28 @@ def start_date_test(in_date, time):
     
 
     return begin
+
+
+def getfiles(url):
+
+    # url = "https://www.shellhacks.com/file.pdf"
+    
+    filename = url.rsplit('/', 1)[-1]
+    dirpath = uuid.uuid4().hex[:6].lower()
+    save_as = "media/"+dirpath
+
+    if not os.path.exists(save_as):
+        os.makedirs(save_as)
+
+    save_as = save_as + "/" + filename
+
+    # Download from URL
+    with urlopen(url) as file:
+        content = file.read()
+
+    # Save to file
+    with open(save_as, 'wb') as download:
+        download.write(content)
+
+    return dirpath, save_as
+
