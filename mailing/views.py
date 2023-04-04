@@ -814,7 +814,7 @@ class affectationView(ViewSet):
 
             dirpaths = []
             filepaths = []
-            if request.data['urls']:
+            if request.data.get('urls'):
                 urls = request.data['urls']
                 for url in urls:
                     dirpath, filepath = getfiles(url)
@@ -849,8 +849,8 @@ class affectationView(ViewSet):
             # files = ['requirements.txt', 'README.md']
 
             # Send Email
-            send_mail_file(destinator, object, text_content,
-                           html_content, filepaths)
+            # send_mail_file(destinator, object, text_content, html_content, filepaths)
+            send_mail_with_ics(destinator, object, text_content, html_content, filepaths[0])
 
             # remove  downloaded files in this server
             for dirpath in dirpaths:
