@@ -8,8 +8,8 @@ services:
     env_file:
       - ./.envs/.local/.live
     ports:
-      - "21001:5674"
-      - "21002:15674"
+      - "21001:5672"
+      - "21002:15672"
     networks:
       - klivar-notification-networks
   api:

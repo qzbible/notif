@@ -26,22 +26,26 @@
                                                             {{ description }}
                                                         </td>
                                                     </tr>
-                                                    <tr>
-                                                        <td class="klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 2px;">
-                                                            <strong> Echeance: </strong>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="lh-26 a-center pb-25 klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
-                                                            - Debut: {{ begin }} <br />
-                                                            - Fin: {{ end }}
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 2px;">
-                                                            <strong>Document(s) complementaire(s) : </strong>
-                                                        </td>
-                                                    </tr>
+                                                    {% if begin %}
+                                                        <tr>
+                                                            <td class="klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 2px;">
+                                                                <strong> Echeance: </strong>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="lh-26 a-center pb-25 klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
+                                                                - Debut: {{ begin }} <br />
+                                                                - Fin: {{ end }}
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                    {% if doc_link %}
+                                                        <tr>
+                                                            <td class="klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 2px;">
+                                                                <strong>Document(s) complementaire(s) : </strong>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
                                                     <tr>
                                                         <td class="lh-26 a-center pb-25 klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
                                                             <a href="{{ doc_link}}">{{ doc_name }}</a>
@@ -82,13 +86,13 @@
                                                                 <tr>
                                                                     <!--td class="gradient pt-10" style="border-radius: 10px; padding-top: 10px;" bgcolor="#f3189e"-->
                                                                     <td class="klivar_police" style="background:#4F0A84; line-height:15px; mso-padding-alt:15px 35px; border-radius: 6px 6px 6px 6px; min-width:auto !important; color:#ffffff;">
-                                                                        <a href="{{ site_url }}" target="_blank" class="link c-white" style="display: block; padding: 10px 10px; text-decoration:none; color:#ffffff;">
-                                                                            <span class="link c-white" style="text-decoration:none; color:#ffffff;">Repondre sur Klivar</span>
+                                                                        <a href="{{ btn_repondre_klivar.btn_link }}" target="_blank" class="link c-white" style="display: block; padding: 10px 10px; text-decoration:none; color:#ffffff;">
+                                                                            <span class="link c-white" style="text-decoration:none; color:#ffffff;">{{ btn_repondre_klivar.btn_title }}</span>
                                                                         </a>
                                                                     </td>
                                                                     <td class="buton_white klivar_police" bgcolor="#ffffff" style="line-height:15px; border-radius: 6px 6px 6px 6px; min-width:auto !important; border:1px solid;">
-                                                                        <a href="{{ site_url }}" target="_blank" class="link c-white" style="display: block; padding: 10px 10px; text-decoration:none; color:#050505;">
-                                                                            <span class="link c-white" style="text-decoration:none; color:#050505;">Marquer comme terminee</span>
+                                                                        <a href="{{ btn_Marquer_comme_terminee.btn_link }}" target="_blank" class="link c-white" style="display: block; padding: 10px 10px; text-decoration:none; color:#050505;">
+                                                                            <span class="link c-white" style="text-decoration:none; color:#050505;">{{ btn_Marquer_comme_terminee.btn_title }}</span>
                                                                         </a>
                                                                     </td>
                                                                 </tr>
@@ -129,8 +133,8 @@
                                                                                     <tr>
                                                                                         {% for collaborator in collaborateurs %}
                                                                                             <td class="text-15" style="padding:5px; line-height:25px; color:#000; text-align:left;">
-                                                                                                <strong style=" border-radius:50%; display: inline-block; width:25px; height:25px; padding:3px; margin:3px; text-align:center; color: #fff; background-color: #840A7C;">{{ collaborator |make_list|first }} </strong> 
-                                                                                                {{ collaborator }}
+                                                                                                <!-- strong style=" border-radius:50%; display: inline-block; width:25px; height:25px; padding:3px; margin:3px; text-align:center; color: #fff; background-color: #840A7C;">{{ collaborator |make_list|first }} </!-- -->
+                                                                                                <img class="g-img" style=" border-radius:50%; display: inline-block; width:25px; height:25px; padding:3px; margin:3px; text-align:center; background-color: transparent;" src="{{ collaborator.avatar }} " />
                                                                                             </td>
                                                                                         {% endfor %}
                                                                                     </tr>

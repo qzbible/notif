@@ -25,6 +25,8 @@ from datetime import datetime
 from .utils import *
 import shutil
 
+from icalendar import Calendar, Event, vCalAddress, vText
+from datetime import datetime
 
 class celeryViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
@@ -84,7 +86,7 @@ class celeryViewSet(ViewSet):
             # start_times = request.data['start_time']
             one_off = True
             # for start_time in start_times:
-            print("fababy")
+            # print("fababy")
             # destinator = request.data['destinator'] # 'email1', email2
             object = request.data['object']
             message = request.data['message']
@@ -790,16 +792,6 @@ class affectationView(ViewSet):
 
             ctext = request.data['context']
 
-            date_end = ctext['end']
-            date_end = date_end.replace("T", " ").split("+", 1)[0]
-            end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
-            end = end.strftime("%b %d %Y %H:%M:%S")
-
-            date_begin = ctext['begin']
-            date_begin = date_begin.replace("T", " ").split("+", 1)[0]
-            begin = datetime.strptime(date_begin, '%Y-%m-%d %H:%M:%S')
-            begin = begin.strftime("%b %d %Y %H:%M:%S")
-
             task_created_at = ctext['task_created_at']
             task_created_at = task_created_at.replace(
                 "T", " ").split("+", 1)[0]
@@ -814,23 +806,58 @@ class affectationView(ViewSet):
 
             dirpaths = []
             filepaths = []
-            if request.data.get('urls'):
-                urls = request.data['urls']
+            if request.data.get('urls_attached'):
+                urls = request.data['urls_attached']
                 for url in urls:
                     dirpath, filepath = getfiles(url)
                     dirpaths.append(dirpath)
                     filepaths.append(filepath)
+
+            begin = None
+            end = None
+            filename = None
+            mail = None
+            if request.data.get('calendar'):
+                calendar = request.data['calendar']
+                date_begin = calendar['begin']
+                description = calendar['description']
+                begin_hour = calendar['begin_hour']
+                duration = calendar['duration']
+
+                date_begin = date_begin.replace("T", " ").split("+", 1)[0]
+                begin = datetime.strptime(date_begin, '%Y-%m-%d %H:%M:%S')
+                begin = begin.strftime("%b %d %Y %H:%M:%S")
+
+                company = ctext['company']
+                filename, date_end = add_calendar(object, description, date_begin, begin_hour, duration, company)
+                # end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
+                end = date_end.strftime("%b %d %Y %H:%M:%S")
+
+                """
+                date_begin = ctext['begin']
+                date_begin = date_begin.replace("T", " ").split("+", 1)[0]
+                begin = datetime.strptime(date_begin, '%Y-%m-%d %H:%M:%S')
+                begin = begin.strftime("%b %d %Y %H:%M:%S")
+                
+                date_end = ctext['end']
+                date_end = date_end.replace("T", " ").split("+", 1)[0]
+                end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
+                end = end.strftime("%b %d %Y %H:%M:%S")
+                """
+
 
             context = {
                 "task": ctext['task'],
                 "project": ctext['project'],
                 "collaborateurs": ctext['collaborateurs'],
                 "description": ctext['description'],
+                "btn_repondre_klivar": ctext['btn_repondre_klivar'],
+                "btn_Marquer_comme_terminee": ctext['btn_Marquer_comme_terminee'],
                 "begin": begin,
                 "end": end,
                 "site_url": ctext['site_url'],
                 "doc_name": ctext['doc_name'],
-                "doc_link": ctext['doc_link'],
+                "doc_link": ctext['url_link'],
                 "task_created_at": created_at,
                 "task_update_at": update_at,
                 "company": ctext['company'],
@@ -847,22 +874,46 @@ class affectationView(ViewSet):
             )
 
             # files = ['requirements.txt', 'README.md']
-
+            
             # Send Email
             # send_mail_file(destinator, object, text_content, html_content, filepaths)
-            send_mail_with_ics(destinator, object, text_content, html_content, filepaths[0])
+            if request.data.get('urls_attached') and request.data.get('calendar'):
+                # *****************************EMAIL WITH ICALENDAR AND PIECES JOINTES*********************
+                # files = ['requirements.txt', 'README.md']
+                mail = send_mail_with_ics_file(destinator, object, filepaths, html_content, filename, company)
+
+            elif request.data.get('urls_attached'):
+                # *****************************EMAIL WITCH FILE****************************************
+                # files = ['requirements.txt', 'README.md']
+                mail = send_mail_file(destinator, object, text_content, html_content, filepaths, company)
+            elif request.data.get('calendar'):
+                # *****************************EMAIL WITH ICALENDAR**************************************
+                mail = send_mail_with_ics(destinator, object, text_content, html_content, filename, company)
+            else:
+                # *****************************EMAIL WITHOUT FILE****************************************
+                mail = send_mail(destinator, object, text_content, html_content, company)
+
+
 
             # remove  downloaded files in this server
             for dirpath in dirpaths:
                 shutil.rmtree("media/"+dirpath, ignore_errors=True)
-
-            return Response(
-                {
-                    'message': 'New schedule is succefull run',
-                    'status': 'success',
-                    'code': status.HTTP_201_CREATED,
-                },
-                status=status.HTTP_201_CREATED)
+            if mail:
+                return Response(
+                    {
+                        'message': 'New schedule is succefull run',
+                        'status': 'success',
+                        'code': status.HTTP_201_CREATED,
+                    },
+                    status=status.HTTP_201_CREATED)
+            else:
+                return Response(
+                    {
+                        'message': 'Mailing failed',
+                        'status': 'Failure',
+                        'code': status.HTTP_400_BAD_REQUEST,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
             return Response(
@@ -873,3 +924,4 @@ class affectationView(ViewSet):
                     'code': status.HTTP_400_BAD_REQUEST,
                 },
                 status=status.HTTP_400_BAD_REQUEST)
+
