@@ -104,6 +104,7 @@ class celeryViewSet(ViewSet):
             path_txt = "mail/planification/celery.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
 
             context = {
                 "message": message,
@@ -138,7 +139,7 @@ class celeryViewSet(ViewSet):
                 context
             )
 
-            schedule, created = IntervalSchedule.objects.get_or_create(
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -163,7 +164,8 @@ class celeryViewSet(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             return Response(
                 {
@@ -315,6 +317,7 @@ class complateRegisterViewSet(ViewSet):
             path_txt = "mail/planification/celery.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
             context = {
                 "button": ctext['button'],
                 "title": ctext['title'],
@@ -334,7 +337,7 @@ class complateRegisterViewSet(ViewSet):
                 context
             )
 
-            schedule, created = IntervalSchedule.objects.get_or_create(
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -344,7 +347,7 @@ class complateRegisterViewSet(ViewSet):
                 # name="send_email",
                 name=uuid.uuid4().hex[:10].lower(),
                 args=json.dumps(
-                    [destinator, object, text_content, html_content]),
+                    [destinator, object, text_content, html_content, company]),
 
                 one_off=one_off,
                 start_time=datetime.now(),
@@ -352,7 +355,8 @@ class complateRegisterViewSet(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             return Response(
                 {
@@ -436,6 +440,7 @@ class initChangePassViewSet(ViewSet):
             path_txt = "mail/planification/celery.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
             context = {
                 "button": ctext['button'],
                 "title": ctext['title'],
@@ -454,7 +459,7 @@ class initChangePassViewSet(ViewSet):
                 context
             )
 
-            schedule, created = IntervalSchedule.objects.get_or_create(
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -472,7 +477,8 @@ class initChangePassViewSet(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             return Response(
                 {
@@ -556,6 +562,8 @@ class changePassViewSet(ViewSet):
             path_txt = "mail/planification/celery.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
+
             context = {
                 "title": ctext['title'],
                 "site_url": ctext['site_url'],
@@ -572,7 +580,7 @@ class changePassViewSet(ViewSet):
                 context
             )
 
-            schedule, created = IntervalSchedule.objects.get_or_create(
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -590,7 +598,8 @@ class changePassViewSet(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             return Response(
                 {
@@ -674,6 +683,7 @@ class taskView(ViewSet):
             path_txt = "mail/tasks/assignment.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
             context = {
                 "task": ctext['task'],
                 "project": ctext['project'],
@@ -689,7 +699,7 @@ class taskView(ViewSet):
                 context
             )
 
-            schedule, created = IntervalSchedule.objects.get_or_create(
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -707,7 +717,8 @@ class taskView(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             return Response(
                 {
