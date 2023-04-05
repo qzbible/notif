@@ -121,34 +121,30 @@
                                                                             {% if collaborateurs %}
                                                                                 {% with nbre_col=collaborateurs|length %}    
                                                                                     <tr>
-                                                                                        <td style="line-height:24px; color:#282828; text-align:left; min-width:auto !important; padding-bottom: 1px;">
+                                                                                        <td class="klivar_police" style="text-align:left; color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 2px;">
                                                                                             
                                                                                             {% if nbre_col > 1 %}
-                                                                                                <strong>&nbsp;  &nbsp; collaborateurs {{ nbre_col }}</strong>
+                                                                                                <strong>collaborateurs {{ nbre_col }}</strong>
                                                                                             {% else %}
-                                                                                                <strong>&nbsp;  &nbsp; collaborateurs {{ nbre_col }}</strong>
+                                                                                                <strong>collaborateur {{ nbre_col }}</strong>
                                                                                             {% endif %} 
                                                                                         </td>
                                                                                     </tr>
-                                                                                    <tr>
+                                                                                    <div style="display:flex;">
                                                                                         {% for collaborator in collaborateurs %}
-                                                                                            <td class="text-15" style="padding:5px; line-height:25px; color:#000; text-align:left;">
+                                                                                            <div class="text-15" style="display: flex; width:100%; padding:5px; line-height:25px; color:#000; text-align:left;">
                                                                                                 <!-- strong style=" border-radius:50%; display: inline-block; width:25px; height:25px; padding:3px; margin:3px; text-align:center; color: #fff; background-color: #840A7C;">{{ collaborator |make_list|first }} </!-- -->
                                                                                                 <img class="g-img" style=" border-radius:50%; display: inline-block; border-color:4F0A84; width:40px; height:40px; padding:3px; margin:3px; text-align:center; background-color: transparent;" src="{{ collaborator.avatar }}" />
-                                                                                            </td>
-                                                                                            <td class="klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 40px;text-align:left;">
-                                                                                                <strong>{{ collaborator.name|truncatechars:10 }}| {{ collaborator.email|truncatechars:10 }}</strong>
-                                                                                            </td>
+                                                                                                <div class="klivar_police" style="display: flex; color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 40px;text-align:left;">
+                                                                                                    <div style="display: flex; flex-direction: column;">
+                                                                                                        <div><strong>{{ collaborator.name|truncatechars:10 }}</strong></div>
+                                                                                                        <div><strong>{{ collaborator.email|truncatechars:20 }}</strong></div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
                                                                                         {% endfor %}
-                                                                                    </tr>
-                                                                                    
+                                                                                    </div>
                                                                                 {% endwith %}
-                                                                            {% else %}
-                                                                                <tr>
-                                                                                    <td class="text-16" style="font-size:16px; line-height:20px; color:#000; text-align:left; min-width:auto !important;">
-                                                                                        <strong>Aucun</strong>
-                                                                                    </td>
-                                                                                </tr>
                                                                             {% endif %} 
                                                                         </table>
                                                                     </th>
