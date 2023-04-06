@@ -302,21 +302,25 @@ def getfiles(url):
     return dirpath, save_as
 
 
-def add_calendar(title, description, date_begin, begin_hour, duration, company):
+def add_calendar(title, description, date_begin, date_end, company):
     event = Event()
     event.add('summary',title)
     event.add('description', description)
 
     # Variables attendues
     in_date = date_begin # La date
-    time = begin_hour # Le debut
-    duration = duration # La duree
+    # time = begin_hour # Le debut
+    # duration = duration # La duree
+    list_date_begin = in_date.split(" ")
+    list_date_end = date_end.split(" ") 
+    begin = start_date(list_date_begin[0], list_date_begin[1])
 
-    begin = start_date(in_date, time)
-    # begin = datetime(2022,12,9,16,0,0)
-    # begin = datetime(begin_str)
-    end = end_date(begin, duration)
-    # end = datetime(2022,12,10,8,0,0)
+    end = start_date(list_date_end[0], list_date_end[1])
+
+    # # begin = datetime(2022,12,9,16,0,0)
+    # # begin = datetime(begin_str)
+    # end = end_date(begin, duration)
+    # # end = datetime(2022,12,10,8,0,0)
     
     event.add('dtstart', begin)
     event.add('dtend', end)
@@ -347,6 +351,6 @@ def add_calendar(title, description, date_begin, begin_hour, duration, company):
     f.write(cal.to_ical())
     f.close()
 
-    return filename, end
+    return filename
 
 
