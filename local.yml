@@ -11,9 +11,9 @@ services:
       - "21001:5672"
       - "21002:15672"
     networks:
-      - klivar-notification-networks
-  api:
-    container_name: api
+      - klivar-notification-nw
+  api: &api
+    #container_name: api
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
@@ -25,13 +25,25 @@ services:
       - media_volume:/app/media
     expose:
       - "9081"
-    ports: # out nginx
-      - "9081:9081" # out nginx port
     networks:
-      - klivar-notification-networks
+      - klivar-notification-nw
     env_file:
       - ./.envs/.local/.postgres
       - ./.envs/.local/.django
+
+  celery_worker:
+    <<: *api
+    image: worker
+    command: /start_celery_worker
+    networks:
+      - klivar-notification-nw
+
+  celery_beat:
+    <<: *api
+    image: beat
+    command: /start_celery_beat
+    networks:
+      - klivar-notification-nw
 
   postgres_celery:
     build:
@@ -47,7 +59,7 @@ services:
     environment:
       - POSTGRES_PORT=5432 # Ajouter cette ligne
     networks:
-      - klivar-notification-networks
+      - klivar-notification-nw
 
   nginx:
     restart: always
@@ -62,11 +74,11 @@ services:
     ports:
       - "8083:80"
     networks:
-      - klivar-notification-networks
+      - klivar-notification-nw
 
 networks:
-  klivar-notification-networks:
-    driver: bridge
+  klivar-notification-nw:
+    external: true
 
 volumes:
   static_volume:
