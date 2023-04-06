@@ -25,6 +25,8 @@ services:
       - media_volume:/app/media
     expose:
       - "9081"
+    ports: # out nginx
+      - "9081:9081" # out nginx port
     networks:
       - klivar-notification-networks
     env_file:
