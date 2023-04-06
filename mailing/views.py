@@ -946,3 +946,138 @@ class affectationView(ViewSet):
         #         },
         #         status=status.HTTP_400_BAD_REQUEST)
 
+
+class notifViewSet(ViewSet):
+    parser_classes = (MultiPartParser, JSONParser,)
+
+    success = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "your request was do successfully success")),
+                ("status", openapi.Schema(type=openapi.TYPE_STRING,example = "success")),
+                ("code", openapi.Schema(type=openapi.TYPE_INTEGER, example = status.HTTP_201_CREATED)),
+            )),
+            required=['results']
+    )
+
+    request_body = openapi.Schema(
+        description="Cette partie decris le corp de l'API. il faut",
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("object", openapi.Schema(type=openapi.TYPE_STRING,example = "mail object (Demande de permission)")),
+                ("name", openapi.Schema(type=openapi.TYPE_STRING,example = "Task name (Mail a tous les clients)")),
+                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "Body of mail (your text)")),
+                ("destinator", openapi.Schema(type=openapi.TYPE_STRING,example = "Emails adress of destinators (loren@gmail.com,ipsum@klblogs.com)")),
+                ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+                ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example = 1)),
+                
+            )),
+            required=['results']
+    )
+
+    bad_token = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+            properties=OrderedDict((
+                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "Bad token or ...")),
+                ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example = 401)),
+            )),
+            required=['results']
+    )
+
+    @swagger_auto_schema(
+        operation_description="This API create celery scheduler request_body={object:Object of mail,name: task name,message:Mail dody,schedul:integer (number of minutes),destinator:string as landry.ziyouma@gmail.com,hoxopi1384@klblogs.com,unitime:time unit (string as minutes)}",
+        
+        responses={
+            0:request_body,
+            status.HTTP_201_CREATED:success,
+            401: bad_token ,
+            400: 'Params error'
+
+        }
+    )
+    def create(self, request):
+
+        try:
+            # list of dates
+            start_times = request.data['start_time']
+            company = request.data['company']
+            receiver = request.data['receiver']
+            one_off = True
+            # for start_time in start_times:
+            # destinator = request.data['destinator'] # 'email1', email2
+            object = request.data['object']
+            message = request.data['message']
+            # sch_time = request.data['schedul']
+            destinator = request.data['destinator']
+            # unitime = request.data['unitime']
+            # unitime = unitime.upper()
+
+            # one_off = request.data['one_off']
+
+            # path = "mail/planification/celery2.html"
+            path = "mail/accounts/create.html"
+            # path = "mail/accounts/change_pass_word.html"
+            # path = "mail/accounts/confirm_change_p_w.html"
+            path_txt = "mail/planification/celery.txt"
+
+            context = {
+                'receiver': receiver,
+                'site_url': 'klivar.com',
+                'message':message,
+                'site_name': settings.APP_NAME
+            }
+            html_content = render_to_string(
+                path,
+                context
+            )
+            
+            text_content = render_to_string(
+                path_txt,
+                context
+            )
+            
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=30,
+                # period=unitime,
+                period=IntervalSchedule.SECONDS,
+            )
+            for start_time in start_times:
+                PeriodicTask.objects.update_or_create(
+                    task="mailing.utils.send_mail",
+                    # name="send_email",
+                    name = uuid.uuid4().hex[:10].lower(),
+                    args=json.dumps([destinator, object, text_content, html_content, company]),
+                    
+                    one_off = one_off,
+                    start_time = start_time,
+                    # last_run_at = "2023-02-28T11:19:00+01:00", + every= 1s ==> envoie le mail at 2023-02-28T11:20:00+01:00
+                    # --> last_run_at = "2023-02-28T13:49:00+01:00",
+                    # -->expires = "2023-02-28T21:46:00+01:00",
+                    # --> total_run_count = 2,
+                    # kwargs=json.dumps({
+                    #    'be_careful': True,
+                    #}),
+                    defaults=dict(
+                        interval=schedule,
+                        expire_seconds=60,
+                    ),
+                )
+
+            
+            return Response(
+                {
+                    'message': 'New schedule is succefull run',
+                    'status': 'success',
+                    'code': status.HTTP_201_CREATED,
+                },
+                status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {
+                    'message': 'Bad parameters',
+                    'status': 'Failed',
+                    'error': str(e),
+                    'code': status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST)

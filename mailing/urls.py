@@ -11,6 +11,7 @@ router.register(r'initchangepass', initChangePassViewSet, basename="initchangepa
 router.register(r'endchangepass', changePassViewSet, basename="endchangepass")
 router.register(r'task', taskView, basename="task")
 router.register(r'affectation', affectationView, basename="affectation")
+router.register(r'notification', notifViewSet, basename="notification")
 
 
 # Wire up our API using automatic URL routing.
