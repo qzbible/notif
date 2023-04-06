@@ -767,7 +767,8 @@ class affectationView(ViewSet):
 
         task_created_at = ctext['task_created_at']
         task_created_at = task_created_at.replace(
-            "T", " ").split("+", 1)[0]
+            "T", " ").split(".", 1)[0] # 2023-04-06T12:52:03.610623
+        print("Task created---------", task_created_at)
         created_at = datetime.strptime(
             task_created_at, '%Y-%m-%d %H:%M:%S')
         created_at = created_at.strftime("%b %d %Y %H:%M:%S")

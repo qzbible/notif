@@ -145,15 +145,14 @@
                                                                                                 {% if collaborator.avatar %}
                                                                                                     <img class="g-img" style="border-radius:50%; display: flex; border: 2px solid #4F0A84; width:30px; height:30px; padding:3px; margin:3px; text-align:center; background-color: transparent;" src="{{ collaborator.avatar }}" />
                                                                                                 {% else %}
-                                                                                                    <div style="border-radius:50%; border: 2px solid #4F0A84; background-color: #840A7C; display:flex; width:30px; height:30px; padding:3px; margin:3px; text-align:center;">
+                                                                                                    <div style="border-radius:50%; border: 2px solid #4F0A84; background: #840A7C; display:flex; width:30px; height:30px; padding:3px; margin:3px; text-align:center;">
                                                                                                         <strong style="color:#000; min-width:auto !important; line-height: 26px;">{{ collaborator.name |make_list|first }} </strong>
                                                                                                     </div>
                                                                                                 {% endif %}
-                                                                                                <div class="klivar_police" style="display: flex; color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 3px;text-align:left;">
-                                                                                                    <div style="display:flex; display: inline-flex; flex-direction: column; row-gap: 10px;">
-                                                                                                        <div><strong>{{ collaborator.name|truncatechars:15 }}</strong></div>
-                                                                                                        <div><strong>{{ collaborator.email|truncatechars:20 }}</strong></div>
-                                                                                                    </div>
+                                                                                                <div class="klivar_police" style="display: flex; flex-direction: row; color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 3px;text-align:left;">
+                                                                                                    <div style="display:flex; display: inline-flex; flex-basis: 50%; row-gap: 10px;"><strong>{{ collaborator.name|truncatechars:15 }}</strong></div>
+                                                                                                    <div style="display:flex; display: inline-flex; flex-basis: 50%; row-gap: 10px;"><strong>{{ collaborator.email|truncatechars:20 }}</strong></div>
+                                                                                                    
                                                                                                 </div>
                                                                                             </div>
                                                                                         {% endfor %}
