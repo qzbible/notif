@@ -291,16 +291,16 @@ def getfiles(url):
 
     save_as = save_as + "/" + filename
 
-    """# Download from URL
+    # Download from URL
     with urlopen(url) as file:
         content = file.read()
 
     # Save to file
     with open(save_as, 'wb') as download:
-        download.write(content)"""
+        download.write(content)
     
-    import urllib.request
-    urllib.request.urlretrieve(url, save_as)
+    """import urllib.request
+    urllib.request.urlretrieve(url, save_as)"""
 
     return dirpath, save_as
 
