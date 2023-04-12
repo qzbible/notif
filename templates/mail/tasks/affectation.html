@@ -76,10 +76,10 @@
                                                                 <!--td class="gradient pt-10" style="border-radius: 10px; padding-top: 10px;" bgcolor="#f3189e"-->
                                                                 <td class="klivar_police" style="box-shadow: 5px 5px 5px 5px; border:1px solid; font-size:14px; line-height:10px;">
                                                                         <p style="display: block; padding: 0px 5px; margin:8px;">
-                                                                            {{ company }} a ajouter la tache {{ task }} le {{ task_created_at }}
+                                                                            {{ company }} a ajouter la tache {{ task|truncatechars:15 }} le {{ task_created_at }}
                                                                         </p>
                                                                         <p style="display: block; padding: 0px 5px; margin:8px;">
-                                                                            {{ company }} vous a attribuer la tache {{ task }} le {{ task_update_at }}
+                                                                            {{ company }} vous a attribuer la tache {{ task|truncatechars:15 }} le {{ task_update_at }}
                                                                         </p>
                                                                     
                                                                 </td>
@@ -145,12 +145,13 @@
                                                                                                 {% if collaborator.avatar %}
                                                                                                     <img class="g-img" style="border-radius:50%; display: flex; border: 2px solid #4F0A84; width:30px; height:30px; padding:3px; margin:3px; text-align:center; background-color: transparent;" src="{{ collaborator.avatar }}" />
                                                                                                 {% else %}
-                                                                                                    <div style="border-radius:50%; border: 2px solid #4F0A84; background: #840A7C; display:flex; width:30px; height:30px; padding:3px; margin:3px; text-align:center;">
+                                                                                                    <!--div style="border-radius:50%; border: 2px solid #4F0A84; background: #840A7C; display:flex; width:30px; height:30px; padding:3px; margin:3px; text-align:center;">
                                                                                                         <strong style="color:#000; min-width:auto !important; line-height: 26px;">{{ collaborator.name |make_list|first }} </strong>
-                                                                                                    </div>
+                                                                                                    </div -->
+                                                                                                    <div></div>
                                                                                                 {% endif %}
                                                                                                 <div class="klivar_police" style="display: flex; flex-direction: row; color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 3px;text-align:left;">
-                                                                                                    <div style="display:flex; display: inline-flex; flex-basis: 50%; row-gap: 10px;"><strong>{{ collaborator.name|truncatechars:15 }}</strong></div>
+                                                                                                    <div style="display:flex; display: inline-flex; flex-basis: 50%; row-gap: 10px;"><strong>{{ collaborator.name|truncatechars:15 }}</strong>&nbsp;  &nbsp;</div>
                                                                                                     <div style="display:flex; display: inline-flex; flex-basis: 50%; row-gap: 10px;"><strong>{{ collaborator.email|truncatechars:20 }}</strong></div>
                                                                                                     
                                                                                                 </div>
