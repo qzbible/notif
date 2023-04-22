@@ -39,18 +39,26 @@
                                                             </td>
                                                         </tr>
                                                     {% endif %}
-                                                    {% if doc_link %}
-                                                        <tr>
-                                                            <td class="klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 2px;">
-                                                                <strong>Document(s) complementaire(s) : </strong>
-                                                            </td>
-                                                        </tr>
+                                                    {% if link_joins %}
+                                                        {% with nbre_link=link_joins|length %} 
+                                                            <tr>
+                                                                <td class="klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 2px;">
+                                                                    {% if nbre_link > 1 %}
+                                                                        <strong>Documents complementaires : </strong>
+                                                                    {% else %}
+                                                                        <strong>Document complementaire : </strong>
+                                                                    {% endif %}
+                                                                </td>
+                                                            </tr>
+                                                            {% for link_join in link_joins %}
+                                                            <tr>
+                                                                <td class="lh-26 a-center pb-25 klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
+                                                                    <a href="{{ link_join.url_link}}">{{ link_join.doc_name }}</a>
+                                                                </td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        {% endwith %}
                                                     {% endif %}
-                                                    <tr>
-                                                        <td class="lh-26 a-center pb-25 klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 5px;">
-                                                            <a href="{{ doc_link}}">{{ doc_name }}</a>
-                                                        </td>
-                                                    </tr>
                                                     <tr>
                                                         <td class="klivar_police" style="color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 2px;">
                                                             <strong>Projet : </strong>
@@ -132,12 +140,18 @@
                                                                                     </tr>
                                                                                     <div style="display:flex;">
                                                                                         {% for collaborator in collaborateurs %}
-                                                                                            <div class="text-15" style="display: flex; width:100%; padding:5px; line-height:25px; color:#000; text-align:left;">
+                                                                                            <div class="text-15" style="display: flex; width:100%; padding:5px; line-height:25px;">
                                                                                                 <!-- strong style=" border-radius:50%; display: inline-block; width:25px; height:25px; padding:3px; margin:3px; text-align:center; color: #fff; background-color: #840A7C;">{{ collaborator |make_list|first }} </!-- -->
-                                                                                                <img class="g-img" style=" border-radius:50%; display: inline-block; border-color:4F0A84; width:40px; height:40px; padding:3px; margin:3px; text-align:center; background-color: transparent;" src="{{ collaborator.avatar }}" />
-                                                                                                <div class="klivar_police" style="display: flex; color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 40px;text-align:left;">
-                                                                                                    <div style="display: flex; flex-direction: column;">
-                                                                                                        <div><strong>{{ collaborator.name|truncatechars:10 }}</strong></div>
+                                                                                                {% if collaborator.avatar %}
+                                                                                                    <img class="g-img" style="border-radius:50%; display: flex; border: 2px solid #4F0A84; width:30px; height:30px; padding:3px; margin:3px; text-align:center; background-color: transparent;" src="{{ collaborator.avatar }}" />
+                                                                                                {% else %}
+                                                                                                    <div style="border-radius:50%; border: 2px solid #4F0A84; background-color: #840A7C; display:flex; width:30px; height:30px; padding:3px; margin:3px; text-align:center;">
+                                                                                                        <strong style="color:#000; min-width:auto !important; line-height: 26px;">{{ collaborator.name |make_list|first }} </strong>
+                                                                                                    </div>
+                                                                                                {% endif %}
+                                                                                                <div class="klivar_police" style="display: flex; color:#000; min-width:auto !important; line-height: 26px; padding-bottom: 3px;text-align:left;">
+                                                                                                    <div style="display:flex; display: inline-flex; flex-direction: column; row-gap: 10px;">
+                                                                                                        <div><strong>{{ collaborator.name|truncatechars:15 }}</strong></div>
                                                                                                         <div><strong>{{ collaborator.email|truncatechars:20 }}</strong></div>
                                                                                                     </div>
                                                                                                 </div>
