@@ -1,0 +1,40 @@
+version: "3.9"
+# test
+services:
+  rabbitmq_mail:
+    image: rabbitmq:3.7-management
+    container_name: rabbitmq_mail
+    restart: always
+    env_file:
+      - ./.envs/.production/.live
+    ports:
+      - "21001:5674"
+      - "21002:15674"
+    networks:
+      - reverseproxy-nw
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: ./docker/production/django/Dockerfile
+    command: /start
+    restart: always
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    expose:
+      - "9081"
+    networks:
+      - reverseproxy-nw
+    env_file:
+      - ./.envs/.production/.postgres
+      - ./.envs/.production/.django
+
+networks:
+  reverseproxy-nw:
+    external: true
+
+volumes:
+  static_volume:
+  media_volume:

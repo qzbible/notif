@@ -12,8 +12,7 @@ services:
       - "21002:15672"
     networks:
       - klivar-notification-nw
-  api: &api
-    #container_name: api
+  api: &api #container_name: api
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile

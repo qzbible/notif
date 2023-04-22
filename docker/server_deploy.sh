@@ -15,9 +15,9 @@ echo "Upload complete....:-)"
 
 echo "Building the image......."
 ssh -o StrictHostKeyChecking=no root@$CONTABO_IP_ADDRESS << 'ENDSSH'
-    mkdir -p /klivar_backend
-    rm -rf /klivar_backend/* && tar -xf /tmp/projectNotif.tar -C /klivar_backend
-    docker-compose -f /klivar_backend/production.yml build
+    mkdir -p /klivar_notif
+    rm -rf /klivar_notif/* && tar -xf /tmp/projectNotif.tar -C /klivar_notif
+    docker-compose -f /klivar_notif/production.yml build
 
 ENDSSH
 echo "Build completed successfully.......:-)"

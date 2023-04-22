@@ -26,19 +26,22 @@ import uuid
 from icalendar import Calendar, Event, vCalAddress, vText
 from datetime import datetime
 import secrets
+import urllib.request
+
 
 app = Celery('send_mail', broker='pyamqp://root@localhost//')
+
 
 @shared_task
 def send_mail(to_emails, title, text_content, html_content, company):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
     for to_email in to_emails:
-        print("***** ",to_email)
+        print("***** ", to_email)
         msg = EmailMultiAlternatives(
             title,
             text_content,
-            company+' Via Klivar <'+ from_email +'>',
+            company+' Via Klivar <' + from_email + '>',
             [to_email],
             reply_to=None,
         )
@@ -54,19 +57,20 @@ def send_mail_test(to_emails, title, text_content, html_content, filename):
     from_email = settings.EMAIL_HOST_USER
 
     for to_email in to_emails:
-        
+
         msg = EmailMultiAlternatives(
             title,
             text_content,
-            'Klivar App No Replay <'+ from_email +'>',
+            'Klivar App No Replay <' + from_email + '>',
             [to_email],
             reply_to=None,
         )
         if html_content:
             msg.attach_alternative(html_content, 'text/html')
-            #msg.attach(filename, 'text/*')
+            # msg.attach(filename, 'text/*')
             # msg.attach(filename, "text/calendar; method=REQUEST; charset=\"UTF-8\"")
-            msg.attach(filename, "text/calendar; method=REQUEST; charset=\"UTF-8\"")
+            msg.attach(
+                filename, "text/calendar; method=REQUEST; charset=\"UTF-8\"")
             msg.content_subtype = 'calendar'
 
         msg.send()
@@ -79,11 +83,11 @@ def send_mail_file(to_emails, title, text_content, html_content, files, company)
     from_email = settings.EMAIL_HOST_USER
 
     for to_email in to_emails:
-        
+
         msg = EmailMultiAlternatives(
             title,
             text_content,
-            company + ' Via Klivar <'+ from_email +'>',
+            company + ' Via Klivar <' + from_email + '>',
             [to_email],
             reply_to=None,
         )
@@ -92,23 +96,23 @@ def send_mail_file(to_emails, title, text_content, html_content, files, company)
         if files:
             for file in files:
                 msg.attach_file(file)
-            
 
         msg.send()
     # os.remove(filename)
     return True
 
+
 def send_mail_with_ics(to_emails, title, text_content, html_content, filename, company):
     """Docstring for send_mail."""
-    
+
     from_email = settings.EMAIL_HOST_USER
 
     for to_email in to_emails:
-        
+
         # Create a multipart message and set headers
         msg = MIMEMultipart()
         # message = EmailMultiAlternatives()
-        msg["From"] = company +' Via Klivar <'+ from_email +'>'
+        msg["From"] = company + ' Via Klivar <' + from_email + '>'
         msg["To"] = to_email
         msg["Subject"] = title
         if html_content:
@@ -147,17 +151,18 @@ def send_mail_with_ics(to_emails, title, text_content, html_content, filename, c
     os.remove(filename)
     return True
 
+
 def send_mail_with_ics_file(to_emails, title, files, html_content, filename, company):
     """Docstring for send_mail."""
-    
+
     from_email = settings.EMAIL_HOST_USER
 
     for to_email in to_emails:
-        
+
         # Create a multipart message and set headers
         msg = MIMEMultipart()
         # message = EmailMultiAlternatives()
-        msg["From"] = company +' Via Klivar <'+ from_email +'>'
+        msg["From"] = company + ' Via Klivar <' + from_email + '>'
         msg["To"] = to_email
         msg["Subject"] = title
 
@@ -169,7 +174,7 @@ def send_mail_with_ics_file(to_emails, title, files, html_content, filename, com
             # print("ffffff44fff1-------------",os.listdir("/app/media/calendar"))
             if files:
                 for file in files:
-                    
+
                     with open(file, "rb") as attachment:
                         # Add file as application/octet-stream
                         # Email client can usually download this automatically as attachment
@@ -183,7 +188,8 @@ def send_mail_with_ics_file(to_emails, title, files, html_content, filename, com
                         "Content-Disposition",
                         f"attachment; file= {file}",
                     )"""
-                    part.add_header('content-disposition', 'attachment', filename=file.split('/')[-1])
+                    part.add_header('content-disposition',
+                                    'attachment', filename=file.split('/')[-1])
                     msg.attach(part)
                     text = msg.as_string()
 
@@ -228,52 +234,54 @@ def start_date(in_date, time):
     # 2022-12-09T14:43:33+01:00
 
     res = in_date.split("T")
-    date_out=res[0]
+    date_out = res[0]
     date_out = date_out.replace("-", ",")
     # date_out = datetime.strptime(date_out, '%m-%d-%Y').date()
     # time = "14:30:00"
     time = time.replace(":", ",")
 
-    date_out = date_out +'-'+ time
+    date_out = date_out + '-' + time
     date_out = date_out.replace(":", ",")
     begin_str = date_out.replace("-", ",")
     begin_str = begin_str.replace(" ", ",")
-    
+
     begin_int = tuple(map(int, begin_str.split(',')))
     time_begin = datetime(*begin_int[0:6])
 
     return time_begin
+
 
 def end_date(begin, duration):
     """This function return end time for activity"""
 
     res = duration.split(":")
     # hours=res[0], minutes=res[1], seconds=0
-    time_end = begin + timedelta(hours=int(res[0]), minutes=int(res[1]),seconds=0)
+    time_end = begin + \
+        timedelta(hours=int(res[0]), minutes=int(res[1]), seconds=0)
     return time_end
+
 
 def start_date_test(in_date, time):
     """This function return start time for activity"""
     # import datetime
-    
+
     # 2022-12-09T14:43:33+01:00
 
     dateee = "2022-12-09 14:43:33"
     """in_date = in_date.replace("T", " ")"""
 
     res = in_date.split("T")
-    in_date=res[0]
+    in_date = res[0]
 
     date = datetime.strptime(in_date, "%Y-%m-%d")
-    
+
     date = repr(date)
-    
+
     time = datetime.strptime(time, "%H:%M:%S")
     time = repr(time)
-    
+
     # begin = datetime.datetime.combine(datetime.date(2011, 1, 1), datetime.time(10, 23))
     begin = datetime.datetime.combine(datetime.date(date), datetime.time(time))
-    
 
     return begin
 
@@ -281,11 +289,11 @@ def start_date_test(in_date, time):
 def getfiles(url):
 
     # url = "https://www.shellhacks.com/file.pdf"
-    
+
     filename = url.rsplit('/', 1)[-1]
     dirpath = uuid.uuid4().hex[:6].lower()
     save_as = "media/"+dirpath
-
+    print('=====')
     if not os.path.exists(save_as):
         os.makedirs(save_as)
 
@@ -294,11 +302,11 @@ def getfiles(url):
     # Download from URL
     with urlopen(url) as file:
         content = file.read()
-
+    print('=====13')
     # Save to file
     with open(save_as, 'wb') as download:
         download.write(content)
-    
+
     """import urllib.request
     urllib.request.urlretrieve(url, save_as)"""
 
@@ -307,15 +315,15 @@ def getfiles(url):
 
 def add_calendar(title, description, date_begin, date_end, company):
     event = Event()
-    event.add('summary',title)
+    event.add('summary', title)
     event.add('description', description)
 
     # Variables attendues
-    in_date = date_begin # La date
+    in_date = date_begin  # La date
     # time = begin_hour # Le debut
     # duration = duration # La duree
     list_date_begin = in_date.split(" ")
-    list_date_end = date_end.split(" ") 
+    list_date_end = date_end.split(" ")
     begin = start_date(list_date_begin[0], list_date_begin[1])
 
     end = start_date(list_date_end[0], list_date_end[1])
@@ -324,14 +332,14 @@ def add_calendar(title, description, date_begin, date_end, company):
     # # begin = datetime(begin_str)
     # end = end_date(begin, duration)
     # # end = datetime(2022,12,10,8,0,0)
-    
+
     event.add('dtstart', begin)
     event.add('dtend', end)
     # 2022-12-09T14:43:33+01:00
-    
+
     event['uid'] = secrets.token_urlsafe(8) + '@klivar.com'
     event.add('priority', 5)
-    
+
     organizer = vCalAddress('MAILTO:' + settings.EMAIL_HOST_USER)
     organizer.params['cn'] = vText(company)
     organizer.params['role'] = vText("Utilisateur Klivar")
@@ -355,5 +363,3 @@ def add_calendar(title, description, date_begin, date_end, company):
     f.close()
 
     return filename
-
-

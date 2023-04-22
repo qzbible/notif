@@ -28,6 +28,7 @@ import shutil
 from icalendar import Calendar, Event, vCalAddress, vText
 from datetime import datetime
 
+
 class celeryViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
@@ -165,7 +166,8 @@ class celeryViewSet(ViewSet):
                     expire_seconds=60,
                 ),
             )"""
-            mail = send_mail(destinator, object, text_content, html_content, company)
+            mail = send_mail(destinator, object, text_content,
+                             html_content, company)
 
             return Response(
                 {
@@ -356,7 +358,8 @@ class complateRegisterViewSet(ViewSet):
                     expire_seconds=60,
                 ),
             )"""
-            mail = send_mail(destinator, object, text_content, html_content, company)
+            mail = send_mail(destinator, object, text_content,
+                             html_content, company)
 
             return Response(
                 {
@@ -478,7 +481,8 @@ class initChangePassViewSet(ViewSet):
                     expire_seconds=60,
                 ),
             )"""
-            mail = send_mail(destinator, object, text_content, html_content, company)
+            mail = send_mail(destinator, object, text_content,
+                             html_content, company)
 
             return Response(
                 {
@@ -599,7 +603,8 @@ class changePassViewSet(ViewSet):
                     expire_seconds=60,
                 ),
             )"""
-            mail = send_mail(destinator, object, text_content, html_content, company)
+            mail = send_mail(destinator, object, text_content,
+                             html_content, company)
 
             return Response(
                 {
@@ -718,7 +723,8 @@ class taskView(ViewSet):
                     expire_seconds=60,
                 ),
             )"""
-            mail = send_mail(destinator, object, text_content, html_content, company)
+            mail = send_mail(destinator, object, text_content,
+                             html_content, company)
 
             return Response(
                 {
@@ -805,7 +811,7 @@ class affectationView(ViewSet):
 
             task_created_at = ctext['task_created_at']
             task_created_at = task_created_at.replace(
-                "T", " ").split(".", 1)[0] # 2023-04-06T12:52:03.610623
+                "T", " ").split(".", 1)[0]  # 2023-04-06T12:52:03.610623
             created_at = datetime.strptime(
                 task_created_at, '%Y-%m-%d %H:%M:%S')
             created_at = created_at.strftime("%b %d %Y %H:%M:%S")
@@ -832,7 +838,7 @@ class affectationView(ViewSet):
             if request.data.get('calendar'):
                 calendar = request.data['calendar']
                 date_begin = calendar['begin']
-                
+
                 description = calendar['description']
                 # begin_hour = calendar['begin_hour']
                 # duration = calendar['duration']
@@ -846,10 +852,10 @@ class affectationView(ViewSet):
                 end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
                 end = end.strftime("%b %d %Y %H:%M:%S")
 
-                
                 # filename, date_end = add_calendar(object, description, date_begin, begin_hour, duration, company)
-                filename = add_calendar(object, description, date_begin, date_end, company)
-                
+                filename = add_calendar(
+                    ctext['task'], description, date_begin, date_end, company)
+
                 # end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
                 # end = date_end.strftime("%b %d %Y %H:%M:%S")
 
@@ -865,7 +871,6 @@ class affectationView(ViewSet):
                 end = end.strftime("%b %d %Y %H:%M:%S")
                 """
 
-
             context = {
                 "task": ctext['task'],
                 "project": ctext['project'],
@@ -876,7 +881,7 @@ class affectationView(ViewSet):
                 "begin": begin,
                 "end": end,
                 "site_url": ctext['site_url'],
-                "link_joins":ctext['link_joins'],
+                "link_joins": ctext['link_joins'],
                 # "doc_name": ctext['doc_name'],
                 # "doc_link": ctext['url_link'],
                 "task_created_at": created_at,
@@ -895,26 +900,28 @@ class affectationView(ViewSet):
             )
 
             # files = ['requirements.txt', 'README.md']
-            
+
             # Send Email
             # send_mail_file(destinator, object, text_content, html_content, filepaths)
             if request.data.get('urls_attached') and request.data.get('calendar'):
                 # *****************************EMAIL WITH ICALENDAR AND PIECES JOINTES*********************
                 # files = ['requirements.txt', 'README.md']
-                mail = send_mail_with_ics_file(destinator, object, filepaths, html_content, filename, company)
+                mail = send_mail_with_ics_file(
+                    destinator, object, filepaths, html_content, filename, company)
 
             elif request.data.get('urls_attached'):
                 # *****************************EMAIL WITCH FILE****************************************
                 # files = ['requirements.txt', 'README.md']
-                mail = send_mail_file(destinator, object, text_content, html_content, filepaths, company)
+                mail = send_mail_file(
+                    destinator, object, text_content, html_content, filepaths, company)
             elif request.data.get('calendar'):
                 # *****************************EMAIL WITH ICALENDAR**************************************
-                mail = send_mail_with_ics(destinator, object, text_content, html_content, filename, company)
+                mail = send_mail_with_ics(
+                    destinator, object, text_content, html_content, filename, company)
             else:
                 # *****************************EMAIL WITHOUT FILE****************************************
-                mail = send_mail(destinator, object, text_content, html_content, company)
-
-
+                mail = send_mail(destinator, object,
+                                 text_content, html_content, company)
 
             # remove  downloaded files in this server
             for dirpath in dirpaths:
@@ -952,45 +959,53 @@ class notifViewSet(ViewSet):
 
     success = openapi.Schema(
         type=openapi.TYPE_OBJECT,
-            properties=OrderedDict((
-                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "your request was do successfully success")),
-                ("status", openapi.Schema(type=openapi.TYPE_STRING,example = "success")),
-                ("code", openapi.Schema(type=openapi.TYPE_INTEGER, example = status.HTTP_201_CREATED)),
-            )),
-            required=['results']
+        properties=OrderedDict((
+            ("message", openapi.Schema(type=openapi.TYPE_STRING,
+             example="your request was do successfully success")),
+            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+             example=status.HTTP_201_CREATED)),
+        )),
+        required=['results']
     )
 
     request_body = openapi.Schema(
         description="Cette partie decris le corp de l'API. il faut",
         type=openapi.TYPE_OBJECT,
-            properties=OrderedDict((
-                ("object", openapi.Schema(type=openapi.TYPE_STRING,example = "mail object (Demande de permission)")),
-                ("name", openapi.Schema(type=openapi.TYPE_STRING,example = "Task name (Mail a tous les clients)")),
-                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "Body of mail (your text)")),
-                ("destinator", openapi.Schema(type=openapi.TYPE_STRING,example = "Emails adress of destinators (loren@gmail.com,ipsum@klblogs.com)")),
-                ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
-                ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example = 1)),
-                
-            )),
-            required=['results']
+        properties=OrderedDict((
+            ("object", openapi.Schema(type=openapi.TYPE_STRING,
+             example="mail object (Demande de permission)")),
+            ("name", openapi.Schema(type=openapi.TYPE_STRING,
+             example="Task name (Mail a tous les clients)")),
+            ("message", openapi.Schema(type=openapi.TYPE_STRING,
+             example="Body of mail (your text)")),
+            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+             example="Emails adress of destinators (loren@gmail.com,ipsum@klblogs.com)")),
+            ("unitime", openapi.Schema(type=openapi.TYPE_STRING,
+             example="minute (nimute, hour, day, week)")),
+            ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example=1)),
+
+        )),
+        required=['results']
     )
 
     bad_token = openapi.Schema(
         type=openapi.TYPE_OBJECT,
-            properties=OrderedDict((
-                ("message", openapi.Schema(type=openapi.TYPE_STRING,example = "Bad token or ...")),
-                ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example = 401)),
-            )),
-            required=['results']
+        properties=OrderedDict((
+            ("message", openapi.Schema(
+                type=openapi.TYPE_STRING, example="Bad token or ...")),
+            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+        )),
+        required=['results']
     )
 
     @swagger_auto_schema(
         operation_description="This API create celery scheduler request_body={object:Object of mail,name: task name,message:Mail dody,schedul:integer (number of minutes),destinator:string as landry.ziyouma@gmail.com,hoxopi1384@klblogs.com,unitime:time unit (string as minutes)}",
-        
+
         responses={
-            0:request_body,
-            status.HTTP_201_CREATED:success,
-            401: bad_token ,
+            0: request_body,
+            status.HTTP_201_CREATED: success,
+            401: bad_token,
             400: 'Params error'
 
         }
@@ -1023,19 +1038,19 @@ class notifViewSet(ViewSet):
             context = {
                 'receiver': receiver,
                 'site_url': 'klivar.com',
-                'message':message,
+                'message': message,
                 'site_name': settings.APP_NAME
             }
             html_content = render_to_string(
                 path,
                 context
             )
-            
+
             text_content = render_to_string(
                 path_txt,
                 context
             )
-            
+
             schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
@@ -1045,25 +1060,25 @@ class notifViewSet(ViewSet):
                 PeriodicTask.objects.update_or_create(
                     task="mailing.utils.send_mail",
                     # name="send_email",
-                    name = uuid.uuid4().hex[:10].lower(),
-                    args=json.dumps([destinator, object, text_content, html_content, company]),
-                    
-                    one_off = one_off,
-                    start_time = start_time,
+                    name=uuid.uuid4().hex[:10].lower(),
+                    args=json.dumps(
+                        [destinator, object, text_content, html_content, company]),
+
+                    one_off=one_off,
+                    start_time=start_time,
                     # last_run_at = "2023-02-28T11:19:00+01:00", + every= 1s ==> envoie le mail at 2023-02-28T11:20:00+01:00
                     # --> last_run_at = "2023-02-28T13:49:00+01:00",
                     # -->expires = "2023-02-28T21:46:00+01:00",
                     # --> total_run_count = 2,
                     # kwargs=json.dumps({
                     #    'be_careful': True,
-                    #}),
+                    # }),
                     defaults=dict(
                         interval=schedule,
                         expire_seconds=60,
                     ),
                 )
 
-            
             return Response(
                 {
                     'message': 'New schedule is succefull run',

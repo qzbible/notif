@@ -2,25 +2,18 @@ config:
 	docker compose -f production.yml config 
 build:
 	docker compose -f production.yml up --build -d --remove-orphans
-
 up:
 	docker compose -f production.yml up -d
-
 down:
 	docker compose -f production.yml down
-
 show_logs:
 	docker compose -f production.yml logs
-
 migrate:
 	docker compose -f production.yml run --rm api python3 manage.py migrate --fake 
-
 makemigrations:
 	docker compose -f production.yml run --rm api python3 manage.py makemigrations
-
 collectstatic:
 	docker compose -f production.yml run --rm api python3 manage.py collectstatic --no-input --clear
-
 superuser:
 	docker compose -f production.yml run --rm api python3 manage.py createsuperuser
 
