@@ -1,9 +1,0 @@
-
-  celery-worker:
-    build: .
-    command: celery -A notification worker -l info
-    volumes:
-      - .:/app
-    depends_on:
-      - rabbitmq_m
-    restart: always
