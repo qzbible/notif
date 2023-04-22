@@ -1,0 +1,59 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: web
+    restart: always
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres_celery
+      - rabbitmq_m
+      - celery-beat
+      - celery-worker
+
+  postgres_celery:
+    image: postgres:latest
+    container_name: postgres_celery
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ziyouma
+      POSTGRES_DB: klivar-db
+      POSTGRES_PORT: 5432
+      PGDATA: /data/postgres
+    ports:
+      - 5432:5432
+    restart: always
+
+  rabbitmq_m:
+    image: rabbitmq:latest
+    container_name: rabbitmq_m
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=ziyouma
+    ports:
+      - 5674:5672
+      - 15674:15672
+
+  celery-beat:
+    build: .
+    command: celery -A notification beat -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq_m
+    restart: always
+
+  celery-worker:
+    build: .
+    command: celery -A notification worker -l info
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq_m
+    restart: always

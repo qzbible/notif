@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  rabbitmq_mail:
+    image: rabbitmq:3.7-management
+    container_name: rabbitmq_mail
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=ziyouma
+    ports:
+      - "21001:5672"
+      - "21002:15672"
