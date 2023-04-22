@@ -34,6 +34,7 @@ def send_mail(to_emails, title, text_content, html_content, company):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
     for to_email in to_emails:
+        print("***** ",to_email)
         msg = EmailMultiAlternatives(
             title,
             text_content,

@@ -25,12 +25,9 @@ from datetime import datetime
 from .utils import *
 import shutil
 
-<<<<<<< HEAD
-=======
 from icalendar import Calendar, Event, vCalAddress, vText
 from datetime import datetime
 
->>>>>>> 3069138 (envoie toute sorte de mail en function du corps de la requette)
 class celeryViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
@@ -82,11 +79,7 @@ class celeryViewSet(ViewSet):
             # start_times = request.data['start_time']
             one_off = True
             # for start_time in start_times:
-<<<<<<< HEAD
-
-=======
             # print("fababy")
->>>>>>> 3069138 (envoie toute sorte de mail en function du corps de la requette)
             # destinator = request.data['destinator'] # 'email1', email2
             object = request.data['object']
             message = request.data['message']
@@ -104,7 +97,8 @@ class celeryViewSet(ViewSet):
             path_txt = "mail/planification/celery.txt"
 
             ctext = request.data['context']
-            
+            company = request.data['company']
+
             context = {
                 "message": message,
                 "title": ctext['title'],
@@ -138,8 +132,8 @@ class celeryViewSet(ViewSet):
                 path_txt,
                 context
             )
-            
-            schedule, created = IntervalSchedule.objects.get_or_create(
+
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -163,7 +157,8 @@ class celeryViewSet(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             
             return Response(
@@ -311,6 +306,7 @@ class complateRegisterViewSet(ViewSet):
             path_txt = "mail/planification/celery.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
             context = {
                 "button":ctext['button'],
                 "title": ctext['title'],
@@ -329,8 +325,8 @@ class complateRegisterViewSet(ViewSet):
                 path_txt,
                 context
             )
-            
-            schedule, created = IntervalSchedule.objects.get_or_create(
+
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -338,16 +334,18 @@ class complateRegisterViewSet(ViewSet):
             PeriodicTask.objects.update_or_create(
                 task="mailing.utils.send_mail",
                 # name="send_email",
-                name = uuid.uuid4().hex[:10].lower(),
-                args=json.dumps([destinator, object, text_content, html_content]),
-                
-                one_off = one_off,
-                start_time = datetime.now(),
+                name=uuid.uuid4().hex[:10].lower(),
+                args=json.dumps(
+                    [destinator, object, text_content, html_content, company]),
+
+                one_off=one_off,
+                start_time=datetime.now(),
                 defaults=dict(
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             
             return Response(
@@ -425,6 +423,7 @@ class initChangePassViewSet(ViewSet):
             path_txt = "mail/planification/celery.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
             context = {
                 "button":ctext['button'],
                 "title": ctext['title'],
@@ -442,8 +441,8 @@ class initChangePassViewSet(ViewSet):
                 path_txt,
                 context
             )
-            
-            schedule, created = IntervalSchedule.objects.get_or_create(
+
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -460,7 +459,8 @@ class initChangePassViewSet(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             
             return Response(
@@ -538,6 +538,8 @@ class changePassViewSet(ViewSet):
             path_txt = "mail/planification/celery.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
+
             context = {
                 "title": ctext['title'],
                 "site_url": ctext['site_url'],
@@ -553,8 +555,8 @@ class changePassViewSet(ViewSet):
                 path_txt,
                 context
             )
-            
-            schedule, created = IntervalSchedule.objects.get_or_create(
+
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -571,7 +573,8 @@ class changePassViewSet(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             
             return Response(
@@ -649,6 +652,7 @@ class taskView(ViewSet):
             path_txt = "mail/tasks/assignment.txt"
 
             ctext = request.data['context']
+            company = request.data['company']
             context = {
                 "task": ctext['task'],
                 "project": ctext['project'],
@@ -663,8 +667,8 @@ class taskView(ViewSet):
                 path_txt,
                 context
             )
-            
-            schedule, created = IntervalSchedule.objects.get_or_create(
+
+            """schedule, created = IntervalSchedule.objects.get_or_create(
                 every=30,
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
@@ -681,7 +685,8 @@ class taskView(ViewSet):
                     interval=schedule,
                     expire_seconds=60,
                 ),
-            )
+            )"""
+            mail = send_mail(destinator, object, text_content, html_content, company)
 
             
             return Response(
@@ -865,16 +870,6 @@ class affectationView(ViewSet):
             # remove  downloaded files in this server 
             for dirpath in dirpaths:
                 shutil.rmtree("media/"+dirpath, ignore_errors=True)
-<<<<<<< HEAD
-            
-            return Response(
-                {
-                    'message': 'New schedule is succefull run',
-                    'status': 'success',
-                    'code': status.HTTP_201_CREATED,
-                },
-                status=status.HTTP_201_CREATED)
-=======
             if mail:
                 return Response(
                     {
@@ -891,7 +886,6 @@ class affectationView(ViewSet):
                         'code': status.HTTP_400_BAD_REQUEST,
                     },
                     status=status.HTTP_400_BAD_REQUEST)
->>>>>>> 3069138 (envoie toute sorte de mail en function du corps de la requette)
 
         except Exception as e:
             return Response(
@@ -903,8 +897,3 @@ class affectationView(ViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 3069138 (envoie toute sorte de mail en function du corps de la requette)
