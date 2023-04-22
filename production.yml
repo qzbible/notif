@@ -1,5 +1,5 @@
 version: "3.9"
-# test remove container
+# test remove container remove rabbitmq
 services:
   rabbitmq_mail:
     image: rabbitmq:3.7-management
