@@ -1,0 +1,73 @@
+version: "3.8"
+
+services:
+  rabbitmq_mail:
+    image: rabbitmq:3.7-management
+    container_name: rabbitmq_mail
+    restart: always
+    env_file:
+      - ./.envs/.local/.live
+    ports:
+      - "21001:5672"
+      - "21002:15672"
+    networks:
+      - klivar-notification-networks
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    command: /start
+    restart: always
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    expose:
+      - "9081"
+    networks:
+      - klivar-notification-networks
+    env_file:
+      - ./.envs/.local/.postgres
+      - ./.envs/.local/.django
+
+  postgres_celery:
+    build:
+      context: .
+      dockerfile: ./docker/local/postgres/Dockerfile
+    container_name: postgres_celery
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
+    environment:
+      - POSTGRES_PORT=5432 # Ajouter cette ligne
+    networks:
+      - klivar-notification-networks
+
+  nginx:
+    restart: always
+    depends_on:
+      - api
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+    build:
+      context: ./docker/local/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8083:80"
+    networks:
+      - klivar-notification-networks
+
+networks:
+  klivar-notification-networks:
+    driver: bridge
+
+volumes:
+  static_volume:
+  media_volume:
+  postgres_data: {}
+  postgres_data_backups: {}
