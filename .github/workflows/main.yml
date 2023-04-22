@@ -25,4 +25,5 @@ jobs:
         script: |
           cd /klivar_prod/klivar_notification/
           git pull origin main
+          make build
          
