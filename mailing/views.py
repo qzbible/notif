@@ -804,7 +804,7 @@ class affectationView(ViewSet):
             object = request.data['object']
             destinator = request.data['destinator']
 
-            path = "mail/tasks/affectation.html"
+            path = "new_temp/email-v17.html"
             path_txt = "mail/tasks/assignment.txt"
 
             ctext = request.data['context']
