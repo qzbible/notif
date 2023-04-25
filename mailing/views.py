@@ -814,12 +814,12 @@ class affectationView(ViewSet):
                 "T", " ").split(".", 1)[0]  # 2023-04-06T12:52:03.610623
             created_at = datetime.strptime(
                 task_created_at, '%Y-%m-%d %H:%M:%S')
-            created_at = created_at.strftime("%b %d %Y %H:%M:%S")
+            created_at = created_at.strftime("%d %B %Y %H:%M:%S")
 
             task_update_at = ctext['task_update_at']
             task_update_at = task_update_at.replace("T", " ").split("+", 1)[0]
             update_at = datetime.strptime(task_update_at, '%Y-%m-%d %H:%M:%S')
-            update_at = update_at.strftime("%b %d %Y %H:%M:%S")
+            update_at = update_at.strftime("%d %B %Y %H:%M:%S")
 
             dirpaths = []
             filepaths = []
@@ -845,12 +845,12 @@ class affectationView(ViewSet):
 
                 date_begin = date_begin.replace("T", " ").split("+", 1)[0]
                 begin = datetime.strptime(date_begin, '%Y-%m-%d %H:%M:%S')
-                begin = begin.strftime("%b %d %Y %H:%M:%S")
+                begin = begin.strftime("%d %B %Y %H:%M:%S")
 
                 date_end = calendar['end']
                 date_end = date_end.replace("T", " ").split("+", 1)[0]
                 end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
-                end = end.strftime("%b %d %Y %H:%M:%S")
+                end = end.strftime("%d %B %Y %H:%M:%S")
 
                 # filename, date_end = add_calendar(object, description, date_begin, begin_hour, duration, company)
                 filename = add_calendar(
@@ -887,6 +887,7 @@ class affectationView(ViewSet):
                 "task_created_at": created_at,
                 "task_update_at": update_at,
                 "company": ctext['company'],
+                "created_by": ctext['company']
             }
 
             html_content = render_to_string(
