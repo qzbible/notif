@@ -26,9 +26,9 @@ CELERY_TASK_TRACK_STARTED = True
 
 CELERY_RESULT_BACKEND_DB = os.getenv(
     "CELERY_RESULT_BACKEND_DB", f'db+mysql+pymysql://root:ziyouma@db/pseudo_mysql')
-CELERY_BROKER_URL = os.getenv(
-    "CELERY_BROKER_URL", f'amqp://root:ziyouma@localhost:5672')
-# CELERY_BROKER_URL = f'amqp://root:ziyouma@rabbitmq//'
+# CELERY_BROKER_URL = os.getenv(
+#     "CELERY_BROKER_URL", f'amqp://root:ziyouma@localhost:5672')
+CELERY_BROKER_URL = f'amqp://root:ziyouma@rabbitmq//'
 CELERY_TASK_RESULT_EXPIRES = 18000
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_IMPORTS = ["mailing.tasks"]
