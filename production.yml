@@ -17,6 +17,7 @@ services:
       context: .
       dockerfile: ./docker/production/django/Dockerfile
     command: /start
+    container_name: api
     restart: always
     volumes:
       - .:/app
