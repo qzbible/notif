@@ -7,9 +7,10 @@ services:
     restart: always
     env_file:
       - ./.envs/.local/.live
-    ports:
-      - "21001:5672"
-      - "21002:15672"
+
+    expose:
+      - "5672"
+      - "15672"
     networks:
       - klivar-notification-nw
   api: &api #container_name: api
@@ -33,16 +34,23 @@ services:
   celery_worker:
     <<: *api
     image: worker
-    command: /start_celery_worker
+    command: celery -A notification worker -l DEBUG
     networks:
       - klivar-notification-nw
+
+    depends_on:
+      - api
+      - rabbitmq_mail
 
   celery_beat:
     <<: *api
     image: beat
-    command: /start_celery_beat
+    command: celery -A notification beat -l INFO
     networks:
       - klivar-notification-nw
+    depends_on:
+      - api
+      - rabbitmq_mail
 
   postgres_celery:
     build:

@@ -53,9 +53,13 @@ COPY ./docker/local/django/start_celery_beat /start_celery_beat
 RUN sed -i 's/\r$//g' /start_celery_beat
 RUN chmod +x /start_celery_beat
 
+# COPY ./docker/local/django/supervisord.conf /supervisord
 
 COPY . ${APP_HOME}
 
 ENTRYPOINT ["/entrypoint"]
+# needs to be set else Celery gives an error (because docker runs commands inside container as root)
+# ENV C_FORCE_ROOT=1
+# CMD ["/supervisord"]
 
 

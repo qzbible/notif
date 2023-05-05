@@ -162,7 +162,10 @@ CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_TASK_TRACK_STARTED = True
 
 CELERY_RESULT_BACKEND_DB = f'db+mysql+pymysql://root:ziyouma@db/pseudo_mysql'
-CELERY_BROKER_URL = f'amqp://root:ziyouma@localhost:5672'
+# CELERY_RESULT_BACKEND_DB = os.getenv(
+#     "CELERY_RESULT_BACKEND_DB", f'db+mysql+pymysql://root:ziyouma@db/pseudo_mysql')
+CELERY_BROKER_URL = f'amqp://root:ziyouma@rabbitmq_mail:5672'
+print("CELERY_BROKER_URL", CELERY_BROKER_URL)
 # CELERY_BROKER_URL = f'amqp://root:ziyouma@rabbitmq//'
 CELERY_TASK_RESULT_EXPIRES = 18000
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
