@@ -50,6 +50,21 @@ services:
       - api
       - rabbitmq_mail
 
+  nginx:
+    restart: always
+    depends_on:
+      - api
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/mediafiles
+    build:
+      context: ./docker/production/nginx
+      dockerfile: Dockerfile
+    ports:
+      - "8083:80"
+    networks:
+      - reverseproxy-nw
+
 networks:
   reverseproxy-nw:
     external: true
