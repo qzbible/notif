@@ -7,9 +7,9 @@ services:
     restart: always
     env_file:
       - ./.envs/.production/.live
-    ports:
-      - "21001:5674"
-      - "21002:15674"
+    expose:
+      - "5674"
+      - "15674"
     networks:
       - reverseproxy-nw
   api:
@@ -30,6 +30,26 @@ services:
     env_file:
       - ./.envs/.production/.postgres
       - ./.envs/.production/.django
+
+  celery_worker:
+    <<: *api
+    image: worker
+    command: celery -A notification worker -l DEBUG
+    networks:
+      - klivar-notification-nw
+    depends_on:
+      - api
+      - rabbitmq_mail
+
+  celery_beat:
+    <<: *api
+    image: beat
+    command: celery -A notification beat -l INFO
+    networks:
+      - klivar-notification-nw
+    depends_on:
+      - api
+      - rabbitmq_mail
 
 networks:
   reverseproxy-nw:

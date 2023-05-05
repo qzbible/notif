@@ -37,7 +37,6 @@ services:
     command: celery -A notification worker -l DEBUG
     networks:
       - klivar-notification-nw
-
     depends_on:
       - api
       - rabbitmq_mail

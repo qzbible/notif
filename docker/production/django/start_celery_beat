@@ -1,0 +1,5 @@
+#!/bin/bash
+set -o errexit
+
+
+celery -A notification beat -l INFO
