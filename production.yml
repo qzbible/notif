@@ -17,7 +17,6 @@ services:
       context: .
       dockerfile: ./docker/production/django/Dockerfile
     command: /start
-    container_name: api_notif
     restart: always
     volumes:
       - .:/app
@@ -59,10 +58,10 @@ services:
       - static_volume:/app/staticfiles
       - media_volume:/app/mediafiles
     build:
-      context: ./docker/production/nginx
+      context: ./docker/local/nginx
       dockerfile: Dockerfile
-    ports:
-      - "8083:80"
+    expose:
+      - "80"
     networks:
       - reverseproxy-nw
 
