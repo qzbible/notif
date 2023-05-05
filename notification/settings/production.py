@@ -5,9 +5,9 @@ SECRET_KEY = env("DJANGO_SECRET_KEY",
                  default="VoQE5G62Qu1Sk8cmBMa8V8D4nYhWazjaEoH9p9wWGPF4Pv23A3M68Wtme2BpHSwt",)
 
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["*"])
-ADMIN_URL = env("DJANGO_ADMIN_URL")
-
  
+
+DATABASES = {"default": env.db("DATABASE_URL")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -45,17 +45,17 @@ EMAIL_SUBJECT_PREFIX = env(
     default="[klivar]",
 )
 
-EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
-EMAIL_HOST = env("EMAIL_HOST")
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("SMTP_MAILGUN_PASSWORD")
-EMAIL_PORT = env("EMAIL_PORT")
-EMAIL_USE_TLS = True
-DOMAIN = env("DOMAIN")
+# EMAIL_BACKEND = "djcelery_email.backends.CeleryEmailBackend"
+# EMAIL_HOST = env("EMAIL_HOST")
+# EMAIL_HOST_USER = env("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = env("SMTP_MAILGUN_PASSWORD")
+# EMAIL_PORT = env("EMAIL_PORT")
+# EMAIL_USE_TLS = True
+# DOMAIN = env("DOMAIN")
 
 
 CELERY_TIMEZONE ="Africa/Douala"
- 
+# CELERY_TIMEZONE = os.getenv("CELERY_TIMEZONE", "Africa/Douala")
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
@@ -79,7 +79,7 @@ EMAIL_PORT = os.getenv(
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST_USER = os.getenv(
-    "EMAIL_HOST_USER", 'avotreecoute@gmail.com')
+    "EMAIL_HOST_USER", 'avotreecoute@klivar.com')
 EMAIL_HOST_PASSWORD = os.getenv(
     "EMAIL_HOST_PASSWORD", '!Klivardev1')
 APP_NAME = 'Klivar'
