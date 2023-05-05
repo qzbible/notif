@@ -12,8 +12,7 @@ services:
       - "15674"
     networks:
       - reverseproxy-nw
-  api:
-    container_name: api
+  api: &api # container_name: api
     build:
       context: .
       dockerfile: ./docker/production/django/Dockerfile
@@ -36,7 +35,7 @@ services:
     image: worker
     command: celery -A notification worker -l DEBUG
     networks:
-      - klivar-notification-nw
+      - reverseproxy-nw
     depends_on:
       - api
       - rabbitmq_mail
@@ -46,7 +45,7 @@ services:
     image: beat
     command: celery -A notification beat -l INFO
     networks:
-      - klivar-notification-nw
+      - reverseproxy-nw
     depends_on:
       - api
       - rabbitmq_mail
