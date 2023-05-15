@@ -85,7 +85,7 @@ services:
 
 networks:
   klivar-notification-nw:
-    driver: bridge
+    external: true
 
 volumes:
   static_volume:
