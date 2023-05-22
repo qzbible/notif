@@ -45,6 +45,13 @@ COPY ./docker/production/django/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
+COPY ./docker/local/django/start_celery_worker /start_celery_worker
+RUN sed -i 's/\r$//g' /start_celery_worker
+RUN chmod +x /start_celery_worker
+
+COPY ./docker/local/django/start_celery_beat /start_celery_beat
+RUN sed -i 's/\r$//g' /start_celery_beat
+RUN chmod +x /start_celery_beat
 
 COPY . ${APP_HOME}
 

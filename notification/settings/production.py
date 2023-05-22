@@ -3,9 +3,9 @@ from .base import env
 
 SECRET_KEY = env("DJANGO_SECRET_KEY",
                  default="VoQE5G62Qu1Sk8cmBMa8V8D4nYhWazjaEoH9p9wWGPF4Pv23A3M68Wtme2BpHSwt",)
-
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["*"])
- 
+# allowed host tru
+ALLOWED_HOSTS =  ["*"]
+ADMIN_URL = env("DJANGO_ADMIN_URL") 
 
 # DATABASES = {"default": env.db("DATABASE_URL")}
 # DATABASES["default"]["ATOMIC_REQUESTS"] = True
