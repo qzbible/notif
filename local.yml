@@ -12,7 +12,7 @@ services:
       - "5672"
       - "15672"
     networks:
-      - klivar-notification-nw
+      - klivar-api-local-live-nw
   api: &api #container_name: api
     build:
       context: .
@@ -26,7 +26,7 @@ services:
     expose:
       - "9081"
     networks:
-      - klivar-notification-nw
+      - klivar-api-local-live-nw
     env_file:
       - ./.envs/.local/.postgres
       - ./.envs/.local/.django
@@ -36,8 +36,7 @@ services:
     image: worker
     command: celery -A notification worker -l DEBUG
     networks:
-      - klivar-notification-nw
-
+      - klivar-api-local-live-nw
     depends_on:
       - api
       - rabbitmq_mail
@@ -47,7 +46,7 @@ services:
     image: beat
     command: celery -A notification beat -l INFO
     networks:
-      - klivar-notification-nw
+      - klivar-api-local-live-nw
     depends_on:
       - api
       - rabbitmq_mail
@@ -66,7 +65,7 @@ services:
     environment:
       - POSTGRES_PORT=5432 # Ajouter cette ligne
     networks:
-      - klivar-notification-nw
+      - klivar-api-local-live-nw
 
   nginx:
     restart: always
@@ -81,10 +80,10 @@ services:
     ports:
       - "8083:80"
     networks:
-      - klivar-notification-nw
+      - klivar-api-local-live-nw
 
 networks:
-  klivar-notification-nw:
+  klivar-api-local-live-nw:
     external: true
 
 volumes:

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_celery_results',
     'django_celery_beat',
     'rest_framework',
+    'corsheaders'
 ]
 
 SWAGGER_SETTINGS = {
@@ -56,6 +57,8 @@ SWAGGER_SETTINGS = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', 
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -123,7 +126,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = [
+    'http://example.com',
+    'https://example.com',
+]
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+]
+CORS_ALLOW_HEADERS = [
+    'Accept',
+    'Content-Type',
+    'Authorization',
+]
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 

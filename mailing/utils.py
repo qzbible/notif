@@ -36,8 +36,7 @@ app = Celery('send_mail', broker='pyamqp://root@localhost//')
 def send_mail(to_emails, title, text_content, html_content, company):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
-    for to_email in to_emails:
-        print("***** ", to_email)
+    for to_email in to_emails: 
         msg = EmailMultiAlternatives(
             title,
             text_content,
@@ -50,6 +49,24 @@ def send_mail(to_emails, title, text_content, html_content, company):
 
         msg.send()
     return True
+
+def send_mail_created(to_emails, title, text_content, html_content, company):
+    """Docstring for send_mail."""
+    from_email = settings.EMAIL_HOST_USER
+    for to_email in to_emails: 
+        msg = EmailMultiAlternatives(
+            title,
+            text_content,
+            'Klivar <' + from_email + '>',
+            [to_email],
+            reply_to=None,
+        )
+        if html_content:
+            msg.attach_alternative(html_content, 'text/html')
+
+        msg.send()
+    return True
+
 
 
 def send_mail_test(to_emails, title, text_content, html_content, filename):
