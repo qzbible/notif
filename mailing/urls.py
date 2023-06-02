@@ -15,9 +15,10 @@ router.register(r'task', taskView, basename="task")
 router.register(r'affectation', affectationView, basename="affectation")
 router.register(r'notification', notifViewSet, basename="notification")
 router.register(r'askDemo', askDemoViewSet, basename="askDemoViewSet")
+router.register(r'resetPassword', resetPasswordViewSet, basename="reset_password")
 
 
-# Wire up our API using automatic URL routing. 
+# Wire up our API using automatic URL routing.  
 urlpatterns = [
     path('', include(router.urls)),
 ]

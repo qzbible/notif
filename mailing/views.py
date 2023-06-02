@@ -30,6 +30,102 @@ from datetime import datetime
 
 
 
+ 
+
+class resetPasswordViewSet(ViewSet):
+    parser_classes = (MultiPartParser, JSONParser,)
+
+    success = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+            ("message", openapi.Schema(type=openapi.TYPE_STRING,
+             example="your request was do successfully success")),
+            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+             example=status.HTTP_201_CREATED)),
+        )),
+        required=['results']
+    )
+
+    request_body = openapi.Schema(
+        description="Cette partie decris le corp de l'API. il faut",
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+            ("object", openapi.Schema(type=openapi.TYPE_STRING,
+             example="mail object (Demande de permission)")),
+            ("name", openapi.Schema(type=openapi.TYPE_STRING,
+             example="Username")),
+
+            ("mail", openapi.Schema(type=openapi.TYPE_ARRAY, 
+                items=openapi.Items(type=openapi.TYPE_STRING),
+             example="Emails adress of destinators ")), 
+             
+            ("url", openapi.Schema(type=openapi.TYPE_STRING, 
+            example=  "Example https:// " )), 
+        )),
+        required=['results']
+    )
+
+    bad_token = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+            ("message", openapi.Schema(
+                type=openapi.TYPE_STRING, example="Bad token or ...")),
+            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+        )),
+        required=['results']
+    )
+    @swagger_auto_schema(
+    operation_description="This API create celery task  ",
+    request_body=request_body,
+    responses={ 
+        status.HTTP_201_CREATED: success,
+        status.HTTP_401_UNAUTHORIZED: bad_token,
+        status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
+        status.HTTP_404_NOT_FOUND: 'slug not found',
+    })
+    
+    def create(self, request): 
+        try: 
+            object = request.data['object']
+            name = request.data['name']
+            mail = request.data['mail']  
+            url = request.data['url']
+            
+            path = "temp_reset_password/reset_password.html"
+            path_txt = "temp_reset_password/reset_password.txt" 
+            context = {  
+                "name": name, 
+                "site_url": url,
+                "expires_at":request.data['expires_at']
+            } 
+            html_content = render_to_string(
+                path,
+                context
+            ) 
+            text_content = render_to_string(
+                path_txt,
+                context
+            ) 
+            mail = send_mail_created([mail], object, text_content,
+                             html_content )
+            return Response(
+                {
+                    'message': 'New schedule is succefull run',
+                    'status': 'success',
+                    'code': status.HTTP_201_CREATED,
+                },
+                status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                {
+                    'message': 'Bad parameters',
+                    'status': 'Failed',
+                    'error': str(e),
+                    'code': status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+    
 
 class askDemoViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
@@ -133,8 +229,6 @@ class askDemoViewSet(ViewSet):
                     'code': status.HTTP_400_BAD_REQUEST,
                 },
                 status=status.HTTP_400_BAD_REQUEST)
-
-     
 
 class feedbackCreateClientViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
@@ -248,7 +342,6 @@ class feedbackCreateClientViewSet(ViewSet):
                 status=status.HTTP_400_BAD_REQUEST)
 
      
-
 class ceatedAccountViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 

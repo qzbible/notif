@@ -50,7 +50,7 @@ def send_mail(to_emails, title, text_content, html_content, company):
         msg.send()
     return True
 
-def send_mail_created(to_emails, title, text_content, html_content, company):
+def send_mail_created(to_emails, title, text_content, html_content):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
     for to_email in to_emails: 
@@ -67,6 +67,8 @@ def send_mail_created(to_emails, title, text_content, html_content, company):
         msg.send()
     return True
 
+
+ 
 
 
 def send_mail_test(to_emails, title, text_content, html_content, filename):
@@ -186,12 +188,9 @@ def send_mail_with_ics_file(to_emails, title, files, html_content, filename, com
         if html_content:
             # msg.attach_alternative(html_content, 'text/html')
             msg.attach(MIMEText(html_content, "html"))
-            msg.attach(MIMEText("", "plain"))
-            # print("ffffff44fff1-------------",os.listdir("/app/media"))
-            # print("ffffff44fff1-------------",os.listdir("/app/media/calendar"))
+            msg.attach(MIMEText("", "plain")) 
             if files:
                 for file in files:
-
                     with open(file, "rb") as attachment:
                         # Add file as application/octet-stream
                         # Email client can usually download this automatically as attachment
@@ -199,7 +198,6 @@ def send_mail_with_ics_file(to_emails, title, files, html_content, filename, com
                         part.set_payload(attachment.read())
                     # Encode file in ASCII characters to send by email
                     encoders.encode_base64(part)
-
                     # Add header as key/value pair to attachment part
                     """part.add_header(
                         "Content-Disposition",
