@@ -1,6 +1,3 @@
-from django.shortcuts import render
-# Landry
-
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
@@ -1242,7 +1239,6 @@ class affectationView(ViewSet):
         }
     )
     def create(self, request):
-
         try:
             one_off = True
             # destinator = request.data['destinator'] # 'email1', email2
@@ -1256,7 +1252,7 @@ class affectationView(ViewSet):
 
             task_created_at = ctext['task_created_at']
             task_created_at = task_created_at.replace(
-                "T", " ").split(".", 1)[0]  # 2023-04-06T12:52:03.610623
+                "T", " ").split(".", 1)[0]  #2023-04-06T12:52:03.610623 
             created_at = datetime.strptime(
                 task_created_at, '%Y-%m-%d %H:%M:%S')
             created_at = created_at.strftime("%d %B %Y %H:%M:%S")
@@ -1543,3 +1539,114 @@ class notifViewSet(ViewSet):
                     'code': status.HTTP_400_BAD_REQUEST,
                 },
                 status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class notifAuditViewSet(ViewSet):
+    parser_classes = (MultiPartParser, JSONParser,)
+    success = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+            ("message", openapi.Schema(type=openapi.TYPE_STRING,
+             example="your request was do successfully success")),
+            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+             example=status.HTTP_201_CREATED)),
+        )),
+        required=['results']
+    )
+    request_body = openapi.Schema(
+        description="Cette partie decris le corp de l'API. il faut",
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+            ("object", openapi.Schema(type=openapi.TYPE_STRING,
+             example="mail object (Demande de permission)")),
+            ("name", openapi.Schema(type=openapi.TYPE_STRING,
+             example="Task name (Mail a tous les clients)")),
+            ("message", openapi.Schema(type=openapi.TYPE_STRING,
+             example="Body of mail (your text)")),
+            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+             example="Emails adress of destinators (loren@gmail.com,ipsum@klblogs.com)")),
+            ("unitime", openapi.Schema(type=openapi.TYPE_STRING,
+             example="minute (nimute, hour, day, week)")),
+            ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example=1)),
+
+        )),
+        required=['results']
+    )
+    bad_token = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+            ("message", openapi.Schema(
+                type=openapi.TYPE_STRING, example="Bad token or ...")),
+            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+        )),
+        required=['results']
+    )
+
+    @swagger_auto_schema(
+        operation_description="This API create celery scheduler request_body={object:Object of mail,name: task name,message:Mail dody,schedul:integer (number of minutes),destinator:string as landry.ziyouma@gmail.com,hoxopi1384@klblogs.com,unitime:time unit (string as minutes)}",
+        responses={
+            0: request_body,
+            status.HTTP_201_CREATED: success,
+            401: bad_token,
+            400: 'Params error'
+
+        }
+    )
+    
+    def create(self, request):
+
+        try:
+            # get data
+            object = request.data['object']
+            name = request.data['name']
+            from_name = request.data['from_name']
+            processus = request.data['processus'] 
+            items = request.data['actions']
+            site_url = request.data['url'] 
+            destinator = [request.data['destinator']]
+            company = request.data['company']
+            # path = "mail/planification/celery2.html"
+            path = "temp_notif_audit/audit_notif.html"
+            # path = "mail/accounts/change_pass_word.html"
+            # path = "mail/accounts/confirm_change_p_w.html"
+            path_txt = "temp_notif_audit/audit_notif.txt"
+            context = {
+                'name': name,
+                'site_url':site_url ,
+                'from_name': from_name,
+                'processus': processus,
+                'items': items
+            }
+            html_content = render_to_string(
+                path,
+                context
+            )
+            text_content = render_to_string(
+                path_txt,
+                context
+            )
+            mail = send_mail(destinator, object,
+                                 text_content, html_content, company)
+
+            return Response(
+                {
+                    'message': 'mail send',
+                    'status': 'success',
+                    'code': status.HTTP_201_CREATED,
+                },
+                status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {
+                    'message': 'Bad parameters',
+                    'status': 'Failed',
+                    'error': str(e),
+                    'code': status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+
+
