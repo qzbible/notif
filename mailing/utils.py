@@ -50,14 +50,14 @@ def send_mail(to_emails, title, text_content, html_content, company):
         msg.send()
     return True
 
-def send_mail_created(to_emails, title, text_content, html_content):
+def send_mail_created(to_emails, title, text_content, html_content, company=None):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
     for to_email in to_emails: 
         msg = EmailMultiAlternatives(
             title,
             text_content,
-            'Klivar <' + from_email + '>',
+          company+' Via Klivar <' + from_email + '>',
             [to_email],
             reply_to=None,
         )

@@ -18,8 +18,9 @@ router.register(r'askDemo', askDemoViewSet, basename="askDemoViewSet")
 router.register(r'resetPassword', resetPasswordViewSet, basename="reset_password")
 router.register(r'notifAudit', notifAuditViewSet, basename="audit_notif")
 
+router.register(r'userAccountCreat', ceatedUserAccountViewSet, basename="ceatedUserAccountViewSet")
  
-# Wire up our API using automatic URL routing.  
+# Wire up our API using automatic URL routing.   
 urlpatterns = [
     path('', include(router.urls)),
 ]
