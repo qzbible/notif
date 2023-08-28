@@ -1244,24 +1244,19 @@ class affectationView(ViewSet):
             # destinator = request.data['destinator'] # 'email1', email2
             object = request.data['object']
             destinator = request.data['destinator']
-
             path = "new_temp/email-v17.html"
             path_txt = "mail/tasks/assignment.txt"
-
             ctext = request.data['context']
-
             task_created_at = ctext['task_created_at']
             task_created_at = task_created_at.replace(
                 "T", " ").split(".", 1)[0]  #2023-04-06T12:52:03.610623 
             created_at = datetime.strptime(
                 task_created_at, '%Y-%m-%d %H:%M:%S')
             created_at = created_at.strftime("%d %B %Y %H:%M:%S")
-
             task_update_at = ctext['task_update_at']
             task_update_at = task_update_at.replace("T", " ").split("+", 1)[0]
             update_at = datetime.strptime(task_update_at, '%Y-%m-%d %H:%M:%S')
             update_at = update_at.strftime("%d %B %Y %H:%M:%S")
-
             dirpaths = []
             filepaths = []
             if request.data.get('urls_attached'):
@@ -1270,7 +1265,6 @@ class affectationView(ViewSet):
                     dirpath, filepath = getfiles(url)
                     dirpaths.append(dirpath)
                     filepaths.append(filepath)
-
             begin = None
             end = None
             filename = None
@@ -1279,27 +1273,21 @@ class affectationView(ViewSet):
             if request.data.get('calendar'):
                 calendar = request.data['calendar']
                 date_begin = calendar['begin']
-
                 description = calendar['description']
                 # begin_hour = calendar['begin_hour']
                 # duration = calendar['duration']
-
                 date_begin = date_begin.replace("T", " ").split("+", 1)[0]
                 begin = datetime.strptime(date_begin, '%Y-%m-%d %H:%M:%S')
                 begin = begin.strftime("%d %B %Y %H:%M:%S")
-
                 date_end = calendar['end']
                 date_end = date_end.replace("T", " ").split("+", 1)[0]
                 end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
                 end = end.strftime("%d %B %Y %H:%M:%S")
-
                 # filename, date_end = add_calendar(object, description, date_begin, begin_hour, duration, company)
                 filename = add_calendar(
                     ctext['task'], description, date_begin, date_end, company)
-
                 # end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
                 # end = date_end.strftime("%b %d %Y %H:%M:%S")
-
                 """
                 date_begin = ctext['begin']
                 date_begin = date_begin.replace("T", " ").split("+", 1)[0]
@@ -1311,14 +1299,13 @@ class affectationView(ViewSet):
                 end = datetime.strptime(date_end, '%Y-%m-%d %H:%M:%S')
                 end = end.strftime("%b %d %Y %H:%M:%S")
                 """
-
             context = {
                 "task": ctext['task'],
                 "project": ctext['project'],
-                "collaborateurs": ctext['collaborateurs'],
+                # "collaborateurs": ctext['collaborateurs'],
                 "description": ctext['description'],
-                "btn_repondre_klivar": ctext['btn_repondre_klivar'],
-                "btn_Marquer_comme_terminee": ctext['btn_Marquer_comme_terminee'],
+                # "btn_repondre_klivar": ctext['btn_repondre_klivar'],
+                # "btn_Marquer_comme_terminee": ctext['btn_Marquer_comme_terminee'],
                 "begin": begin,
                 "end": end,
                 "site_url": ctext['site_url'],
@@ -1330,41 +1317,119 @@ class affectationView(ViewSet):
                 "company": ctext['company'],
                 "created_by": ctext['company']
             }
-
             html_content = render_to_string(
                 path,
                 context
             )
-
             text_content = render_to_string(
                 path_txt,
                 context
             )
-
-            # files = ['requirements.txt', 'README.md']
-
             # Send Email
             # send_mail_file(destinator, object, text_content, html_content, filepaths)
+            # prepare schedule task 
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=30,
+                # period=unitime,
+                period=IntervalSchedule.SECONDS,
+            )
             if request.data.get('urls_attached') and request.data.get('calendar'):
                 # *****************************EMAIL WITH ICALENDAR AND PIECES JOINTES*********************
                 # files = ['requirements.txt', 'README.md']
                 mail = send_mail_with_ics_file(
                     destinator, object, filepaths, html_content, filename, company)
+                if request.data.get('notification') :
+                    notif = request.data.get('notification')
+                    if notif.get("dates_receive") and len(notif.get("dates_receive"))>0:
+                        start_times = notif.get("dates_receive")
+                        object_rappel= "Rappel, "+ object
+                        for start_time in start_times:
+                            PeriodicTask.objects.update_or_create(
+                                task="mailing.utils.send_mail_with_ics_file",
+                                # name="send_email",
+                                name=uuid.uuid4().hex[:10].lower(),
+                                args=json.dumps(
+                                    [destinator, object_rappel, filepaths, html_content, filename, company]),
+                                one_off=one_off,
+                                start_time=start_time, 
+                                defaults=dict(
+                                    interval=schedule,
+                                    expire_seconds=60,
+                                ),
+                            )
 
             elif request.data.get('urls_attached'):
                 # *****************************EMAIL WITCH FILE****************************************
                 # files = ['requirements.txt', 'README.md']
                 mail = send_mail_file(
                     destinator, object, text_content, html_content, filepaths, company)
+                if request.data.get('notification') :
+                    notif = request.data.get('notification')
+                    if notif.get("dates_receive") and len(notif.get("dates_receive"))>0:
+                        start_times = notif.get("dates_receive")
+                        object_rappel= "Rappel, "+ object
+                        for start_time in start_times:
+                            PeriodicTask.objects.update_or_create(
+                                task="mailing.utils.send_mail_file",
+                                # name="send_email",
+                                name=uuid.uuid4().hex[:10].lower(),
+                                args=json.dumps(
+                                    [destinator, object_rappel, text_content, html_content,filepaths, company]),
+                                one_off=one_off,
+                                start_time=start_time, 
+                                defaults=dict(
+                                    interval=schedule,
+                                    expire_seconds=60,
+                                ),
+                            )
             elif request.data.get('calendar'):
                 # *****************************EMAIL WITH ICALENDAR**************************************
                 mail = send_mail_with_ics(
                     destinator, object, text_content, html_content, filename, company)
+
+                if request.data.get('notification') :
+                    notif = request.data.get('notification')
+                    if notif.get("dates_receive") and len(notif.get("dates_receive"))>0:
+                        start_times = notif.get("dates_receive")
+                        object_rappel= "Rappel, "+ object
+                        for start_time in start_times:
+                            PeriodicTask.objects.update_or_create(
+                                task="mailing.utils.send_mail_with_ics",
+                                # name="send_email",
+                                name=uuid.uuid4().hex[:10].lower(),
+                                args=json.dumps(
+                                    [destinator, object_rappel, text_content, html_content,filename, company]),
+                                one_off=one_off,
+                                start_time=start_time, 
+                                defaults=dict(
+                                    interval=schedule,
+                                    expire_seconds=60,
+                                ),
+                            )
             else:
                 # *****************************EMAIL WITHOUT FILE****************************************
                 mail = send_mail(destinator, object,
                                  text_content, html_content, company)
 
+                if request.data.get('notification') :
+                    notif = request.data.get('notification')
+                    if notif.get("dates_receive") and len(notif.get("dates_receive"))>0:
+                        start_times = notif.get("dates_receive")
+                        object_rappel= "Rappel, "+ object
+                        for start_time in start_times:
+                            PeriodicTask.objects.update_or_create(
+                                task="mailing.utils.send_mail",
+                                # name="send_email",
+                                name=uuid.uuid4().hex[:10].lower(),
+                                args=json.dumps(
+                                    [destinator, object_rappel, text_content, html_content, company]),
+                                one_off=one_off,
+                                start_time=start_time, 
+                                defaults=dict(
+                                    interval=schedule,
+                                    expire_seconds=60,
+                                ),
+                            )
             # remove  downloaded files in this server
             for dirpath in dirpaths:
                 shutil.rmtree("media/"+dirpath, ignore_errors=True)
@@ -1396,9 +1461,9 @@ class affectationView(ViewSet):
                 status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class notifViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
-
     success = openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties=OrderedDict((
@@ -1410,7 +1475,6 @@ class notifViewSet(ViewSet):
         )),
         required=['results']
     )
-
     request_body = openapi.Schema(
         description="Cette partie decris le corp de l'API. il faut",
         type=openapi.TYPE_OBJECT,
@@ -1430,7 +1494,6 @@ class notifViewSet(ViewSet):
         )),
         required=['results']
     )
-
     bad_token = openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties=OrderedDict((
@@ -1440,10 +1503,8 @@ class notifViewSet(ViewSet):
         )),
         required=['results']
     )
-
     @swagger_auto_schema(
         operation_description="This API create celery scheduler request_body={object:Object of mail,name: task name,message:Mail dody,schedul:integer (number of minutes),destinator:string as landry.ziyouma@gmail.com,hoxopi1384@klblogs.com,unitime:time unit (string as minutes)}",
-
         responses={
             0: request_body,
             status.HTTP_201_CREATED: success,
@@ -1454,7 +1515,6 @@ class notifViewSet(ViewSet):
     )
     
     def create(self, request):
-
         try:
             # list of dates
             start_times = request.data['start_time']
@@ -1477,7 +1537,6 @@ class notifViewSet(ViewSet):
             # path = "mail/accounts/change_pass_word.html"
             # path = "mail/accounts/confirm_change_p_w.html"
             path_txt = "mail/planification/celery.txt"
-
             context = {
                 'receiver': receiver,
                 'site_url': 'klivar.com',
@@ -1499,6 +1558,7 @@ class notifViewSet(ViewSet):
                 # period=unitime,
                 period=IntervalSchedule.SECONDS,
             )
+
             for start_time in start_times:
                 PeriodicTask.objects.update_or_create(
                     task="mailing.utils.send_mail",
@@ -1506,7 +1566,6 @@ class notifViewSet(ViewSet):
                     name=uuid.uuid4().hex[:10].lower(),
                     args=json.dumps(
                         [destinator, object, text_content, html_content, company]),
-
                     one_off=one_off,
                     start_time=start_time,
                     # last_run_at = "2023-02-28T11:19:00+01:00", + every= 1s ==> envoie le mail at 2023-02-28T11:20:00+01:00
@@ -1540,9 +1599,6 @@ class notifViewSet(ViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
 class notifAuditViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
     success = openapi.Schema(
@@ -1571,7 +1627,6 @@ class notifAuditViewSet(ViewSet):
             ("unitime", openapi.Schema(type=openapi.TYPE_STRING,
              example="minute (nimute, hour, day, week)")),
             ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example=1)),
-
         )),
         required=['results']
     )
@@ -1597,7 +1652,6 @@ class notifAuditViewSet(ViewSet):
     )
     
     def create(self, request):
-
         try:
             # get data
             object = request.data['object']
@@ -1649,9 +1703,6 @@ class notifAuditViewSet(ViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-
-
-   
 class ceatedUserAccountViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
@@ -1719,6 +1770,127 @@ class ceatedUserAccountViewSet(ViewSet):
             context = {  
                 "company": company,
                 "site_url": url,
+                "user_name": user_name, 
+            } 
+            html_content = render_to_string(
+                path,
+                context
+            ) 
+            text_content = render_to_string(
+                path_txt,
+                context
+            ) 
+            mail = send_mail_created(destinator, object, text_content,
+                             html_content, company)
+            return Response(
+                {
+                    'message': 'New schedule is succefull run',
+                    'status': 'success',
+                    'code': status.HTTP_201_CREATED,
+                },
+                status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response(
+                {
+                    'message': 'Bad parameters',
+                    'status': 'Failed',
+                    'error': str(e),
+                    'code': status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        operation_description="This API retieve specific celery task.",
+        responses={
+            # status.HTTP_200_OK:AnnouncementSerializer,
+            status.HTTP_401_UNAUTHORIZED: 'Bad toke',
+            status.HTTP_404_NOT_FOUND: 'slug not found',
+        }
+    )
+    def retrieve(self, request, pk=None):
+        # token = request.headers['Authorization']
+        # id, code, shema = Histories().get_user_from_token(token)
+        code = 200
+        id = 2
+        schema = 2
+        if code == 200:
+            queryset = PeriodicTask.objects.all()
+            object = queryset.values()
+            res = "This task no exists or has expired/ deleted"
+            for item in object:
+                if int(item["id"]) == int(pk):
+                    res = item
+            return Response(
+                {
+                    'message': 'Detail of Scheduler.',
+                    'status': 'success',
+                    'data': res,
+                    'code': status.HTTP_200_OK,
+                },
+                status=status.HTTP_200_OK)
+        else:
+            datas = {
+                'message': 'Bad token or ' + str(id)
+            }
+            return Response(datas, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+class codeAuthUserViewSet(ViewSet):
+    parser_classes = (MultiPartParser, JSONParser,)
+    success = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+            ("message", openapi.Schema(type=openapi.TYPE_STRING,
+             example="your request was do successfully success")),
+            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+             example=status.HTTP_201_CREATED)),
+        )),
+        required=['results']
+    )
+
+    request_body = openapi.Schema(
+        description="Cette partie decris le corp de l'API. il faut",
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+             
+        )),
+        required=['results']
+    )
+    bad_token = openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties=OrderedDict((
+            ("message", openapi.Schema(
+                type=openapi.TYPE_STRING, example="Bad token or ...")),
+            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+        )),
+        required=['results']
+    )
+
+
+    @swagger_auto_schema(
+    operation_description="This API create celery task  ",
+    request_body=request_body,
+    responses={ 
+        status.HTTP_201_CREATED: success,
+        status.HTTP_401_UNAUTHORIZED: bad_token,
+        status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
+        status.HTTP_404_NOT_FOUND: 'slug not found',
+    })
+    
+    def create(self, request): 
+        try: 
+            object = request.data['object']
+            user_name = request.data['user_name']
+            destinator = request.data['destinator'] 
+            company = request.data['company']
+            code = request.data['code']
+            path = "temp_code_auth/auth_code.html"
+            path_txt = "temp_code_auth/auth_code.txt" 
+            context = {  
+                "company": company,
+                "code_validation": code,
                 "user_name": user_name, 
             } 
             html_content = render_to_string(

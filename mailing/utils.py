@@ -57,7 +57,7 @@ def send_mail_created(to_emails, title, text_content, html_content, company=None
         msg = EmailMultiAlternatives(
             title,
             text_content,
-          company+' Via Klivar <' + from_email + '>',
+          company+' via Klivar <' + from_email + '>',
             [to_email],
             reply_to=None,
         )

@@ -19,6 +19,7 @@ router.register(r'resetPassword', resetPasswordViewSet, basename="reset_password
 router.register(r'notifAudit', notifAuditViewSet, basename="audit_notif")
 
 router.register(r'userAccountCreat', ceatedUserAccountViewSet, basename="ceatedUserAccountViewSet")
+router.register(r'codeAuth', codeAuthUserViewSet, basename="codeAuthUserViewSet")
  
 # Wire up our API using automatic URL routing.   
 urlpatterns = [
