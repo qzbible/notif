@@ -8,7 +8,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from collections import OrderedDict
-
+from rest_framework.decorators import api_view
 import json
 
 # from .tasks import *
@@ -16,6 +16,7 @@ import json
 from django.template.loader import render_to_string
 from django_celery_beat.models import PeriodicTask, IntervalSchedule, CrontabSchedule
 from django_celery_beat import querysets, validators
+from rest_framework.views import APIView
 import uuid
 from datetime import datetime
 
@@ -25,13 +26,10 @@ import shutil
 from icalendar import Calendar, Event, vCalAddress, vText
 from datetime import datetime
 
-
-
- 
+from django.utils import timezone
 
 class resetPasswordViewSet(ViewSet):
-    parser_classes = (MultiPartParser, JSONParser,)
-
+    # parser_classes = (MultiPartParser, JSONParser,)
     success = openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties=OrderedDict((
@@ -43,7 +41,6 @@ class resetPasswordViewSet(ViewSet):
         )),
         required=['results']
     )
-
     request_body = openapi.Schema(
         description="Cette partie decris le corp de l'API. il faut",
         type=openapi.TYPE_OBJECT,
@@ -52,11 +49,9 @@ class resetPasswordViewSet(ViewSet):
              example="mail object (Demande de permission)")),
             ("name", openapi.Schema(type=openapi.TYPE_STRING,
              example="Username")),
-
             ("mail", openapi.Schema(type=openapi.TYPE_ARRAY, 
                 items=openapi.Items(type=openapi.TYPE_STRING),
              example="Emails adress of destinators ")), 
-             
             ("url", openapi.Schema(type=openapi.TYPE_STRING, 
             example=  "Example https:// " )), 
         )),
@@ -88,7 +83,7 @@ class resetPasswordViewSet(ViewSet):
             name = request.data['name']
             mail = request.data['mail']  
             url = request.data['url']
-            
+            company=request.data['company']
             path = "temp_reset_password/reset_password.html"
             path_txt = "temp_reset_password/reset_password.txt" 
             context = {  
@@ -105,7 +100,8 @@ class resetPasswordViewSet(ViewSet):
                 context
             ) 
             mail = send_mail_created([mail], object, text_content,
-                             html_content )
+                             html_content, company )
+            print("ici ....")
             return Response(
                 {
                     'message': 'New schedule is succefull run',
@@ -226,6 +222,7 @@ class askDemoViewSet(ViewSet):
                     'code': status.HTTP_400_BAD_REQUEST,
                 },
                 status=status.HTTP_400_BAD_REQUEST)
+        
 
 class feedbackCreateClientViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
@@ -1954,3 +1951,206 @@ class codeAuthUserViewSet(ViewSet):
                 'message': 'Bad token or ' + str(id)
             }
             return Response(datas, status=status.HTTP_401_UNAUTHORIZED)
+
+
+@api_view(['POST'])
+def frap_notif_feedback(request):
+    data = request.data
+    try: 
+        object = data.get("object")
+        destinator = data.get("destinator")
+        evaluation_type = data.get("evaluation_type", None)
+        response_question = data.get("response_question") 
+        question_title = data.get("question_title") 
+        url = request.data['url']
+         
+        path = "audit_notif/audit_notif.html"
+        path_txt = "audit_notif/audit_notif.txt" 
+        context = {  
+            "evaluation_type": evaluation_type,
+            "response_question": response_question,
+            "url": url, 
+            "question_title": question_title
+        } 
+        html_content = render_to_string(
+            path,
+            context
+        ) 
+        text_content = render_to_string(
+            path_txt,
+            context
+        ) 
+        mail = send_mail_created(destinator, object, text_content,
+                            html_content)
+        return Response(
+            {
+                'message': 'New schedule is succefull run',
+                'status': 'success',
+                'code': status.HTTP_201_CREATED,
+            },
+            status=status.HTTP_201_CREATED)
+    except Exception as e:
+        return Response(
+            {
+                'message': 'Bad parameters',
+                'status': 'Failed',
+                'error': str(e),
+                'code': status.HTTP_400_BAD_REQUEST,
+            },
+            status=status.HTTP_400_BAD_REQUEST)
+
+
+class Audit_defis(ViewSet):
+    parser_classes = (MultiPartParser, JSONParser,)
+
+    def create(self, request):
+        data = request.data
+        # Extraction des données pertinentes
+        start_date = data["date"]["date"]
+        recurrence = data["recurrence"]
+        # Générer les dates en fonction de la récurrence choisie
+        generated_dates = generate_dates(start_date, recurrence)
+        # create the ics calendar
+        # dats 
+        datas = []
+        for date in generated_dates:
+            date_begin = datetime.strptime(date, '%d/%m/%Y %H:%M:%S')
+            updated_date_time = date_begin + timedelta(hours=1, minutes=30)
+            date_end = updated_date_time.strftime('%d/%m/%Y %H:%M:%S')
+            datas.append({
+               "title": data.get("object", "") +" "+ date, 
+               "description": "Audit de défis",
+               "date_begin": date_begin.strftime('%d/%m/%Y %H:%M:%S'),
+               "date_end": date_end,
+               "company": data.get("company", None),
+                "role":data.get("role", None),
+                "organizer":data.get("organizer", None)
+
+            })
+        filename = add_calendar_with_multiple_date(datas)
+        # Afficher les dates générées 
+        try:
+            one_off = True 
+            object = data.get("object", None)
+            destinator = list(map(lambda owner: owner['email'], data.get("owners", [])))
+            path = "audit_notif/audit_defis.html"
+            path_txt = "audit_notif/audit_defis.txt"
+            company = data.get("company", None)
+            # ctext = data.get('context', None)
+
+            context = {
+                # "task": ctext['task'],
+                # "project": ctext['project'],
+                # # "collaborateurs": ctext['collaborateurs'],
+                # "description": ctext['description'],
+                # # "btn_repondre_klivar": ctext['btn_repondre_klivar'],
+                # # "btn_Marquer_comme_terminee": ctext['btn_Marquer_comme_terminee'],
+                # "begin": begin,
+                # "end": end,
+                # "site_url": ctext['site_url'],
+                # "link_joins": ctext['link_joins'],
+                # # "doc_name": ctext['doc_name'],
+                # # "doc_link": ctext['url_link'],
+                # "task_created_at": created_at,
+                # "task_update_at": update_at,
+                # "company": ctext['company'],
+                # "created_by": ctext['company']
+            }
+            html_content = render_to_string(
+                path,
+                context
+            )
+            text_content = render_to_string(
+                path_txt,
+                context
+            )
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=30,
+                # period=unitime,
+                period=IntervalSchedule.SECONDS,
+            )
+            mail = send_mail_with_ics(
+                    destinator, object, text_content, html_content, filename, company)
+           
+            for start_time in generated_dates:
+                date_obj = datetime.strptime(start_time, "%d/%m/%Y %H:%M:%S")
+                # Reformater la date dans le format requis (AAAA-MM-JJ HH:MM:SS)
+                date_formatee = date_obj.strftime("%Y-%m-%d %H:%M:%S")
+                aware_date_obj = timezone.make_aware(date_obj)
+                date_formatee = aware_date_obj.isoformat()
+                date_formatee = date_formatee.split("+")[0]
+                print("=========>>", date_formatee)
+                object = object +" "+date_formatee
+                instance = PeriodicTask.objects.update_or_create(
+                    task="mailing.utils.send_mail_with_ics",
+                    # name="send_email",
+                    name=uuid.uuid4().hex[:10].lower(),
+                    args=json.dumps(
+                        [destinator, object, text_content, html_content, filename, company]),
+                    one_off=one_off,
+                    start_time=date_formatee, 
+                    defaults=dict(
+                        interval=schedule,
+                        expire_seconds=60,
+                    ),
+                )
+                 
+            return Response(
+                {
+                    'message': 'New schedule is succefull run',
+                    'status': 'success',
+                    'code': status.HTTP_201_CREATED,
+                },
+                status=status.HTTP_201_CREATED)
+
+            # Send Email
+            # send_mail_file(destinator, object, text_content, html_content, filepaths)
+            # prepare schedule task 
+            # schedule, created = IntervalSchedule.objects.get_or_create(
+            #     every=30,
+            #     # period=unitime,
+            #     period=IntervalSchedule.SECONDS,
+            # )
+            # if notif.get("dates_receive") and len(notif.get("dates_receive"))>0:
+            #     start_times = notif.get("dates_receive")
+            #     object_rappel= "Rappel, "+ object
+            #     for start_time in start_times:
+            #         PeriodicTask.objects.update_or_create(
+            #             task="mailing.utils.send_mail_with_ics_file",
+            #             # name="send_email",
+            #             name=uuid.uuid4().hex[:10].lower(),
+            #             args=json.dumps(
+            #                 [destinator, object_rappel, filepaths, html_content, filename, company]),
+            #             one_off=one_off,
+            #             start_time=start_time, 
+            #             defaults=dict(
+            #                 interval=schedule,
+            #                 expire_seconds=60,
+            #             ),
+            #         )
+            # if mail:
+            #     return Response(
+            #         {
+            #             'message': 'New schedule is succefull run',
+            #             'status': 'success',
+            #             'code': status.HTTP_201_CREATED,
+            #         },
+            #         status=status.HTTP_201_CREATED)
+            # else:
+            #     return Response(
+            #         {
+            #             'message': 'Mailing failed',
+            #             'status': 'Failure',
+            #             'code': status.HTTP_400_BAD_REQUEST,
+            #         },
+            #         status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(
+                {
+                    'message': 'Bad parameters',
+                    'status': 'Failed',
+                    'error': str(e),
+                    'code': status.HTTP_400_BAD_REQUEST,
+                },
+                status=status.HTTP_400_BAD_REQUEST)

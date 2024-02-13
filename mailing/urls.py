@@ -20,8 +20,10 @@ router.register(r'notifAudit', notifAuditViewSet, basename="audit_notif")
 
 router.register(r'userAccountCreat', ceatedUserAccountViewSet, basename="ceatedUserAccountViewSet")
 router.register(r'codeAuth', codeAuthUserViewSet, basename="codeAuthUserViewSet")
+router.register(r'defis-audit', Audit_defis, basename="defis-audit")
  
 # Wire up our API using automatic URL routing.   
 urlpatterns = [
     path('', include(router.urls)),
+    path('frap_notif_feedback/', frap_notif_feedback, name='frap_notif_feedback'),
 ]

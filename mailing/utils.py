@@ -28,6 +28,8 @@ from datetime import datetime
 import secrets
 import urllib.request
 
+ 
+
 
 app = Celery('send_mail', broker='pyamqp://root@localhost//')
 
@@ -36,14 +38,24 @@ app = Celery('send_mail', broker='pyamqp://root@localhost//')
 def send_mail(to_emails, title, text_content, html_content, company):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
-    for to_email in to_emails: 
-        msg = EmailMultiAlternatives(
-            title,
-            text_content,
-            company+' Via Klivar <' + from_email + '>',
-            [to_email],
-            reply_to=None,
-        )
+    for to_email in to_emails:
+        if company:
+            msg = EmailMultiAlternatives(
+                title,
+                text_content,
+                company+' Via Klivar <' + from_email + '>',
+                [to_email],
+                reply_to=None,
+            )
+        else:
+            msg = EmailMultiAlternatives(
+                title,
+                text_content,
+                'Klivar <' + from_email + '>',
+                [to_email],
+                reply_to=None,
+            ) 
+         
         if html_content:
             msg.attach_alternative(html_content, 'text/html')
 
@@ -54,22 +66,27 @@ def send_mail_created(to_emails, title, text_content, html_content, company=None
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
     for to_email in to_emails: 
-        msg = EmailMultiAlternatives(
-            title,
-            text_content,
-          company+' via Klivar <' + from_email + '>',
-            [to_email],
-            reply_to=None,
-        )
+        if company :
+            msg = EmailMultiAlternatives(
+                title,
+                text_content,
+                company+' Via Klivar <' + from_email + '>',
+                [to_email],
+                reply_to=None,
+            )
+        else:
+            msg = EmailMultiAlternatives(
+                title,
+                text_content,
+                'Klivar <' + from_email + '>',
+                [to_email],
+                reply_to=None,
+            )
         if html_content:
             msg.attach_alternative(html_content, 'text/html')
 
         msg.send()
     return True
-
-
- 
-
 
 def send_mail_test(to_emails, title, text_content, html_content, filename):
     """Docstring for send_mail."""
@@ -378,3 +395,128 @@ def add_calendar(title, description, date_begin, date_end, company):
     f.close()
 
     return filename
+
+
+
+
+def generate_dates(start_date, recurrence):
+    """
+    Generate dates based on recurrence.
+    
+    Args:
+    - start_date (str): Start date in the format 'DD/MM/YYYY'.
+    - recurrence (dict): Recurrence information containing 'key' and 'label'.
+    
+    Returns:
+    - list of str: List of generated dates with time.
+    """
+    if recurrence['key'] == 'UNE_SEULE_FOIS':
+        return [start_date + " 13:15:00"]
+    elif recurrence['key'] == 'A_CHAQUE_JOUR':
+        current_date = datetime.strptime(start_date, '%d/%m/%Y')
+        dates = [start_date + " 06:30:00"]
+        while True:
+            current_date += timedelta(days=1)
+            dates.append(current_date.strftime('%d/%m/%Y') + " 06:30:00")
+            if current_date.year > datetime.now().year + 1:
+                break
+        return dates
+    elif recurrence['key'] == 'UNE_SEULS_FOIS_PAR_SEMAINE':
+        current_date = datetime.strptime(start_date, '%d/%m/%Y')
+        target_weekday = current_date.weekday()
+        while current_date.weekday() != target_weekday:
+            current_date += timedelta(days=1)
+        dates = [current_date.strftime('%d/%m/%Y') + " 06:30:00"]
+        while True:
+            current_date += timedelta(days=7)
+            dates.append(current_date.strftime('%d/%m/%Y') + " 06:30:00")
+            if current_date.year > datetime.now().year + 1:
+                break
+        return dates
+    elif recurrence['key'] == 'UNE_SEULS_FOIS_PAR_MOIS':
+        current_date = datetime.strptime(start_date, '%d/%m/%Y')
+        dates = [start_date + " 06:30:00"]
+        while True:
+            current_date = current_date.replace(day=1)
+            current_date += timedelta(days=32)
+            current_date = current_date.replace(day=1)
+            if current_date.month == 2 and current_date.day > 28:
+                current_date = current_date.replace(day=28)
+            dates.append(current_date.strftime('%d/%m/%Y') + " 06:30:00")
+            if current_date.year > datetime.now().year + 1:
+                break
+        return dates
+    elif recurrence['key'] == 'UNE_SEULE_FOIS_PAR_AN':
+        current_date = datetime.strptime(start_date, '%d/%m/%Y')
+        dates = [start_date + " 06:30:00"]
+        while True:
+            current_date = current_date.replace(year=current_date.year + 1)
+            dates.append(current_date.strftime('%d/%m/%Y') + " 06:30:00")
+            if current_date.year > datetime.now().year + 1:
+                break
+        return dates
+    elif recurrence['key'] == 'UNE_SEULE_FOIS_PAR_JOUR':
+        return [start_date + " 06:30:00"]
+    else:
+        return []
+ 
+
+def add_calendar_with_multiple_date(events):
+    """
+    Add events to an iCalendar (.ics) file and return the filename.
+    
+    Args:
+    - events (list of dict): List of events. Each event should be a dictionary containing:
+        - title (str): Title of the event.
+        - description (str): Description of the event.
+        - date_begin (str): Start date and time in the format 'DD/MM/YYYY HH:MM'.
+        - date_end (str): End date and time in the format 'DD/MM/YYYY HH:MM'.
+        - company (str): Name of the company/organizer.
+    
+    Returns:
+    - str: Filename of the generated iCalendar (.ics) file.
+    """
+    cal = Calendar() 
+
+    for event_data in events:
+        event = Event()
+        event.add('summary', event_data['title'])
+        event.add('description', event_data['description'])
+
+        # Parse dates
+        begin_date_time = datetime.strptime(event_data['date_begin'], '%d/%m/%Y %H:%M:%S')
+        end_date_time = datetime.strptime(event_data['date_end'], '%d/%m/%Y %H:%M:%S')
+
+        event.add('dtstart', begin_date_time)
+        event.add('dtend', end_date_time)
+
+        # Generate a unique ID for the event
+        event['uid'] = secrets.token_urlsafe(8) + '@klivar.com'
+        
+        # Set organizer information
+        organizer = vCalAddress('MAILTO:' +  event_data['organizer'])
+        organizer.params['cn'] = vText(event_data['company'])
+        organizer.params['role'] = vText(event_data['role'])
+        event['organizer'] = organizer
+        cal.add_component(event)
+
+    # Create directory for saving the calendar file
+    dirpath = uuid.uuid4().hex[:4].lower()
+    save_as = "media/calendar/" + dirpath
+    if not os.path.exists(save_as):
+        os.makedirs(save_as)
+    # Write the calendar data to the file
+    filename = save_as + "/" + 'icalendar.ics'
+    if os.path.exists(filename):
+        os.remove(filename)
+    f = open(filename, 'wb')
+    f.write(cal.to_ical())
+    f.close() 
+    return filename
+
+ 
+
+# Example us
+
+
+ 

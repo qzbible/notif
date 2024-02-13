@@ -1,0 +1,4 @@
+																		Bonjour,
+                                                                        Dans l'évaluation de {{evaluation_type}},
+                                                                        concernant la question {{question_title}}, 
+                                                                        vous avez répondu que {{response_question}} Nous aimerions obtenir plus de précisions sur les éléments ayant conduit à cette situation. Nous vous prions donc de compléter la fiche suivante en ce sens.
