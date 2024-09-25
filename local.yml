@@ -2,12 +2,12 @@ version: "3.8"
 
 services:
 
-  api: &api #container_name: api
+  api: #container_name: api
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
     command: /start
-    restart: always
+    # restart: always
     volumes:
       - .:/app
       - static_volume:/app/static

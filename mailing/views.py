@@ -5,8 +5,8 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+# from drf_yasg.utils import swagger_auto_schema
+# from drf_yasg import openapi
 from collections import OrderedDict
 from rest_framework.decorators import api_view
 import json
@@ -14,8 +14,9 @@ import json
 # from .tasks import *
 
 from django.template.loader import render_to_string
-from django_celery_beat.models import PeriodicTask, IntervalSchedule, CrontabSchedule
-from django_celery_beat import querysets, validators
+
+# from django_celery_beat.models import PeriodicTask, IntervalSchedule, CrontabSchedule
+# from django_celery_beat import querysets, validators
 from rest_framework.views import APIView
 import uuid
 from datetime import datetime
@@ -30,52 +31,52 @@ from django.utils import timezone
 
 class resetPasswordViewSet(ViewSet):
     # parser_classes = (MultiPartParser, JSONParser,)
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Username")),
-            ("mail", openapi.Schema(type=openapi.TYPE_ARRAY, 
-                items=openapi.Items(type=openapi.TYPE_STRING),
-             example="Emails adress of destinators ")), 
-            ("url", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  "Example https:// " )), 
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("name", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Username")),
+    #         ("mail", openapi.Schema(type=openapi.TYPE_ARRAY, 
+    #             items=openapi.Items(type=openapi.TYPE_STRING),
+    #          example="Emails adress of destinators ")), 
+    #         ("url", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  "Example https:// " )), 
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
-    @swagger_auto_schema(
-    operation_description="This API create celery task  ",
-    request_body=request_body,
-    responses={ 
-        status.HTTP_201_CREATED: success,
-        status.HTTP_401_UNAUTHORIZED: bad_token,
-        status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-        status.HTTP_404_NOT_FOUND: 'slug not found',
-    })
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
+    # @swagger_auto_schema(
+    # operation_description="This API create celery task  ",
+    # request_body=request_body,
+    # responses={ 
+    #     status.HTTP_201_CREATED: success,
+    #     status.HTTP_401_UNAUTHORIZED: bad_token,
+    #     status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
+    #     status.HTTP_404_NOT_FOUND: 'slug not found',
+    # })
     
     def create(self, request): 
         try: 
@@ -122,58 +123,58 @@ class resetPasswordViewSet(ViewSet):
 
 class askDemoViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
                
-            ("name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="first and last name")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
-                items=openapi.Items(type=openapi.TYPE_STRING),
-             example="Emails adress of destinators ")), 
-            ("company", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  "Ziyouma " )),
-            ("phone", openapi.Schema(type=openapi.TYPE_NUMBER, 
-            example=  "phone " )),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  2 ))
-        )),
-        required=['results']
-    )
+    #         ("name", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="first and last name")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
+    #             items=openapi.Items(type=openapi.TYPE_STRING),
+    #          example="Emails adress of destinators ")), 
+    #         ("company", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  "Ziyouma " )),
+    #         ("phone", openapi.Schema(type=openapi.TYPE_NUMBER, 
+    #         example=  "phone " )),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  2 ))
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
-    @swagger_auto_schema(
-    operation_description="This API create celery task  ",
-    request_body=request_body,
-    responses={ 
-        status.HTTP_201_CREATED: success,
-        status.HTTP_401_UNAUTHORIZED: bad_token,
-        status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-        status.HTTP_404_NOT_FOUND: 'slug not found',
-    })
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
+    # @swagger_auto_schema(
+    # operation_description="This API create celery task  ",
+    # request_body=request_body,
+    # responses={ 
+    #     status.HTTP_201_CREATED: success,
+    #     status.HTTP_401_UNAUTHORIZED: bad_token,
+    #     status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
+    #     status.HTTP_404_NOT_FOUND: 'slug not found',
+    # })
     
     def create(self, request): 
         try: 
@@ -227,63 +228,63 @@ class askDemoViewSet(ViewSet):
 class feedbackCreateClientViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Username")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
-                items=openapi.Items(type=openapi.TYPE_STRING),
-             example="Emails adress of destinators ")), 
-            ("company", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  "Ziyouma " )),
-            ("url", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  "Example https:// " )),
-            ("nbr_client", openapi.Schema(type=openapi.TYPE_INTEGER, 
-            example=  2 )),
-            ("created_at", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=   "16 mai ")),
-             ("address_client", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=   "16 TOULOUSE  ")),
-             ("pays", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=   "France  ")),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Username")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
+    #             items=openapi.Items(type=openapi.TYPE_STRING),
+    #          example="Emails adress of destinators ")), 
+    #         ("company", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  "Ziyouma " )),
+    #         ("url", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  "Example https:// " )),
+    #         ("nbr_client", openapi.Schema(type=openapi.TYPE_INTEGER, 
+    #         example=  2 )),
+    #         ("created_at", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=   "16 mai ")),
+    #          ("address_client", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=   "16 TOULOUSE  ")),
+    #          ("pays", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=   "France  ")),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
-    @swagger_auto_schema(
-    operation_description="This API create celery task  ",
-    request_body=request_body,
-    responses={ 
-        status.HTTP_201_CREATED: success,
-        status.HTTP_401_UNAUTHORIZED: bad_token,
-        status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-        status.HTTP_404_NOT_FOUND: 'slug not found',
-    })
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
+    # @swagger_auto_schema(
+    # operation_description="This API create celery task  ",
+    # request_body=request_body,
+    # responses={ 
+    #     status.HTTP_201_CREATED: success,
+    #     status.HTTP_401_UNAUTHORIZED: bad_token,
+    #     status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
+    #     status.HTTP_404_NOT_FOUND: 'slug not found',
+    # })
     
     def create(self, request): 
         try: 
@@ -339,57 +340,57 @@ class feedbackCreateClientViewSet(ViewSet):
 class ceatedAccountViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Username")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
-                items=openapi.Items(type=openapi.TYPE_STRING),
-             example="Emails adress of destinators ")), 
-            ("company", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  "Ziyouma " )),
-            ("url", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  "Example https:// " )),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Username")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
+    #             items=openapi.Items(type=openapi.TYPE_STRING),
+    #          example="Emails adress of destinators ")), 
+    #         ("company", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  "Ziyouma " )),
+    #         ("url", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  "Example https:// " )),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
 
-    @swagger_auto_schema(
-    operation_description="This API create celery task  ",
-    request_body=request_body,
-    responses={ 
-        status.HTTP_201_CREATED: success,
-        status.HTTP_401_UNAUTHORIZED: bad_token,
-        status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-        status.HTTP_404_NOT_FOUND: 'slug not found',
-    })
+    # @swagger_auto_schema(
+    # operation_description="This API create celery task  ",
+    # request_body=request_body,
+    # responses={ 
+    #     status.HTTP_201_CREATED: success,
+    #     status.HTTP_401_UNAUTHORIZED: bad_token,
+    #     status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
+    #     status.HTTP_404_NOT_FOUND: 'slug not found',
+    # })
     
     def create(self, request): 
         try: 
@@ -432,93 +433,60 @@ class ceatedAccountViewSet(ViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(
-        operation_description="This API retieve specific celery task.",
-        responses={
-            # status.HTTP_200_OK:AnnouncementSerializer,
-            status.HTTP_401_UNAUTHORIZED: 'Bad toke',
-            status.HTTP_404_NOT_FOUND: 'slug not found',
-        }
-    )
-    def retrieve(self, request, pk=None):
-        # token = request.headers['Authorization']
-        # id, code, shema = Histories().get_user_from_token(token)
-        code = 200
-        id = 2
-        schema = 2
-        if code == 200:
-            queryset = PeriodicTask.objects.all()
-            object = queryset.values()
-            res = "This task no exists or has expired/ deleted"
-            for item in object:
-                if int(item["id"]) == int(pk):
-                    res = item
-            return Response(
-                {
-                    'message': 'Detail of Scheduler.',
-                    'status': 'success',
-                    'data': res,
-                    'code': status.HTTP_200_OK,
-                },
-                status=status.HTTP_200_OK)
-        else:
-            datas = {
-                'message': 'Bad token or ' + str(id)
-            }
-            return Response(datas, status=status.HTTP_401_UNAUTHORIZED)
+    
 
    
 class celeryViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Body of mail (your text)")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
-            # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
-            ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
-             "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Body of mail (your text)")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
+    #         # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+    #         ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
+    #          "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
-    @swagger_auto_schema(
-        operation_description="This API create celery task ",
-        request_body=request_body,
-        responses={
-            status.HTTP_201_CREATED: success,
-            401: bad_token,
-            400: 'Params error'
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="This API create celery task ",
+    #     request_body=request_body,
+    #     responses={
+    #         status.HTTP_201_CREATED: success,
+    #         401: bad_token,
+    #         400: 'Params error'
+    #     }
+    # )
     def create(self, request):
 
         try:
@@ -579,32 +547,7 @@ class celeryViewSet(ViewSet):
                 context
             )
 
-            """schedule, created = IntervalSchedule.objects.get_or_create(
-                every=30,
-                # period=unitime,
-                period=IntervalSchedule.SECONDS,
-            )
-            PeriodicTask.objects.update_or_create(
-                task="mailing.utils.send_mail",
-                # name="send_email",
-                name=uuid.uuid4().hex[:10].lower(),
-                args=json.dumps(
-                    [destinator, object, text_content, html_content]),
-
-                one_off=one_off,
-                start_time=datetime.now(),
-                # last_run_at = "2023-02-28T11:19:00+01:00", + every= 1s ==> envoie le mail at 2023-02-28T11:20:00+01:00
-                # --> last_run_at = "2023-02-28T13:49:00+01:00",
-                # -->expires = "2023-02-28T21:46:00+01:00",
-                # --> total_run_count = 2,
-                # kwargs=json.dumps({
-                #    'be_careful': True,
-                # }),
-                defaults=dict(
-                    interval=schedule,
-                    expire_seconds=60,
-                ),
-            )"""
+           
             mail = send_mail(destinator, object, text_content,
                              html_content, company)
 
@@ -626,126 +569,60 @@ class celeryViewSet(ViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(
-        operation_description="This API retieve specific celery task.",
-        responses={
-            # status.HTTP_200_OK:AnnouncementSerializer,
-            status.HTTP_401_UNAUTHORIZED: 'Bad toke',
-            status.HTTP_404_NOT_FOUND: 'slug not found',
-        }
-    )
-    def retrieve(self, request, pk=None):
-        # token = request.headers['Authorization']
-        # id, code, shema = Histories().get_user_from_token(token)
-        code = 200
-        id = 2
-        schema = 2
-        if code == 200:
-            queryset = PeriodicTask.objects.all()
-            object = queryset.values()
-            res = "This task no exists or has expired/ deleted"
-            for item in object:
-                if int(item["id"]) == int(pk):
-                    res = item
-            return Response(
-                {
-                    'message': 'Detail of Scheduler.',
-                    'status': 'success',
-                    'data': res,
-                    'code': status.HTTP_200_OK,
-                },
-                status=status.HTTP_200_OK)
-        else:
-            datas = {
-                'message': 'Bad token or ' + str(id)
-            }
-            return Response(datas, status=status.HTTP_401_UNAUTHORIZED)
-
-    @swagger_auto_schema(
-        operation_description="This API list celery task.",
-        responses={
-            # status.HTTP_200_OK:AnnouncementSerializer(many=True),
-            status.HTTP_401_UNAUTHORIZED: 'Bad toke',
-        }
-    )
-    def list(self, request):
-        # queryset = Historique_anoModel.objects.all().filter(created_by = 1)
-
-        # token = request.headers['Authorization']
-        # id, code, shema = Histories().get_user_from_token(token)
-        code = 200
-        id = 2
-        schema = 2
-        if code == 200:
-            queryset = PeriodicTask.objects.all()
-
-            # print(queryset.values())
-            return Response(
-                {
-                    'message': 'My Announcements.',
-                    'status': 'success',
-                    'data': queryset.values(),
-                    'code': status.HTTP_200_OK,
-                },
-                status=status.HTTP_200_OK)
-        else:
-            datas = {
-                'message': 'Bad token or ' + str(id)
-            }
-            return Response(datas, status=status.HTTP_401_UNAUTHORIZED)
+    
 
 
 class complateRegisterViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Body of mail (your text)")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
-            # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
-            ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
-             "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Body of mail (your text)")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
+    #         # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+    #         ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
+    #          "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
-    @swagger_auto_schema(
-        operation_description="This API create celery task ",
-        request_body=request_body,
-        responses={
-            status.HTTP_201_CREATED: success,
-            401: bad_token,
-            400: 'Params error'
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="This API create celery task ",
+    #     request_body=request_body,
+    #     responses={
+    #         status.HTTP_201_CREATED: success,
+    #         401: bad_token,
+    #         400: 'Params error'
+    #     }
+    # )
     def create(self, request):
 
         try:
@@ -822,54 +699,54 @@ class complateRegisterViewSet(ViewSet):
 class initChangePassViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Body of mail (your text)")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
-            # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
-            ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
-             "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Body of mail (your text)")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
+    #         # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+    #         ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
+    #          "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
-    @swagger_auto_schema(
-        operation_description="This API create celery task ",
-        request_body=request_body,
-        responses={
-            status.HTTP_201_CREATED: success,
-            401: bad_token,
-            400: 'Params error'
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="This API create celery task ",
+    #     request_body=request_body,
+    #     responses={
+    #         status.HTTP_201_CREATED: success,
+    #         401: bad_token,
+    #         400: 'Params error'
+    #     }
+    # )
     def create(self, request):
 
         try:
@@ -901,25 +778,7 @@ class initChangePassViewSet(ViewSet):
                 context
             )
 
-            """schedule, created = IntervalSchedule.objects.get_or_create(
-                every=30,
-                # period=unitime,
-                period=IntervalSchedule.SECONDS,
-            )
-            PeriodicTask.objects.update_or_create(
-                task="mailing.utils.send_mail",
-                # name="send_email",
-                name=uuid.uuid4().hex[:10].lower(),
-                args=json.dumps(
-                    [destinator, object, text_content, html_content]),
-
-                one_off=one_off,
-                start_time=datetime.now(),
-                defaults=dict(
-                    interval=schedule,
-                    expire_seconds=60,
-                ),
-            )"""
+           
             mail = send_mail(destinator, object, text_content,
                              html_content, company)
 
@@ -945,54 +804,54 @@ class initChangePassViewSet(ViewSet):
 class changePassViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Body of mail (your text)")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
-            # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
-            ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
-             "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Body of mail (your text)")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
+    #         # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+    #         ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
+    #          "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
-    @swagger_auto_schema(
-        operation_description="This API create celery task ",
-        request_body=request_body,
-        responses={
-            status.HTTP_201_CREATED: success,
-            401: bad_token,
-            400: 'Params error'
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="This API create celery task ",
+    #     request_body=request_body,
+    #     responses={
+    #         status.HTTP_201_CREATED: success,
+    #         401: bad_token,
+    #         400: 'Params error'
+    #     }
+    # )
     def create(self, request):
 
         try:
@@ -1023,25 +882,6 @@ class changePassViewSet(ViewSet):
                 context
             )
 
-            """schedule, created = IntervalSchedule.objects.get_or_create(
-                every=30,
-                # period=unitime,
-                period=IntervalSchedule.SECONDS,
-            )
-            PeriodicTask.objects.update_or_create(
-                task="mailing.utils.send_mail",
-                # name="send_email",
-                name=uuid.uuid4().hex[:10].lower(),
-                args=json.dumps(
-                    [destinator, object, text_content, html_content]),
-
-                one_off=one_off,
-                start_time=datetime.now(),
-                defaults=dict(
-                    interval=schedule,
-                    expire_seconds=60,
-                ),
-            )"""
             mail = send_mail(destinator, object, text_content,
                              html_content, company)
 
@@ -1067,54 +907,54 @@ class changePassViewSet(ViewSet):
 class taskView(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Body of mail (your text)")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
-            # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
-            ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
-             "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Body of mail (your text)")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
+    #         # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+    #         ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
+    #          "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
-    @swagger_auto_schema(
-        operation_description="This API create celery task ",
-        request_body=request_body,
-        responses={
-            status.HTTP_201_CREATED: success,
-            401: bad_token,
-            400: 'Params error'
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="This API create celery task ",
+    #     request_body=request_body,
+    #     responses={
+    #         status.HTTP_201_CREATED: success,
+    #         401: bad_token,
+    #         400: 'Params error'
+    #     }
+    # )
     def create(self, request):
 
         try:
@@ -1187,54 +1027,54 @@ class taskView(ViewSet):
 class affectationView(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Body of mail (your text)")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
-            # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
-            ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
-             "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Body of mail (your text)")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Emails adress of destinators", pattern=["loren@gmail.com", "ipsum@klblogs.com"])),
+    #         # ("unitime", openapi.Schema(type=openapi.TYPE_STRING,example = "minute (nimute, hour, day, week)")),
+    #         ("start_time", openapi.Schema(type=openapi.FORMAT_DATETIME, example=[
+    #          "2023-03-22T10:12:00+01:00", "2023-03-22T10:13:00+01:00"])),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
-    @swagger_auto_schema(
-        operation_description="This API create celery task ",
-        request_body=request_body,
-        responses={
-            status.HTTP_201_CREATED: success,
-            401: bad_token,
-            400: 'Params error'
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="This API create celery task ",
+    #     request_body=request_body,
+    #     responses={
+    #         status.HTTP_201_CREATED: success,
+    #         401: bad_token,
+    #         400: 'Params error'
+    #     }
+    # )
     def create(self, request):
         try:
             one_off = True
@@ -1461,55 +1301,55 @@ class affectationView(ViewSet):
 
 class notifViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Task name (Mail a tous les clients)")),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Body of mail (your text)")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Emails adress of destinators (loren@gmail.com,ipsum@klblogs.com)")),
-            ("unitime", openapi.Schema(type=openapi.TYPE_STRING,
-             example="minute (nimute, hour, day, week)")),
-            ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example=1)),
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("name", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Task name (Mail a tous les clients)")),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Body of mail (your text)")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Emails adress of destinators (loren@gmail.com,ipsum@klblogs.com)")),
+    #         ("unitime", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="minute (nimute, hour, day, week)")),
+    #         ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example=1)),
 
-        )),
-        required=['results']
-    )
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
-    @swagger_auto_schema(
-        operation_description="This API create celery scheduler request_body={object:Object of mail,name: task name,message:Mail dody,schedul:integer (number of minutes),destinator:string as landry.ziyouma@gmail.com,hoxopi1384@klblogs.com,unitime:time unit (string as minutes)}",
-        responses={
-            0: request_body,
-            status.HTTP_201_CREATED: success,
-            401: bad_token,
-            400: 'Params error'
+    #     )),
+    #     required=['results']
+    # )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
+    # @swagger_auto_schema(
+    #     operation_description="This API create celery scheduler request_body={object:Object of mail,name: task name,message:Mail dody,schedul:integer (number of minutes),destinator:string as landry.ziyouma@gmail.com,hoxopi1384@klblogs.com,unitime:time unit (string as minutes)}",
+    #     responses={
+    #         0: request_body,
+    #         status.HTTP_201_CREATED: success,
+    #         401: bad_token,
+    #         400: 'Params error'
 
-        }
-    )
+    #     }
+    # )
     
     def create(self, request):
         try:
@@ -1598,55 +1438,55 @@ class notifViewSet(ViewSet):
 
 class notifAuditViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Task name (Mail a tous les clients)")),
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Body of mail (your text)")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Emails adress of destinators (loren@gmail.com,ipsum@klblogs.com)")),
-            ("unitime", openapi.Schema(type=openapi.TYPE_STRING,
-             example="minute (nimute, hour, day, week)")),
-            ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example=1)),
-        )),
-        required=['results']
-    )
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("name", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Task name (Mail a tous les clients)")),
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Body of mail (your text)")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Emails adress of destinators (loren@gmail.com,ipsum@klblogs.com)")),
+    #         ("unitime", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="minute (nimute, hour, day, week)")),
+    #         ("schedul", openapi.Schema(type=openapi.TYPE_INTEGER, example=1)),
+    #     )),
+    #     required=['results']
+    # )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
-    @swagger_auto_schema(
-        operation_description="This API create celery scheduler request_body={object:Object of mail,name: task name,message:Mail dody,schedul:integer (number of minutes),destinator:string as landry.ziyouma@gmail.com,hoxopi1384@klblogs.com,unitime:time unit (string as minutes)}",
-        responses={
-            0: request_body,
-            status.HTTP_201_CREATED: success,
-            401: bad_token,
-            400: 'Params error'
+    # @swagger_auto_schema(
+    #     operation_description="This API create celery scheduler request_body={object:Object of mail,name: task name,message:Mail dody,schedul:integer (number of minutes),destinator:string as landry.ziyouma@gmail.com,hoxopi1384@klblogs.com,unitime:time unit (string as minutes)}",
+    #     responses={
+    #         0: request_body,
+    #         status.HTTP_201_CREATED: success,
+    #         401: bad_token,
+    #         400: 'Params error'
 
-        }
-    )
+    #     }
+    # )
     
     def create(self, request):
         try:
@@ -1703,57 +1543,57 @@ class notifAuditViewSet(ViewSet):
 class ceatedUserAccountViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
 
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="mail object (Demande de permission)")),
-            ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Username")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
-                items=openapi.Items(type=openapi.TYPE_STRING),
-             example="Emails adress of destinators ")), 
-            ("company", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  "Ziyouma " )),
-            ("url", openapi.Schema(type=openapi.TYPE_STRING, 
-            example=  "Example https:// " )),
-        )),
-        required=['results']
-    )
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("object", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="mail object (Demande de permission)")),
+    #         ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="Username")),
+    #         ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
+    #             items=openapi.Items(type=openapi.TYPE_STRING),
+    #          example="Emails adress of destinators ")), 
+    #         ("company", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  "Ziyouma " )),
+    #         ("url", openapi.Schema(type=openapi.TYPE_STRING, 
+    #         example=  "Example https:// " )),
+    #     )),
+    #     required=['results']
+    # )
 
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
 
-    @swagger_auto_schema(
-    operation_description="This API create celery task  ",
-    request_body=request_body,
-    responses={ 
-        status.HTTP_201_CREATED: success,
-        status.HTTP_401_UNAUTHORIZED: bad_token,
-        status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-        status.HTTP_404_NOT_FOUND: 'slug not found',
-    })
+    # @swagger_auto_schema(
+    # operation_description="This API create celery task  ",
+    # request_body=request_body,
+    # responses={ 
+    #     status.HTTP_201_CREATED: success,
+    #     status.HTTP_401_UNAUTHORIZED: bad_token,
+    #     status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
+    #     status.HTTP_404_NOT_FOUND: 'slug not found',
+    # })
     
     def create(self, request): 
         try: 
@@ -1796,14 +1636,14 @@ class ceatedUserAccountViewSet(ViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(
-        operation_description="This API retieve specific celery task.",
-        responses={
-            # status.HTTP_200_OK:AnnouncementSerializer,
-            status.HTTP_401_UNAUTHORIZED: 'Bad toke',
-            status.HTTP_404_NOT_FOUND: 'slug not found',
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="This API retieve specific celery task.",
+    #     responses={
+    #         # status.HTTP_200_OK:AnnouncementSerializer,
+    #         status.HTTP_401_UNAUTHORIZED: 'Bad toke',
+    #         status.HTTP_404_NOT_FOUND: 'slug not found',
+    #     }
+    # )
     def retrieve(self, request, pk=None):
         # token = request.headers['Authorization']
         # id, code, shema = Histories().get_user_from_token(token)
@@ -1835,46 +1675,46 @@ class ceatedUserAccountViewSet(ViewSet):
 
 class codeAuthUserViewSet(ViewSet):
     parser_classes = (MultiPartParser, JSONParser,)
-    success = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="your request was do successfully success")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        )),
-        required=['results']
-    )
+    # success = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(type=openapi.TYPE_STRING,
+    #          example="your request was do successfully success")),
+    #         ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
+    #         ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
+    #          example=status.HTTP_201_CREATED)),
+    #     )),
+    #     required=['results']
+    # )
 
-    request_body = openapi.Schema(
-        description="Cette partie decris le corp de l'API. il faut",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
+    # request_body = openapi.Schema(
+    #     description="Cette partie decris le corp de l'API. il faut",
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
              
-        )),
-        required=['results']
-    )
-    bad_token = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Bad token or ...")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        )),
-        required=['results']
-    )
+    #     )),
+    #     required=['results']
+    # )
+    # bad_token = openapi.Schema(
+    #     type=openapi.TYPE_OBJECT,
+    #     properties=OrderedDict((
+    #         ("message", openapi.Schema(
+    #             type=openapi.TYPE_STRING, example="Bad token or ...")),
+    #         ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
+    #     )),
+    #     required=['results']
+    # )
 
 
-    @swagger_auto_schema(
-    operation_description="This API create celery task  ",
-    request_body=request_body,
-    responses={ 
-        status.HTTP_201_CREATED: success,
-        status.HTTP_401_UNAUTHORIZED: bad_token,
-        status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-        status.HTTP_404_NOT_FOUND: 'slug not found',
-    })
+    # @swagger_auto_schema(
+    # operation_description="This API create celery task  ",
+    # request_body=request_body,
+    # responses={ 
+    #     status.HTTP_201_CREATED: success,
+    #     status.HTTP_401_UNAUTHORIZED: bad_token,
+    #     status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
+    #     status.HTTP_404_NOT_FOUND: 'slug not found',
+    # })
     
     def create(self, request): 
         try: 
@@ -1917,14 +1757,14 @@ class codeAuthUserViewSet(ViewSet):
                 },
                 status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(
-        operation_description="This API retieve specific celery task.",
-        responses={
-            # status.HTTP_200_OK:AnnouncementSerializer,
-            status.HTTP_401_UNAUTHORIZED: 'Bad toke',
-            status.HTTP_404_NOT_FOUND: 'slug not found',
-        }
-    )
+    # @swagger_auto_schema(
+    #     operation_description="This API retieve specific celery task.",
+    #     responses={
+    #         # status.HTTP_200_OK:AnnouncementSerializer,
+    #         status.HTTP_401_UNAUTHORIZED: 'Bad toke',
+    #         status.HTTP_404_NOT_FOUND: 'slug not found',
+    #     }
+    # )
     def retrieve(self, request, pk=None):
         # token = request.headers['Authorization']
         # id, code, shema = Histories().get_user_from_token(token)

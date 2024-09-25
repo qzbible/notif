@@ -15,8 +15,7 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from celery import app, Celery
-from celery import shared_task
+
 
 from datetime import datetime, timedelta
 
@@ -30,11 +29,7 @@ import urllib.request
 
  
 
-
-app = Celery('send_mail', broker='pyamqp://root@localhost//')
-
-
-@shared_task
+ 
 def send_mail(to_emails, title, text_content, html_content, company):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER

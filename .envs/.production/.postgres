@@ -1,6 +1,0 @@
-
-POSTGRES_HOST=postgres_klivar
-POSTGRES_PORT=5432
-POSTGRES_DB=klivar_celery
-POSTGRES_USER=klivarcloud
-POSTGRES_PASSWORD=a1128f69-e6f7zi-4e93you-a2df-ma3d4db6030abc

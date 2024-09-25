@@ -7,7 +7,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
    libpq-dev 
 
 COPY ./requirements .
-
+RUN pip install -q --upgrade pip
+RUN pip install drf-spectacular
 RUN pip wheel --wheel-dir /usr/src/app/wheels \
    -r ${BUILD_ENVIRONMENT}.txt
 
@@ -41,17 +42,9 @@ COPY ./docker/local/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
 RUN chmod +x /entrypoint
 
-# COPY ./docker/local/django/start /start
-# RUN sed -i 's/\r$//g' /start
-# RUN chmod +x /start
-
-# COPY ./docker/local/django/start_celery_worker /start_celery_worker
-# RUN sed -i 's/\r$//g' /start_celery_worker
-# RUN chmod +x /start_celery_worker
-
-# COPY ./docker/local/django/start_celery_beat /start_celery_beat
-# RUN sed -i 's/\r$//g' /start_celery_beat
-# RUN chmod +x /start_celery_beat
+COPY ./docker/local/django/start /start
+RUN sed -i 's/\r$//g' /start
+RUN chmod +x /start
 
 
 COPY . ${APP_HOME}

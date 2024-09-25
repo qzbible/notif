@@ -39,22 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'drf_yasg',
     'mailing',
-    'django_celery_results',
-    'django_celery_beat',
+    
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    # 'drf_spectacular'
 ]
 
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
-    },
-    'USE_SESSION_AUTH': False,
-}
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', 
@@ -87,6 +78,27 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'notification.wsgi.application'
+REST_FRAMEWORK = {
+   
+    # 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+}
+
+# SPECTACULAR_SETTINGS = {
+#     'TITLE': 'Klivar API MAIL NOTIFICATION',
+#     'DESCRIPTION': 'Description de l\'API.',
+#     'VERSION': '1.0.0',
+#     'TERMS_OF_SERVICE': 'https://monsite.com/terms/',
+#     'CONTACT': {
+#         'name': 'Support Technique',
+#         'url': 'https://monsite.com/contact/',
+#         'email': 'support@monsite.com',
+#     },
+#     'LICENSE': {
+#         'name': 'Apache 2.0',
+#         'url': 'https://www.apache.org/licenses/LICENSE-2.0.html',
+#     },
+#     'SERVE_INCLUDE_SCHEMA': False,  # Désactiver la livraison du schéma via API
+# }
 
 
 # Database

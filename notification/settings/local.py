@@ -16,24 +16,6 @@ SECRET_KEY = env(
 ALLOWED_HOSTS = ["*"]
 
 
-CELERY_TIMEZONE ="Africa/Douala"
-# CELERY_TIMEZONE = os.getenv("CELERY_TIMEZONE", "Africa/Douala")
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-
-CELERY_CACHE_BACKEND = 'django-cache'
-CELERY_TASK_TRACK_STARTED = True
-
-CELERY_RESULT_BACKEND_DB = f'db+mysql+pymysql://root:ziyouma@db/pseudo_mysql'
-# CELERY_RESULT_BACKEND_DB = os.getenv(
-#     "CELERY_RESULT_BACKEND_DB", f'db+mysql+pymysql://root:ziyouma@db/pseudo_mysql')
-CELERY_BROKER_URL = f'amqp://root:ziyouma@rabbitmq_mail//'
-# CELERY_BROKER_URL = f'amqp://root:ziyouma@rabbitmq//'
-CELERY_TASK_RESULT_EXPIRES = 18000
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_IMPORTS = ["mailing.tasks"]
-
 EMAIL_HOST = os.getenv(
     "EMAIL_HOST", 'smtp.gmail.com')
 EMAIL_PORT = os.getenv(
