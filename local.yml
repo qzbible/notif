@@ -1,18 +1,7 @@
 version: "3.8"
 
 services:
-  rabbitmq_mail:
-    image: rabbitmq:3.7-management
-    container_name: rabbitmq_mail
-    restart: always
-    env_file:
-      - ./.envs/.local/.live
 
-    expose:
-      - "5672"
-      - "15672"
-    networks:
-      - klivar-api-local-live-nw
   api: &api #container_name: api
     build:
       context: .
@@ -31,41 +20,6 @@ services:
       - ./.envs/.local/.postgres
       - ./.envs/.local/.django
 
-  celery_worker:
-    <<: *api
-    image: worker
-    command: celery -A notification worker -l DEBUG
-    networks:
-      - klivar-api-local-live-nw
-    depends_on:
-      - api
-      - rabbitmq_mail
-
-  celery_beat:
-    <<: *api
-    image: beat
-    command: celery -A notification beat -l INFO
-    networks:
-      - klivar-api-local-live-nw
-    depends_on:
-      - api
-      - rabbitmq_mail
-
-  postgres_celery:
-    build:
-      context: .
-      dockerfile: ./docker/local/postgres/Dockerfile
-    container_name: postgres_celery
-    restart: always
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - postgres_data_backups:/backups
-    env_file:
-      - ./.envs/.local/.postgres
-    environment:
-      - POSTGRES_PORT=5432 # Ajouter cette ligne
-    networks:
-      - klivar-api-local-live-nw
 
   nginx:
     restart: always
@@ -89,5 +43,4 @@ networks:
 volumes:
   static_volume:
   media_volume:
-  postgres_data: {}
-  postgres_data_backups: {}
+ 

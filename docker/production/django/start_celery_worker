@@ -1,4 +1,0 @@
-#!/bin/bash
-set -o errexit
-
-celery -A notification worker -l DEBUG
