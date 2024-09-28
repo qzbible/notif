@@ -1,3 +1,0 @@
-{{ message }}
-
-{{ site_url }}Voir depuis l'application

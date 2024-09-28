@@ -14,9 +14,6 @@ from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-
-
-
 from datetime import datetime, timedelta
 
 from urllib.request import urlopen
@@ -27,7 +24,6 @@ from datetime import datetime
 import secrets
 import urllib.request
 
- 
 
  
 def send_mail(to_emails, title, text_content, html_content, company):
@@ -277,7 +273,6 @@ def start_date(in_date, time):
 
     return time_begin
 
-
 def end_date(begin, duration):
     """This function return end time for activity"""
 
@@ -286,7 +281,6 @@ def end_date(begin, duration):
     time_end = begin + \
         timedelta(hours=int(res[0]), minutes=int(res[1]), seconds=0)
     return time_end
-
 
 def start_date_test(in_date, time):
     """This function return start time for activity"""
@@ -390,8 +384,6 @@ def add_calendar(title, description, date_begin, date_end, company):
     f.close()
 
     return filename
-
-
 
 
 def generate_dates(start_date, recurrence):
@@ -510,8 +502,6 @@ def add_calendar_with_multiple_date(events):
     return filename
 
  
-
-# Example us
 
 
  
