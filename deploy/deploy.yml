@@ -1,0 +1,13 @@
+---
+- name: Deploy Backend
+  hosts: ovh_manager_v2
+  vars_files:
+    - environments/all.yml
+    - environments/{{ env }}/vars.yml
+    - environments/{{ env }}/vault
+
+  roles:
+    - role: klivar-backend
+      klivar_backend_stack_name: "{{ env }}-klivar-backend"
+      klivar_backend_dest_folder: "/apps"
+      klivar_backend_hostname: "{{ backend_app_hostname }}"

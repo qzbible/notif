@@ -1,0 +1,5 @@
+---
+backend_app_hostname: dev-tmp.back.klivar.com
+front_app_manager_hostname: dev.app.klivar.com
+front_app_admin_hostname: dev.admin.klivar.com
+front_app_staff_hostname: dev.staff.klivar.com

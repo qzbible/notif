@@ -1,0 +1,5 @@
+---
+backend_app_hostname: play2-backend.app.klivar.com
+front_app_manager_hostname: play2.app.klivar.com
+front_app_admin_hostname: play2.admin.klivar.com
+front_app_staff_hostname: play2.staff.klivar.com

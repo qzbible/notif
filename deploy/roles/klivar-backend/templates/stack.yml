@@ -1,0 +1,152 @@
+# https://stackoverflow.com/questions/44694640/docker-swarm-with-image-versions-externalized-to-env-file
+# See https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
+services:
+  nginx:
+    image: nginx:1.21.5-alpine
+    configs:
+      - source: "{{ nginx_config_name }}"
+        target: /etc/nginx/conf.d/default.conf
+        mode: 0440
+    volumes:
+      - static_volume:/app/static:ro
+      - media_volume:/app/media:ro
+    networks:
+      - klivar
+      - "{{ traefik_network }}"
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        failure_action: rollback
+      rollback_config:
+        order: start-first
+        parallelism: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label=traefik-public
+
+        # Http router: redirection to https
+        - traefik.http.routers.{{ env }}-nginx-klivar-backend-http.rule=Host(`{{ klivar_backend_hostname }}`)
+        - traefik.http.routers.{{ env }}-nginx-klivar-backend-http.entrypoints=http
+        - traefik.http.routers.{{ env }}-nginx-klivar-backend-http.middlewares=https-redirect
+
+        # Https router
+        - traefik.http.routers.{{ env }}-nginx-klivar-backend-https.rule=Host(`{{ klivar_backend_hostname }}`)
+        - traefik.http.routers.{{ env }}-nginx-klivar-backend-https.entrypoints=https
+        - traefik.http.routers.{{ env }}-nginx-klivar-backend-https.tls=true
+        - traefik.http.routers.{{ env }}-nginx-klivar-backend-https.tls.certresolver=letsencrypt
+
+        # Pointing to nginx (for serving static files)
+        - traefik.http.services.{{ env }}-nginx-klivar-backend.loadbalancer.server.port=80
+
+  api: &api
+    image: "{{ klivar_backend_image }}"
+    command: /start
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    networks:
+      - klivar
+    env_file:
+      - ./.django.env
+      - ./.postgres.env
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail -X GET -H 'Accept:application/json' http://localhost:{{ django_listening_port }}/__healthcheck/liveness-probe/ || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 20s
+      start_interval: 10s
+
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        failure_action: rollback
+      rollback_config:
+        order: start-first
+        parallelism: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.enable=false
+      placement:
+        constraints:
+          - node.role == manager
+
+  redis:
+    image: redis:6-alpine
+    networks:
+      - klivar
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - traefik.enable=false
+
+  # es:
+  #   image: elasticsearch:7.17.9
+  #   environment:
+  #     - discovery.type=single-node
+  #     - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  #   volumes:
+  #     - es_data:/usr/share/elasticsearch/data
+  #   networks:
+  #     - klivar
+  #   deploy:
+  #     restart_policy:
+  #       condition: on-failure
+  #     labels:
+  #       - traefik.enable=false
+  #     resources:
+  #       limits:
+  #         memory: "1024m"
+
+  celery_worker:
+    <<: *api
+    command: /start-celeryworker
+    healthcheck: # TODO: needs to be implemented
+      test: []
+      disable: true
+
+  celery_beat:
+    <<: *api
+    command: /start-beat
+    healthcheck: # TODO: needs to be implemented
+      test: []
+      disable: true
+
+  flower:
+    <<: *api
+    command: /start-flower
+    healthcheck: # TODO: needs to be implemented
+      test: []
+      disable: true
+
+volumes:
+  static_volume:
+  media_volume:
+  # es_data:
+
+networks:
+  klivar:
+    name: "{{ env }}-klivar-backend"
+  "{{ traefik_network }}":
+    external: true
+
+configs:
+  "{{ nginx_config_name }}":
+    external: true
