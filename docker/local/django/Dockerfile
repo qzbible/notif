@@ -1,15 +1,16 @@
-ARG PYTHON_VERSION=3.9-slim-bullseye
-FROM python:${PYTHON_VERSION} as python
+FROM --platform=linux/amd64 python:3.12.2-slim-bullseye as python
+
 FROM python as python-build-stage
 ARG BUILD_ENVIRONMENT=local
-RUN apt-get update && apt-get install --no-install-recommends -y \
-   build-essential \
-   libpq-dev 
+
+# RUN apt-get update -q && apt-get install --no-install-recommends -q -y \
+#    build-essential \
+#    libpq-dev
+
 
 COPY ./requirements .
 RUN pip install -q --upgrade pip
-RUN pip install drf-spectacular
-RUN pip wheel --wheel-dir /usr/src/app/wheels \
+RUN pip wheel -q --wheel-dir /usr/src/app/wheels \
    -r ${BUILD_ENVIRONMENT}.txt
 
 
@@ -26,17 +27,11 @@ ENV BUILD_ENV ${BUILD_ENVIRONMENT}
 
 WORKDIR ${APP_HOME}
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    libpq-dev \
-    gettext \
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && rm -rf /var/lib/apt/lists/*
-
 
 COPY --from=python-build-stage /usr/src/app/wheels /wheels/
 
-RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-   && rm -rf /wheels/
+RUN pip install -q --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
+   && rm -rf /wheels/ && pip freeze
 
 COPY ./docker/local/django/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
@@ -47,9 +42,22 @@ RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
 
-COPY . ${APP_HOME}
+COPY ./docker/local/django/celery/worker/start /start-celeryworker
+RUN sed -i 's/\r$//g' /start-celeryworker
+RUN chmod +x /start-celeryworker
+
+COPY ./docker/local/django/celery/flower/start /start-flower
+RUN sed -i 's/\r$//g' /start-flower
+RUN chmod +x /start-flower
+
+COPY ./docker/local/django/celery/beat/start /start-beat
+RUN sed -i 's/\r$//g' /start-beat
+RUN chmod +x /start-beat
+# COPY --chown=django:django . ${APP_HOME}
+COPY  . ${APP_HOME}
+
+# RUN chown django:django -R ${APP_HOME}
+
+# USER django
 
 ENTRYPOINT ["/entrypoint"]
-
-
-

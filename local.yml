@@ -2,7 +2,19 @@ version: "3.8"
 
 services:
 
-  api: #container_name: api
+  redis:
+    image: redis:6-alpine
+    networks:
+      - klivar-api-local-live-nw
+
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+
+  api: &api #container_name: api
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
@@ -19,7 +31,63 @@ services:
     env_file:
       - ./.envs/.local/.postgres
       - ./.envs/.local/.django
+    depends_on:
+        - redis
 
+
+  celery_worker:
+    <<: *api
+    image: klivar-backend-celeryworker
+    command: /start-celeryworker
+    healthcheck: # TODO: needs to be implemented
+      test: []
+      disable: true
+    networks:
+      - klivar-api-local-live-nw
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    volumes:
+      - .:/app # cablage au source de travail
+    depends_on:
+      redis:
+        condition: service_healthy
+
+
+  celery_beat:
+    <<: *api
+    image: klivar-backend-celerybeat
+    command: /start-beat
+    healthcheck: # TODO: needs to be implemented
+      test: []
+      disable: true
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    networks:
+      - klivar-api-local-live-nw
+    volumes:
+      - .:/app # cablage au source de travail
+    depends_on:
+      - redis
+
+
+  flower:
+    <<: *api
+    image: klivar-backend-flower
+    command: /start-flower
+    healthcheck: # TODO: needs to be implemented
+      test: []
+      disable: true
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    networks:
+      - klivar-api-local-live-nw
+    volumes:
+      - .:/app # cablage au source de travail
+    depends_on:
+      - redis
 
   nginx:
     restart: always
@@ -36,9 +104,11 @@ services:
     networks:
       - klivar-api-local-live-nw
 
+
 networks:
   klivar-api-local-live-nw:
     external: true
+
 
 volumes:
   static_volume:

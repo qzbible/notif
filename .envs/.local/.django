@@ -6,3 +6,4 @@ EMAIL_HOST = smtp.gmail.com
 EMAIL_PORT = 587
 EMAIL_HOST_USER = avotreecoute@klivar.com
 EMAIL_HOST_PASSWORD = !Klivardev1
+CELERY_BROKER_URL=redis://redis:6379/0

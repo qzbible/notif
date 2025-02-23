@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'corsheaders',
+    'django_celery_results',
+    'django_celery_beat',
     # 'drf_spectacular'
 ]
 
@@ -176,3 +178,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Celery configuration
+CELERY_TIMEZONE = os.environ.get("CELERY_TIMEZONE", "Africa/Douala")
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_CACHE_BACKEND = 'django-cache'
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_RESULT_EXPIRES = 18000
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+CELERY_IMPORTS = ["mailing.utils"]
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+REDIS_URL = os.environ.get("REDIS_URL", "redis://redis:6379/0")
