@@ -49,7 +49,7 @@
 
 - name: Deploy the stack
   community.docker.docker_stack:
-    name: "{{ klivar_backend_stack_name }}"
+    name: "{{ tmp_back_stack_name }}"
     compose:
       - "{{ final_dest_folder }}/final-stack.yml"
     prune: true
@@ -60,7 +60,7 @@
 
 - name: Wait for the deployment to finish
   ansible.builtin.command:
-    cmd: docker-stack-wait -t 20 {{ klivar_backend_stack_name }}
+    cmd: docker-stack-wait -t 20 {{ tmp_back_stack_name }}
     chdir: "{{ final_dest_folder }}"
   register: wait_for_deploy
   ignore_errors: true
@@ -81,7 +81,7 @@
 
 - name: Check if we can access the service
   ansible.builtin.uri:
-    url: http://{{ klivar_backend_hostname }}/__healthcheck/
+    url: http://{{ tmp_back_hostname }}/__healthcheck/
     follow_redirects: true
     return_content: true
     headers:

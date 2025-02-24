@@ -7,7 +7,7 @@
     - environments/{{ env }}/vault
 
   roles:
-    - role: klivar-backend
-      klivar_backend_stack_name: "{{ env }}-klivar-backend"
-      klivar_backend_dest_folder: "/apps"
-      klivar_backend_hostname: "{{ backend_app_hostname }}"
+    - role: tmp-back
+      tmp_back_stack_name: "{{ env }}-tmp-back"
+      tmp_back_dest_folder: "/apps"
+      tmp_back_hostname: "{{ backend_app_hostname }}"

@@ -46,7 +46,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          file: docker/develop/django/Dockerfile
+          file: docker/local/django/Dockerfile
           context: .
           push: true
           tags: ${{ steps.meta-api.outputs.tags }}
@@ -84,7 +84,7 @@ jobs:
       - name: Running ansible
         working-directory: deploy
         run: |
-          ansible-playbook -e env=dev -e klivar_backend_image=${IMAGE_TAG} deploy.yml
+          ansible-playbook -e env=dev -e tmp_back_image=${IMAGE_TAG} deploy.yml
 
   play2:
     runs-on: ubuntu-latest
@@ -119,9 +119,8 @@ jobs:
       - name: Running ansible
         working-directory: deploy
         run: |
-          ansible-playbook -e env=play2 -e klivar_backend_image=${IMAGE_TAG} deploy.yml
+          ansible-playbook -e env=play2 -e tmp_back_image=${IMAGE_TAG} deploy.yml
 
-        
   play:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/play' || startsWith(github.ref, 'refs/tags/')
@@ -152,7 +151,7 @@ jobs:
       - name: Running ansible
         working-directory: deploy
         run: |
-          ansible-playbook -e env=play -e klivar_backend_image=${IMAGE_TAG} deploy.yml
+          ansible-playbook -e env=play -e tmp_back_image=${IMAGE_TAG} deploy.yml
 
   prod:
     runs-on: ubuntu-latest
@@ -184,4 +183,4 @@ jobs:
       - name: Running ansible
         working-directory: deploy
         run: |
-          ansible-playbook -e env=prod -e klivar_backend_image=${IMAGE_TAG} deploy.yml
+          ansible-playbook -e env=prod -e tmp_back_image=${IMAGE_TAG} deploy.yml

@@ -1,7 +1,7 @@
 ---
-final_dest_folder: "{{ klivar_backend_dest_folder }}/{{ klivar_backend_stack_name }}"
+final_dest_folder: "{{ tmp_back_dest_folder }}/{{ tmp_back_stack_name }}"
 django_listening_port: 8000
-nginx_config_name: "{{ env }}-klivar-nginx-conf-v3"
+nginx_config_name: "{{ env }}-klivar-nginx-conf-v"
 
 # This is where the docker dependencies are installed
 ansible_python_interpreter: /usr/local/bin/python3-docker
