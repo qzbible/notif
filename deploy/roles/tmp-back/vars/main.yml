@@ -1,6 +1,6 @@
 ---
 final_dest_folder: "{{ tmp_back_dest_folder }}/{{ tmp_back_stack_name }}"
-django_listening_port: 9081
+django_listening_port: 8000
 nginx_config_name: "{{ env }}-klivar-nginx-conf-v1"
 
 # This is where the docker dependencies are installed
