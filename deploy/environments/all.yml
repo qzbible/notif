@@ -3,11 +3,11 @@
 traefik_network: traefik-public
 
 # DB settings
-klivar_backend_db_host: "{{ vault_db_host }}"
-klivar_backend_db_name: "{{ vault_db_name }}"
-klivar_backend_db_user: "{{ vault_db_user }}"
-klivar_backend_db_password: "{{ vault_db_password }}"
-klivar_backend_db_port: "{{ vault_db_port }}"
+tmp_back_db_host: "{{ vault_db_host }}"
+tmp_back_db_name: "{{ vault_db_name }}"
+tmp_back_db_user: "{{ vault_db_user }}"
+tmp_back_db_password: "{{ vault_db_password }}"
+tmp_back_db_port: "{{ vault_db_port }}"
 
 # Django settings
-klivar_backend_django_secret_key: "{{ vault_django_secret_key }}"
+tmp_back_django_secret_key: "{{ vault_django_secret_key }}"
