@@ -39,6 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'drf_yasg',
     'mailing',
+
+    # Healthchecks
+    'health_check',  # required
+    'health_check.db',  # stock Django health checkers: DatabaseBackend
+    'health_check.contrib.migrations',  # check if: MigrationsHealthCheck
     
     'rest_framework',
     'corsheaders',
@@ -192,3 +197,14 @@ CELERY_IMPORTS = ["mailing.utils"]
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
 REDIS_URL = os.environ.get("REDIS_URL", "redis://redis:6379/0")
+
+
+# Healthchecks: https://github.com/revsys/django-health-check
+HEALTH_CHECK = {
+
+    "SUBSETS": {
+        "startup-probe": ["MigrationsHealthCheck", "DatabaseBackend"],
+        "liveness-probe": ["DatabaseBackend"],
+        # "liveness-probe": ["DatabaseBackend", "CeleryHealthCheckCelery", "CeleryPingHealthCheck"],
+    },
+}
