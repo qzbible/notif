@@ -7,4 +7,4 @@ python3 manage.py collectstatic --noinput
 
 
 
-python3 manage.py runserver 0.0.0.0:9081 --settings=notification.settings.local
+python3 manage.py runserver "0.0.0.0:${DJANGO_LISTENING_PORT:-9081}"
