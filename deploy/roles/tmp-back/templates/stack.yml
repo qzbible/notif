@@ -99,8 +99,6 @@ services:
       labels:
         - traefik.enable=false
 
-
-
   celery_worker:
     <<: *api
     command: /start-celeryworker

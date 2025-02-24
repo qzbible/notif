@@ -1,10 +1,11 @@
 #!/bin/bash
+
 set -o errexit
+set -o pipefail
+set -o nounset
 
-python3 manage.py makemigrations
 python3 manage.py migrate
-python3 manage.py collectstatic --noinput
-
-
-
+# python3 manage.py migrate_schemas --list
+python3 manage.py collectstatic --no-input
+# TODO: use gunicorn to start the server
 python3 manage.py runserver "0.0.0.0:${DJANGO_LISTENING_PORT:-9081}"
