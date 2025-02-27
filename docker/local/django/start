@@ -9,4 +9,4 @@ python3 manage.py migrate
 python3 manage.py collectstatic --no-input
 # TODO: use gunicorn to start the server
 echo "Starting Django server on port ${DJANGO_LISTENING_PORT:-9081}"
-python3 manage.py runserver "0.0.0.0:${DJANGO_LISTENING_PORT:-9081}"
+python3 manage.py runserver "0.0.0.0:9081"
