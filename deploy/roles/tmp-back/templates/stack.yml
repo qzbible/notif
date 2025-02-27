@@ -48,6 +48,7 @@ services:
         # Pointing to nginx (for serving static files)
         - traefik.http.services.{{ env }}-nginx-tmp-back.loadbalancer.server.port=80
 
+
   api: &api
     image: "{{ tmp_back_image }}"
     command: /start
@@ -59,16 +60,7 @@ services:
     env_file:
       - ./.django.env
       - ./.postgres.env
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl --fail -X GET -H 'Accept:application/json' http://localhost:{{ django_listening_port }}/__healthcheck/liveness-probe/ || exit 1",
-        ]
-      interval: 30s
-      timeout: 10s
-      start_period: 20s
-      start_interval: 10s
+
 
     deploy:
       mode: replicated
