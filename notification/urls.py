@@ -22,40 +22,25 @@ from django.conf import settings
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view as getshemaview
 from drf_yasg import openapi
-# from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-schema_view = getshemaview(
-    openapi.Info(
-        title="Documentation application de notification",
-        default_version=' V0.00.01',
-        description="Documentation des API",
-        terms_of_service="http://5.189.181.239:9005/",
-        contact=openapi.Contact(email="contact@ziyouma-agency.com"),
-        license=openapi.License(name="Ziyouma Agency"),
-    ),
-    public=True,  # True to expose all API and False to exclude token's API
-    # if IsAuthenticated 401 AllowAny
-    permission_classes=(permissions.AllowAny,),
+ 
+
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
 )
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('celery/', include('mailing.urls')),
-    path(
-        'doc/swagger.json',
-        schema_view.without_ui(cache_timeout=0),
-        name='schema-json'
-    ),
-    path(
-        '',
-        schema_view.with_ui('swagger', cache_timeout=0),
-        name='schema-swagger-ui'
-    ),
-    path(
-        'redoc/',
-        schema_view.with_ui('redoc', cache_timeout=0),
-        name='schema-redoc'
-    ),
+    # path('celery/', include('mailing.urls')),
+    path('exigence/', include('exigence.urls')),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),  # Endpoint pour le schéma JSON/YAML
+    
+    # Interface Swagger UI
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    
+    # Interface ReDoc (alternative à Swagger UI)
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('__healthcheck/', include('health_check.urls')),
 ]

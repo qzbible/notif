@@ -37,26 +37,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'drf_yasg',
-    'mailing',
-
+    'corsheaders',
+    # 'drf_yasg',
+    'mailing', 
+    'exigence',
     # Healthchecks
     'health_check',  # required
-    'health_check.db',  # stock Django health checkers: DatabaseBackend
-    'health_check.contrib.migrations',  # check if: MigrationsHealthCheck
-    
+    'health_check.db',  
+    'health_check.contrib.migrations',   
     'rest_framework',
-    'corsheaders',
+
     'django_celery_results',
     'django_celery_beat',
-    # 'drf_spectacular'
+    'drf_spectacular'
 ]
-
 
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', 
-
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -65,6 +63,51 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Configuration de REST Framework
+REST_FRAMEWORK = {
+    # Utilisez DRF Spectacular pour la génération de schéma
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
+    # Autres configurations REST Framework
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+# Autoriser tous les CORS - À utiliser uniquement en développement
+CORS_ALLOW_ALL_ORIGINS = True
+ 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API d\'exigence',
+    'DESCRIPTION': 'API pour créer des exigences et envoyer des notifications',
+    'VERSION': '1.0.0',
+    
+    # Autres options utiles
+    'SERVE_INCLUDE_SCHEMA': False,  # Ne pas inclure le schema dans la liste des endpoints
+    
+    # Configuration d'authentification pour Swagger UI
+    'SECURITY': [
+        {
+            'Token': [],
+        }
+    ],
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': False,
+    },
+    
+    # Personnalisation avancée (optionnel)
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api/',
+    
+    # Filtres pour exclure certains endpoints (optionnel)
+    # 'EXCLUDE_PATHS': ['/api/admin/'],
+}
 
 ROOT_URLCONF = 'notification.urls'
 
@@ -85,29 +128,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'notification.wsgi.application'
-REST_FRAMEWORK = {
-   
-    # 'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
-}
-
-# SPECTACULAR_SETTINGS = {
-#     'TITLE': 'Klivar API MAIL NOTIFICATION',
-#     'DESCRIPTION': 'Description de l\'API.',
-#     'VERSION': '1.0.0',
-#     'TERMS_OF_SERVICE': 'https://monsite.com/terms/',
-#     'CONTACT': {
-#         'name': 'Support Technique',
-#         'url': 'https://monsite.com/contact/',
-#         'email': 'support@monsite.com',
-#     },
-#     'LICENSE': {
-#         'name': 'Apache 2.0',
-#         'url': 'https://www.apache.org/licenses/LICENSE-2.0.html',
-#     },
-#     'SERVE_INCLUDE_SCHEMA': False,  # Désactiver la livraison du schéma via API
-# }
-
-
+ 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -144,23 +165,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = [
-    'http://example.com',
-    'https://example.com',
-]
-CORS_ALLOW_METHODS = [
-    'GET',
-    'POST',
-    'PUT',
-    'DELETE',
-]
-CORS_ALLOW_HEADERS = [
-    'Accept',
-    'Content-Type',
-    'Authorization',
-]
+  
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
@@ -230,3 +235,8 @@ EMAIL_HOST_USER = os.getenv(
 EMAIL_HOST_PASSWORD = os.getenv(
     "EMAIL_HOST_PASSWORD", '!Klivardev1')
 APP_NAME = 'Klivar'
+
+
+
+
+ 
