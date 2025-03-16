@@ -64,7 +64,7 @@ jobs:
 
     environment:
       name: dev
-      url: https://dev-backend.app.klivar.com/__healthcheck/ 
+      url: https://dev-tmp.back.klivar.com/ 
 
     env:
       IMAGE_TAG: ${{needs.build-images.outputs.api-image-tags}}
