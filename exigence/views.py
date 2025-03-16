@@ -29,6 +29,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from django.template.loader import render_to_string
 
+from django.utils import timezone
+
 # Vue API
 class ExigenceResponsableView(APIView):
     permission_classes = [AllowAny]
@@ -234,7 +236,7 @@ class sendMailAuthCodeView(APIView):
             
             # Générer le code de vérification
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-            expires_at = datetime.now() + timedelta(minutes=30) 
+            expires_at =  timezone.now() + timezone.timedelta(minutes=30)
             
             nbr = (
                 auth_code.objects.all()
