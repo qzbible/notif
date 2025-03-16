@@ -217,12 +217,15 @@ HEALTH_CHECK = {
 load_dotenv()
 
 # SECURITY WARNING: keep the secret key used in production secret!
+ 
+
 SECRET_KEY = env(
     "DJANGO_SECRET_KEY",
     default="django-insecure-o(%d_rzzf^g01b1bm9j--$wv**&fvez9y_!bmkl(xupof2qzfj",
 )
 
 ALLOWED_HOSTS = ["*"]
+
 
 EMAIL_HOST = os.getenv(
     "EMAIL_HOST", 'smtp.gmail.com')
@@ -235,7 +238,6 @@ EMAIL_HOST_USER = os.getenv(
 EMAIL_HOST_PASSWORD = os.getenv(
     "EMAIL_HOST_PASSWORD", '!Klivardev1')
 APP_NAME = 'Klivar'
-
 
 
 
