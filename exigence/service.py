@@ -43,7 +43,7 @@ def exigence_approver(object, description, dest_email, sender_name, dest_name, c
     x.start() 
 
 
-def exigence_responsable( object, description, dest_email, sender_name, dest_name, company, url, back_url=None ):
+def exigence_responsable( object, description, dest_email, sender_name, dest_name, company, url, scope=[], back_url=None ):
     # object and description
     path = "notification/tasks/new-email-responsable.html" 
     path_txt = "notification/tasks/new-email-responsable.txt" 
@@ -53,6 +53,7 @@ def exigence_responsable( object, description, dest_email, sender_name, dest_nam
         "task_title": object, 
         "url": url,
         "description":description,
+        "scope":scope,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
     }
     header_path = "notification/tasks/header.html"

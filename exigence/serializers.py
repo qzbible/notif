@@ -55,6 +55,10 @@ class ExigenceSerializer(serializers.Serializer):
         required=False,
         help_text="Id de l'action"
     )
+    id_analysis =  serializers.CharField(
+        required=False,
+        help_text="Id de l'action"
+    )
 
 
 # Serializer pour la réponse

@@ -58,7 +58,9 @@ class ExigenceResponsableView(APIView):
                     'base_url': 'https://api.example.com',
                     'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                     'scope': ['Périmètre 1', 'Périmètre 2'],
-                    'id_action':"10"
+                    'id_action':"10",
+                    'id_analysis':"10"
+                    
                 },
                 request_only=True,
             ),
@@ -105,7 +107,8 @@ class ExigenceResponsableView(APIView):
                 method=validated_data.get("method"),
                 base_url=validated_data.get("base_url"),
                 jwt_token=validated_data.get("jwt_token"),
-                id_action = validated_data.get("id_action")
+                id_action = validated_data.get("id_action"),
+                id_analysis = validated_data.get("id_analysis")
             )
             
             
@@ -122,8 +125,9 @@ class ExigenceResponsableView(APIView):
                 validated_data.get("dest_email"),
                 validated_data.get("sender_name"),
                 validated_data.get("dest_name"),
-                validated_data.get("company"),
-                validated_data.get("url")
+                validated_data.get("company"), 
+                validated_data.get("url"),
+                 validated_data.get("scope", [])
             )
             
             return Response(
@@ -345,8 +349,10 @@ class ValidateAuthCodeView(APIView):
         
             instance_customUser = ExigenceMail.objects.filter(jwt_token=jwt_token).last() 
             id_action = instance_customUser.id_action
+            id_analysis = instance_customUser.id_analysis
+            scope = instance_customUser.scope
             # auth_code_instance.delete()
-            return Response({"id":id_action}, status.HTTP_200_OK)  
+            return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope }, status.HTTP_200_OK)  
         except  Exception as e:
             return Response(
                 {

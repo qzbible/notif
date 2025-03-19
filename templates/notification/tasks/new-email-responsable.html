@@ -20,6 +20,22 @@
 					<div class="task-content description" style="font-size: 14px; line-height: 1.5715; color: rgba(0, 0, 0, 0.65);">
 						{{description|safe}}
 					</div>
+					<div 
+class="task-content description" 
+style="font-size: 14px; line-height: 1.5715; color: rgba(0, 0, 0, 0.65);"
+>
+
+    {% if scope %}
+	Périmetre : 
+        <ul style="margin-top: 8px; padding-left: 20px;">
+            {% for item in scope %}
+                <li style="margin-bottom: 4px;">{{ item }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        
+    {% endif %}
+</div>
 				</td>
 			</tr>
 		</table>
