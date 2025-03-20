@@ -50,6 +50,8 @@ class ExigenceMail(models.Model):
     is_send =  models.BooleanField(default=False)
     id_action = models.CharField(max_length=255, null=True, blank=True)
     id_analysis = models.CharField(max_length=255, null=True, blank=True)
+    id_indicateur = models.CharField(max_length=255, null=True, blank=True)
+    id_reporting = models.CharField(max_length=255, null=True, blank=True)
     
     class Meta:
         verbose_name = "Exigence"

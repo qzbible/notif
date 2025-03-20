@@ -59,7 +59,9 @@ class ExigenceResponsableView(APIView):
                     'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                     'scope': ['Périmètre 1', 'Périmètre 2'],
                     'id_action':"10",
-                    'id_analysis':"10"
+                    'id_analysis':"10",
+                    'id_reporting':"10",
+                    'id_indicateur':"10"
                     
                 },
                 request_only=True,
@@ -108,7 +110,9 @@ class ExigenceResponsableView(APIView):
                 base_url=validated_data.get("base_url"),
                 jwt_token=validated_data.get("jwt_token"),
                 id_action = validated_data.get("id_action"),
-                id_analysis = validated_data.get("id_analysis")
+                id_analysis = validated_data.get("id_analysis"),
+                id_reporting = validated_data.get("id_reporting"),
+                id_indicateur = validated_data.get("id_indicateur"),
             )
             
             
@@ -351,8 +355,10 @@ class ValidateAuthCodeView(APIView):
             id_action = instance_customUser.id_action
             id_analysis = instance_customUser.id_analysis
             scope = instance_customUser.scope
+            id_reporting = instance_customUser.id_reporting
+            id_indicateur = instance_customUser.id_indicateur
             # auth_code_instance.delete()
-            return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope }, status.HTTP_200_OK)  
+            return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope, "id_reporting": id_reporting, "id_indicateur":id_indicateur }, status.HTTP_200_OK)  
         except  Exception as e:
             return Response(
                 {

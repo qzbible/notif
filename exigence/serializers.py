@@ -57,7 +57,15 @@ class ExigenceSerializer(serializers.Serializer):
     )
     id_analysis =  serializers.CharField(
         required=False,
-        help_text="Id de l'action"
+        help_text="Id de l'analysis"
+    )
+    id_reporting =  serializers.CharField(
+        required=False,
+        help_text="Id de l'reporting"
+    )
+    id_indicateur =  serializers.CharField(
+        required=False,
+        help_text="Id de l'indicateur"
     )
 
 
