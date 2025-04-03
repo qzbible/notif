@@ -63,6 +63,7 @@ class ExigenceResponsableView(APIView):
                     'id_reporting':"10",
                     'id_indicateur':"10",
                     'dealine': '12/02/2025',
+                    'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20"
                     
                 },
@@ -99,6 +100,7 @@ class ExigenceResponsableView(APIView):
         # Récupération des données validées
         validated_data = serializer.validated_data
         print("validated_data", validated_data.get("dealine"))
+        # 2025-04-03T22:23:52.900Z
         try:
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
@@ -117,6 +119,7 @@ class ExigenceResponsableView(APIView):
                 id_reporting = validated_data.get("id_reporting"),
                 id_indicateur = validated_data.get("id_indicateur"),
                 dealine = validated_data.get("dealine"),
+                start_date = validated_data.get("start_date"),
                 time = validated_data.get("time")
             )
             
@@ -138,6 +141,7 @@ class ExigenceResponsableView(APIView):
                 url= validated_data.get("url"),
                 time= validated_data.get("time"),
                 deadline= validated_data.get("dealine"),
+                start_date= validated_data.get("start_date"),
                 scope= validated_data.get("scope", [])
             )
             

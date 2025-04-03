@@ -75,6 +75,11 @@ class ExigenceSerializer(serializers.Serializer):
         required=False,
         help_text="time de l'exigence"
     )
+    start_data = serializers.CharField(
+        required=False,
+        help_text="time de l'exigence"
+    )
+
 
 
 # Serializer pour la réponse
