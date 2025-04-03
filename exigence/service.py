@@ -50,6 +50,8 @@ def exigence_approver(object, description, dest_email, sender_name, dest_name, c
 
 def is_valid_date_string(date_string, format="%Y-%m-%dT%H:%M:%S.%fZ"):
     try:
+        if date_string == "" or date_string == None:
+            return False
         datetime.strptime(date_string, format)
         return True
     except ValueError:
@@ -118,6 +120,7 @@ def add_calendar(title, description, date_begin, date_end, company):
     f.close()
 
     return filename
+
 def exigence_responsable( object, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None ):
     # object and description
 
