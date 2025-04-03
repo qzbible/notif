@@ -43,17 +43,20 @@ def exigence_approver(object, description, dest_email, sender_name, dest_name, c
     x.start() 
 
 
-def exigence_responsable( object, description, dest_email, sender_name, dest_name, company, url, scope=[], back_url=None ):
+def exigence_responsable( object, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", back_url=None ):
     # object and description
-    path = "notification/tasks/new-email-responsable.html" 
-    path_txt = "notification/tasks/new-email-responsable.txt" 
+    path = "notification/evaluation/responsable.html" 
+    path_txt = "notification/evaluation/responsable.txt" 
     context = {
         "sender_name":sender_name, 
-        "dest_name": dest_name,
-        "task_title": object, 
+        "name": dest_name,
+        "title": object, 
         "url": url,
         "description":description,
+        "time": time,
         "scope":scope,
+        "deadline": deadline,
+        "company": company,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
     }
     header_path = "notification/tasks/header.html"
@@ -77,7 +80,7 @@ def exigence_responsable( object, description, dest_email, sender_name, dest_nam
             context
     )
     # send_mail_created([dest_email], object, text_content, html_content, company)
-    x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, html_content, company,))
+    x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
     x.start() 
     
     return True

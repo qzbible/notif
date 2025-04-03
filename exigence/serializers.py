@@ -67,6 +67,14 @@ class ExigenceSerializer(serializers.Serializer):
         required=False,
         help_text="Id de l'indicateur"
     )
+    dealine = serializers.CharField(
+        required=False,
+        help_text="Deadline de l'exigence"
+    )
+    time = serializers.CharField(
+        required=False,
+        help_text="time de l'exigence"
+    )
 
 
 # Serializer pour la réponse

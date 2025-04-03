@@ -52,6 +52,16 @@ class ExigenceMail(models.Model):
     id_analysis = models.CharField(max_length=255, null=True, blank=True)
     id_indicateur = models.CharField(max_length=255, null=True, blank=True)
     id_reporting = models.CharField(max_length=255, null=True, blank=True)
+    dealine = models.CharField(
+        max_length=255,
+        verbose_name="Nom de l'expéditeur",
+         null=True,
+    )
+    time = models.CharField(
+        max_length=255,
+        verbose_name="Nom de l'expéditeur",
+         null=True,
+    )
     
     class Meta:
         verbose_name = "Exigence"

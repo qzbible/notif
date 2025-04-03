@@ -61,7 +61,9 @@ class ExigenceResponsableView(APIView):
                     'id_action':"10",
                     'id_analysis':"10",
                     'id_reporting':"10",
-                    'id_indicateur':"10"
+                    'id_indicateur':"10",
+                    'dealine': '12/02/2025',
+                    'time' : "20"
                     
                 },
                 request_only=True,
@@ -82,6 +84,7 @@ class ExigenceResponsableView(APIView):
         tags=["Exigences"],
     )
     def post(self, request):
+         
         serializer = ExigenceSerializer(data=request.data)
         
         if not serializer.is_valid():
@@ -95,7 +98,7 @@ class ExigenceResponsableView(APIView):
             
         # Récupération des données validées
         validated_data = serializer.validated_data
-        
+        print("validated_data", validated_data.get("dealine"))
         try:
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
@@ -113,6 +116,8 @@ class ExigenceResponsableView(APIView):
                 id_analysis = validated_data.get("id_analysis"),
                 id_reporting = validated_data.get("id_reporting"),
                 id_indicateur = validated_data.get("id_indicateur"),
+                dealine = validated_data.get("dealine"),
+                time = validated_data.get("time")
             )
             
             
@@ -124,14 +129,16 @@ class ExigenceResponsableView(APIView):
             
             # Envoi de l'email
             mail = exigence_responsable(
-                validated_data.get("object"),
-                validated_data.get("description"),
-                validated_data.get("dest_email"),
-                validated_data.get("sender_name"),
-                validated_data.get("dest_name"),
-                validated_data.get("company"), 
-                validated_data.get("url"),
-                 validated_data.get("scope", [])
+                 object= validated_data.get("object"),
+                description= validated_data.get("description"),
+                 dest_email=validated_data.get("dest_email"),
+                sender_name=validated_data.get("sender_name"),
+                dest_name= validated_data.get("dest_name"),
+                company= validated_data.get("company"), 
+                url= validated_data.get("url"),
+                time= validated_data.get("time"),
+                deadline= validated_data.get("dealine"),
+                scope= validated_data.get("scope", [])
             )
             
             return Response(
