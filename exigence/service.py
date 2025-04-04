@@ -182,6 +182,7 @@ def exigence_responsable( object, description, dest_email, sender_name, dest_nam
     )
     # send_mail_created([dest_email], object, text_content, html_content, company)
     if filename != None:
+        print("filename", filename)
         x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
         x.start() 
     else:
