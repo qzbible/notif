@@ -134,7 +134,14 @@ def exigence_responsable( object, description, dest_email, sender_name, dest_nam
 
     if is_valid_date_string(start_date):
         start_date = start_date.split(" ")[0]
-        date_begin = datetime.strptime(start_date,  "%Y-%m-%d %H:%M")
+
+        # Analyser la date ISO 8601
+        parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+        # Reformater au format souhaité
+        formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+
+        date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
         date_end = date_begin + datetime.timedelta(minutes=int(time))
         
     
