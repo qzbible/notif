@@ -4,7 +4,8 @@ import threading
 from exigence.utils import send_mail_created, send_mail_with_ics
 
 from django.template.loader import render_to_string
-from datetime import datetime
+ 
+from datetime import datetime, timedelta
 from icalendar import Calendar, Event, vCalAddress, vText
 import os
 import uuid
@@ -142,7 +143,7 @@ def exigence_responsable( object, description, dest_email, sender_name, dest_nam
         formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
 
         date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
-        date_end = date_begin + datetime.timedelta(minutes=int(time))
+        date_end = date_begin + timedelta(minutes=int(time))
         
     
         # configuration iCalendar
