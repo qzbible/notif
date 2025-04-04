@@ -52,6 +52,7 @@ def is_valid_date_string(date_string, format="%Y-%m-%dT%H:%M:%S.%fZ"):
     try:
         if date_string == "" or date_string == None:
             return False
+        date_string = date_string.split(" ")[0]
         datetime.strptime(date_string, format)
         return True
     except ValueError:
@@ -132,8 +133,8 @@ def exigence_responsable( object, description, dest_email, sender_name, dest_nam
     filename = None
 
     if is_valid_date_string(start_date):
-     
-        date_begin = datetime.strptime(start_date + " " + time, "%Y-%m-%d %H:%M")
+        start_date = start_date.split(" ")[0]
+        date_begin = datetime.strptime(start_date,  "%Y-%m-%d %H:%M")
         date_end = date_begin + datetime.timedelta(minutes=int(time))
         
     
