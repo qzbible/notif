@@ -12,10 +12,12 @@ class ExigenceSerializer(serializers.Serializer):
     )
     description = serializers.CharField(
         required=False,
+        allow_blank=True,
         help_text="Description détaillée de l'exigence"
     )
     company = serializers.CharField(
         required=True,
+        allow_blank=True,
         help_text="Nom de l'entreprise"
     )
     dest_email = serializers.EmailField(
@@ -24,10 +26,12 @@ class ExigenceSerializer(serializers.Serializer):
     )
     sender_name = serializers.CharField(
         required=True,
+         allow_blank=True,
         help_text="Nom de l'expéditeur"
     )
     dest_name = serializers.CharField(
         required=True,
+         allow_blank=True,
         help_text="Nom du destinataire"
     )
     url = serializers.URLField(
