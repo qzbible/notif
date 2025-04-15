@@ -120,7 +120,8 @@ class ExigenceResponsableView(APIView):
                 id_indicateur = validated_data.get("id_indicateur"),
                 dealine = validated_data.get("dealine"),
                 start_date = validated_data.get("start_date"),
-                time = validated_data.get("time")
+                time = validated_data.get("time"),
+                type_task = validated_data.get("type_task"),
             )
             
             
@@ -368,8 +369,9 @@ class ValidateAuthCodeView(APIView):
             scope = instance_customUser.scope
             id_reporting = instance_customUser.id_reporting
             id_indicateur = instance_customUser.id_indicateur
+            type_task = instance_customUser.type_task
             # auth_code_instance.delete()
-            return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope, "id_reporting": id_reporting, "id_indicateur":id_indicateur }, status.HTTP_200_OK)  
+            return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope, "id_reporting": id_reporting, "id_indicateur":id_indicateur, "type_task":type_task }, status.HTTP_200_OK)  
         except  Exception as e:
             return Response(
                 {

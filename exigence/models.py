@@ -67,6 +67,11 @@ class ExigenceMail(models.Model):
         verbose_name="Date de début",
          null=True,
     )
+    type_task = models.CharField(
+        max_length=255,
+        verbose_name="Date de début",
+         null=True,
+    )
     
     class Meta:
         verbose_name = "Exigence"
