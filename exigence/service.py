@@ -123,7 +123,7 @@ def add_calendar(title, description, date_begin, date_end, company):
 
     return filename
 
-def exigence_responsable( object, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None ):
+def exigence_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None ):
     # object and description
 
     deadline_text = "non défini" 
@@ -167,6 +167,7 @@ def exigence_responsable( object, description, dest_email, sender_name, dest_nam
         "scope":scope,
         "deadline": deadline_text,
         "company": company,
+        "type_tsak": type_task,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
     }
     header_path = "notification/tasks/header.html"

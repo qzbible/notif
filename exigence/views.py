@@ -130,10 +130,15 @@ class ExigenceResponsableView(APIView):
                 exigence.scope = validated_data.get("scope")
                 exigence.save()
             
-            
+             
+            if validated_data.get("type_task") == "EXIGENCE":
+                type_task = "Exigence"
+            elif validated_data.get("type_task") == "CORRECT_ACTION":
+                type_task = "Action corrective"
             # Envoi de l'email
             mail = exigence_responsable(
                  object= validated_data.get("object"),
+                 type_task = type_task,
                 description= validated_data.get("description"),
                  dest_email=validated_data.get("dest_email"),
                 sender_name=validated_data.get("sender_name"),
