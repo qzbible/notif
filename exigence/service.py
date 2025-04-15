@@ -183,7 +183,7 @@ def exigence_responsable( object, description, dest_email, sender_name, dest_nam
         path,
         context
     )
-    html_content  = header_content + body_content + footer_content
+ 
 
     text_content = render_to_string(
             path_txt,

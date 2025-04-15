@@ -98,9 +98,8 @@ class ExigenceResponsableView(APIView):
             )
             
         # Récupération des données validées
-        validated_data = serializer.validated_data
-        print("validated_data", validated_data.get("dealine"))
-        print("validated_start_date", validated_data.get("start_date"))
+        validated_data = serializer.validated_data 
+        
         # 2025-04-03T22:23:52.900Z
         try:
             # Sauvegarde des données dans le modèle

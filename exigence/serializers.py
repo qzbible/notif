@@ -11,7 +11,7 @@ class ExigenceSerializer(serializers.Serializer):
         help_text="Objet de l'exigence"
     )
     description = serializers.CharField(
-        required=True,
+        required=False,
         help_text="Description détaillée de l'exigence"
     )
     company = serializers.CharField(
