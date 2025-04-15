@@ -4,36 +4,57 @@ from django.utils import timezone
 
 class ExigenceMail(models.Model):
     object = models.TextField(
-        verbose_name="Description détaillée de l'exigence"
+        verbose_name="Description détaillée de l'exigence",
+          null=True,
+        blank=True
     )
     description = models.TextField(
-        verbose_name="Description détaillée de l'exigence"
+        verbose_name="Description détaillée de l'exigence",
+        null=True,
+        blank=True
+
     )
     company = models.TextField(
-        verbose_name="Description détaillée de l'exigence"
+        verbose_name="Description détaillée de l'exigence",
+          null=True,
+        blank=True
     )
     dest_email = models.EmailField(
-        verbose_name="Email du destinataire"
+        verbose_name="Email du destinataire",
+          null=True,
+        blank=True
     )
     sender_name = models.CharField(
         max_length=255,
-        verbose_name="Nom de l'expéditeur"
+        verbose_name="Nom de l'expéditeur",
+          null=True,
+        blank=True
     )
     dest_name = models.CharField(
         max_length=255,
-        verbose_name="Nom du destinataire"
+        verbose_name="Nom du destinataire",
+          null=True,
+        blank=True
     )
     url = models.TextField(
-        verbose_name="Description détaillée de l'exigence"
+        verbose_name="Description détaillée de l'exigence",
+          null=True,
+        blank=True
     )
     method = models.TextField(
-        verbose_name="Description détaillée de l'exigence"
+        verbose_name="Description détaillée de l'exigence",
+          null=True,
+        blank=True
     )
     base_url =models.TextField(
-        verbose_name="Description détaillée de l'exigence"
+        verbose_name="Description détaillée de l'exigence",
+          null=True,
+        blank=True
     )
     jwt_token = models.TextField(
-        verbose_name="Token user config exigence"
+        verbose_name="Token user config exigence",
+          null=True,
+        blank=True
     )
     # Utilisation d'ArrayField pour stocker une liste de chaînes (nécessite PostgreSQL)
     scope = ArrayField(
