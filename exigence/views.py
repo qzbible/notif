@@ -1,7 +1,7 @@
 import random
 from exigence.models import ExigenceMail, auth_code
-from exigence.serializers import ErrorResponseSerializer, ExigenceResponseSerializer
-from exigence.service import exigence_approver, exigence_responsable
+from exigence.serializers import ErrorResponseSerializer, ExigenceResponseSerializer, TaskSerializer
+from exigence.service import exigence_approver, exigence_responsable, task_responsable
 from exigence.serializers import ExigenceSerializer
 from exigence.utils import send_mail_created
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -30,6 +30,8 @@ from rest_framework.decorators import api_view
 from django.template.loader import render_to_string
 
 from django.utils import timezone
+
+
 
 # Vue API
 class ExigenceResponsableView(APIView):
@@ -64,7 +66,8 @@ class ExigenceResponsableView(APIView):
                     'id_indicateur':"10",
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
-                    'time' : "20"
+                    'time' : "20",
+                    "type_task" : "EXIGENCE"
                     
                 },
                 request_only=True,
@@ -133,24 +136,36 @@ class ExigenceResponsableView(APIView):
              
             if validated_data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
+                mail = exigence_responsable(
+                    object= validated_data.get("object"),
+                    type_task = type_task,
+                    description= validated_data.get("description"),
+                    dest_email=validated_data.get("dest_email"),
+                    sender_name=validated_data.get("sender_name"),
+                    dest_name= validated_data.get("dest_name"),
+                    company= validated_data.get("company"), 
+                    url= validated_data.get("url"),
+                    time= validated_data.get("time"),
+                    deadline= validated_data.get("dealine"),
+                    start_date= validated_data.get("start_date"),
+                    scope= validated_data.get("scope", [])
+                )
             elif validated_data.get("type_task") == "CORRECT_ACTION":
                 type_task = "Action corrective"
-            # Envoi de l'email
-            mail = exigence_responsable(
-                 object= validated_data.get("object"),
-                 type_task = type_task,
-                description= validated_data.get("description"),
-                 dest_email=validated_data.get("dest_email"),
-                sender_name=validated_data.get("sender_name"),
-                dest_name= validated_data.get("dest_name"),
-                company= validated_data.get("company"), 
-                url= validated_data.get("url"),
-                time= validated_data.get("time"),
-                deadline= validated_data.get("dealine"),
-                start_date= validated_data.get("start_date"),
-                scope= validated_data.get("scope", [])
-            )
-            
+                mail = task_responsable(
+                    object= validated_data.get("object"),
+                    type_task = type_task,
+                    description= validated_data.get("description"),
+                    dest_email=validated_data.get("dest_email"),
+                    sender_name=validated_data.get("sender_name"),
+                    dest_name= validated_data.get("dest_name"),
+                    company= validated_data.get("company"), 
+                    url= validated_data.get("url"),
+                    during= validated_data.get("time"), 
+                    start_date= validated_data.get("start_date"),
+                    scope= validated_data.get("scope", [])
+                )
+            # Envoi de l'email 
             return Response(
                 {
                     "message": "Exigence créée avec succès",
@@ -174,6 +189,7 @@ class ExigenceResponsableView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+ 
 
 # Vue API
 class ExigenceApprobatorView(APIView):

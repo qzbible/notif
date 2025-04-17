@@ -91,6 +91,72 @@ class ExigenceSerializer(serializers.Serializer):
 
 
 
+# Serializer pour valider les données d'entrée
+class TaskSerializer(serializers.Serializer):
+    object = serializers.CharField(
+        required=True, 
+        help_text="Objet de l'exigence"
+    )
+    description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Description détaillée de l'exigence"
+    )
+    company = serializers.CharField(
+        required=True,
+        allow_blank=True,
+        help_text="Nom de l'entreprise"
+    )
+    dest_email = serializers.EmailField(
+        required=True,
+        help_text="Email du destinataire"
+    )
+    sender_name = serializers.CharField(
+        required=True,
+         allow_blank=True,
+        help_text="Nom de l'expéditeur"
+    )
+    dest_name = serializers.CharField(
+        required=True,
+         allow_blank=True,
+        help_text="Nom du destinataire"
+    )
+    url = serializers.URLField(
+        required=True,
+        help_text="URL pour le lien front end de l'exigence"
+    )
+    method = serializers.CharField(
+        required=False,
+        help_text="Methode  de l'exigence"
+    )
+    base_url = serializers.URLField(
+        required=True,
+        help_text="Url pour les image de référence de l'exigence"
+    )
+    jwt_token = serializers.CharField(
+        required=True,
+        help_text="Token user config exigence"
+    )
+
+    id_action =  serializers.CharField(
+        required=False,
+        help_text="Id de l'action"
+    )
+    during = serializers.CharField(
+        required=False,
+        help_text="time de l'exigence"
+    )
+    start_date = serializers.CharField(
+        required=False,
+        help_text="time de l'exigence"
+    )
+
+    type_task = serializers.CharField(
+        required=False,
+        help_text="time de l'exigence"
+    )
+
+
 # Serializer pour la réponse
 class ExigenceResponseSerializer(serializers.Serializer):
     message = serializers.CharField(default="Exigence créée avec succès")

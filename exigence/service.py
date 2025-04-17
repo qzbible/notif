@@ -155,8 +155,8 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         
 
-    path = "notification/evaluation/responsable.html" 
-    path_txt = "notification/evaluation/responsable.txt" 
+    path = "notification/evaluation/responsable-exigence.html" 
+    path_txt = "notification/evaluation/responsable-exigence.txt" 
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
@@ -167,7 +167,7 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         "scope":scope,
         "deadline": deadline_text,
         "company": company,
-        "type_tsak": type_task,
+        "type_task": type_task,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
     }
     header_path = "notification/tasks/header.html"
@@ -193,6 +193,66 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
     # send_mail_created([dest_email], object, text_content, html_content, company)
     if filename != None:
         print("filename", filename)
+        x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
+        x.start() 
+    else:
+        x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+        x.start() 
+    
+    return True
+
+
+def task_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], during="", start_date="", back_url=None ):
+    # object and description
+    deadline_text = "non défini" 
+    filename = None
+    if is_valid_date_string(start_date):
+        start_date = start_date.split(" ")[0]
+        # Analyser la date ISO 8601
+        parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+        # Reformater au format souhaité
+        formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+
+        date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
+        date_end = date_begin + timedelta(minutes=int(during))
+        
+        deadline_text = date_end.strftime("%Y-%m-%d %H:%M" )
+    
+        # configuration iCalendar
+        if company != None: 
+            filename = add_calendar(
+                    object, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        else:
+            filename = add_calendar(
+                object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        
+    path = "notification/evaluation/tache_conformite.html" 
+    path_txt = "notification/evaluation/tache_conformite.txt" 
+    context = {
+        "sender_name":sender_name, 
+        "name": dest_name,
+        "title": object, 
+        "url": url,
+        "description":description,
+        "time": during,
+        "scope":scope,
+        "deadline": deadline_text,
+        "company": company,
+        "type_task": type_task,
+        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+    }
+    
+    body_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+    # send_mail_created([dest_email], object, text_content, html_content, company)
+    if filename != None:
         x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
         x.start() 
     else:
