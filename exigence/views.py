@@ -212,7 +212,19 @@ class ExigenceApprobatorView(APIView):
                     'dest_email': 'destinataire@example.com',
                     'sender_name': 'Jean Dupont',
                     'dest_name': 'Marie Martin',
-                    'url': 'https://example.com/exigence/123'
+                    'url': 'https://example.com/exigence/123',
+                    'method': 'POST',
+                    'base_url': 'https://api.example.com',
+                    'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                    'scope': ['Périmètre 1', 'Périmètre 2'],
+                    'id_action':"10",
+                    'id_analysis':"10",
+                    'id_reporting':"10",
+                    'id_indicateur':"10",
+                    'dealine': '12/02/2025',
+                    'start_date' : "2025-02-12T22:23:52.900Z",
+                    'time' : "20",
+                    "type_task" : "EXIGENCE"
                 },
                 request_only=True,
             ),
@@ -243,17 +255,71 @@ class ExigenceApprobatorView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             ) 
         # Récupération des données validées
-        object_text = serializer.validated_data.get("object") 
-        description = serializer.validated_data.get("description")
-        company = serializer.validated_data.get("company")
-        dest_email = serializer.validated_data.get("dest_email")
-        sender_name = serializer.validated_data.get("sender_name")
-        dest_name = serializer.validated_data.get("dest_name")
-        url = serializer.validated_data.get("url")
+        validated_data = serializer.validated_data 
  
         # Création de la tâche Celery
         try:
-            mail = exigence_approver(object_text,description, dest_email, sender_name, dest_name, company, url )
+            # Sauvegarde des données dans le modèle
+            exigence = ExigenceMail.objects.create(
+                object=validated_data.get("object"),
+                description=validated_data.get("description"),
+                company=validated_data.get("company"),
+                dest_email=validated_data.get("dest_email"),
+                sender_name=validated_data.get("sender_name"),
+                dest_name=validated_data.get("dest_name"),
+                url=validated_data.get("url"),
+                method=validated_data.get("method"),
+                base_url=validated_data.get("base_url"),
+                jwt_token=validated_data.get("jwt_token"),
+                id_action = validated_data.get("id_action"),
+                id_analysis = validated_data.get("id_analysis"),
+                id_reporting = validated_data.get("id_reporting"),
+                id_indicateur = validated_data.get("id_indicateur"),
+                dealine = validated_data.get("dealine"),
+                start_date = validated_data.get("start_date"),
+                time = validated_data.get("time"),
+                type_task = validated_data.get("type_task"),
+            )
+            
+            
+            # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
+            if "scope" in validated_data and validated_data.get("scope"):
+                exigence.scope = validated_data.get("scope")
+                exigence.save()
+            
+             
+            if validated_data.get("type_task") == "EXIGENCE":
+                type_task = "Exigence"
+                mail = exigence_approver(
+                    object= validated_data.get("object"),
+                    type_task = type_task,
+                    description= validated_data.get("description"),
+                    dest_email=validated_data.get("dest_email"),
+                    sender_name=validated_data.get("sender_name"),
+                    dest_name= validated_data.get("dest_name"),
+                    company= validated_data.get("company"), 
+                    url= validated_data.get("url"),
+                    time= validated_data.get("time"),
+                    deadline= validated_data.get("dealine"),
+                    start_date= validated_data.get("start_date"),
+                    scope= validated_data.get("scope", [])
+                )
+            elif validated_data.get("type_task") == "CORRECT_ACTION":
+                type_task = "Action corrective"
+                # mail = task_responsable(
+                #     object= validated_data.get("object"),
+                #     type_task = type_task,
+                #     description= validated_data.get("description"),
+                #     dest_email=validated_data.get("dest_email"),
+                #     sender_name=validated_data.get("sender_name"),
+                #     dest_name= validated_data.get("dest_name"),
+                #     company= validated_data.get("company"), 
+                #     url= validated_data.get("url"),
+                #     during= validated_data.get("time"), 
+                #     start_date= validated_data.get("start_date"),
+                #     scope= validated_data.get("scope", [])
+                # )
+            
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:
             return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )

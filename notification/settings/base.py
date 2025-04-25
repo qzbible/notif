@@ -234,7 +234,7 @@ EMAIL_PORT = os.getenv(
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST_USER = 'avotreecoute@klivar.com'
-EMAIL_HOST_PASSWORD = '!Klivardev1'
+EMAIL_HOST_PASSWORD = 'dxec xjmz atwg lffz'
 APP_NAME = 'Klivar'
 
 
