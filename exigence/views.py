@@ -1,7 +1,7 @@
 import random
 from exigence.models import ExigenceMail, auth_code
 from exigence.serializers import ErrorResponseSerializer, ExigenceResponseSerializer, TaskSerializer
-from exigence.service import exigence_approver, exigence_responsable, task_responsable
+from exigence.service import exigence_approver, exigence_notification, exigence_responsable, task_responsable
 from exigence.serializers import ExigenceSerializer
 from exigence.utils import send_mail_created
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -224,6 +224,144 @@ class ExigenceApprobatorView(APIView):
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20",
+                    'is_answer':"1",
+                    'id_answer' :"2",
+                    "type_task" : "EXIGENCE"
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        description="Crée une exigence et envoie une notification par email",
+        summary="Créer une exigence",
+        tags=["Exigences"],
+    )
+    def post(self, request):
+        serializer = ExigenceSerializer(data=request.data)
+        data= request.data
+        # if not serializer.is_valid():
+        #     return Response(
+        #         {
+        #             "message": "Erreur de validation des données",
+        #             "errors": serializer.errors
+        #         },
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     ) 
+        # Récupération des données validées
+        # validated_data = serializer.validated_data 
+        # Création de la tâche Celery
+        try:
+            # Sauvegarde des données dans le modèle
+            exigence = ExigenceMail.objects.create(
+                object=data.get("object"),
+                description=data.get("description"),
+                company=data.get("company"),
+                dest_email=data.get("dest_email"),
+                sender_name=data.get("sender_name"),
+                dest_name=data.get("dest_name"),
+                url=data.get("url"),
+                method=data.get("method", "Sondage"),
+                base_url=data.get("base_url"),
+                jwt_token=data.get("jwt_token"),
+                id_action = data.get("id_action", None),
+                id_analysis = data.get("id_analysis", None),
+                id_reporting = data.get("id_reporting", None),
+                id_indicateur = data.get("id_indicateur", None),
+                dealine = data.get("dealine", None),
+                start_date = data.get("start_date", None),
+                time = data.get("time", None),
+                type_task = data.get("type_task", None),
+                is_answer = True,
+                id_answer = data.get("id_answer", None)
+
+            )
+            # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
+            if "scope" in data and data.get("scope"):
+                exigence.scope = data.get("scope")
+                exigence.save()
+            
+             
+            if data.get("type_task") == "EXIGENCE":
+                type_task = "Exigence"
+                mail = exigence_approver(
+                    object= data.get("object"),
+                    type_task = type_task,
+                    description= data.get("description"),
+                    dest_email=data.get("dest_email"),
+                    sender_name=data.get("sender_name"),
+                    dest_name= data.get("dest_name"),
+                    company= data.get("company"), 
+                    url= data.get("url"),
+                    time= data.get("time"),
+                    deadline= data.get("dealine"),
+                    start_date= data.get("start_date"),
+                    scope= data.get("scope", [])
+                )
+            elif data.get("type_task") == "CORRECT_ACTION":
+                type_task = "Action corrective"
+                # mail = task_responsable(
+                #     object= validated_data.get("object"),
+                #     type_task = type_task,
+                #     description= validated_data.get("description"),
+                #     dest_email=validated_data.get("dest_email"),
+                #     sender_name=validated_data.get("sender_name"),
+                #     dest_name= validated_data.get("dest_name"),
+                #     company= validated_data.get("company"), 
+                #     url= validated_data.get("url"),
+                #     during= validated_data.get("time"), 
+                #     start_date= validated_data.get("start_date"),
+                #     scope= validated_data.get("scope", [])
+                # )
+            
+            return Response( status=status.HTTP_201_CREATED )
+        except Exception as e:
+            return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
+        
+
+
+
+# Vue API
+class ExigenceNotificationView(APIView):
+    permission_classes = [AllowAny]
+    @extend_schema(
+        request=ExigenceSerializer,
+        responses={
+            201: ExigenceResponseSerializer,
+            400: ErrorResponseSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'object': 'Demande d\'exigence',
+                    'description': 'Description détaillée de l\'exigence',
+                    'company': 'Ziyouma',
+                    'dest_email': 'destinataire@example.com',
+                    'sender_name': 'Jean Dupont',
+                    'dest_name': 'Marie Martin',
+                    'url': 'https://example.com/exigence/123',
+                    'method': 'POST',
+                    'base_url': 'https://api.example.com',
+                    'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                    'scope': ['Périmètre 1', 'Périmètre 2'],
+                    'id_action':"10",
+                    'id_analysis':"10",
+                    'id_reporting':"10",
+                    'id_indicateur':"10",
+                    'dealine': '12/02/2025',
+                    'start_date' : "2025-02-12T22:23:52.900Z",
+                    'time' : "20",
                     "type_task" : "EXIGENCE"
                 },
                 request_only=True,
@@ -281,7 +419,6 @@ class ExigenceApprobatorView(APIView):
                 type_task = validated_data.get("type_task"),
             )
             
-            
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in validated_data and validated_data.get("scope"):
                 exigence.scope = validated_data.get("scope")
@@ -290,7 +427,7 @@ class ExigenceApprobatorView(APIView):
              
             if validated_data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
-                mail = exigence_approver(
+                mail = exigence_notification(
                     object= validated_data.get("object"),
                     type_task = type_task,
                     description= validated_data.get("description"),
@@ -457,6 +594,8 @@ class ValidateAuthCodeView(APIView):
             id_reporting = instance_customUser.id_reporting
             id_indicateur = instance_customUser.id_indicateur
             type_task = instance_customUser.type_task
+            if instance_customUser.is_answer:
+                return Response({"id":instance_customUser.id_answer }, status.HTTP_200_OK)  
             # auth_code_instance.delete()
             return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope, "id_reporting": id_reporting, "id_indicateur":id_indicateur, "type_task":type_task }, status.HTTP_200_OK)  
         except  Exception as e:

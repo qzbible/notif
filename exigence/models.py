@@ -69,10 +69,12 @@ class ExigenceMail(models.Model):
         verbose_name="Date de création"
     )
     is_send =  models.BooleanField(default=False)
+    is_answer =  models.BooleanField(default=False)
     id_action = models.CharField(max_length=255, null=True, blank=True)
     id_analysis = models.CharField(max_length=255, null=True, blank=True)
     id_indicateur = models.CharField(max_length=255, null=True, blank=True)
     id_reporting = models.CharField(max_length=255, null=True, blank=True)
+    id_answer = models.CharField(max_length=255, null=True, blank=True)
     dealine = models.CharField(
         max_length=255,
         verbose_name="Nom de l'expéditeur",
