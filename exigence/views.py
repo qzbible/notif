@@ -516,6 +516,8 @@ class sendMailAuthCodeView(APIView):
                 context = {  
                     "user_name": "",
                     "code_auth": verification_code,
+                    "company": custom_ins.company,
+                    "name" : custom_ins.sender_name,
                 } 
                 
                 html_content = render_to_string(path, context)
