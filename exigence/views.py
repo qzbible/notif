@@ -465,7 +465,8 @@ class sendMailAuthCodeView(APIView):
                 )
                 .count()
             ) 
-            
+            current_datetime = datetime.now()
+            current_datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
             if nbr == 0: 
                 
                 auth_code_instance = auth_code.objects.create(
@@ -475,10 +476,10 @@ class sendMailAuthCodeView(APIView):
                 )
                 if custom_ins.lang == "fr-FR":
                     path = "notification/2fa_auth/2FA-auth-fr.html"
-                    object = "Code d'authentification"
+                    object = "Code d'authentification" + "[" + current_datetime_string  + "]"
                 else:
                     path = "notification/2fa_auth/2FA-auth-en.html"
-                    object = "Authentication code"
+                    object = "Authentication code" + "[" + current_datetime_string  + "]"
 
                 path_txt = "notification/2fa_auth/2FA-auth.txt"
                 
@@ -506,10 +507,10 @@ class sendMailAuthCodeView(APIView):
                 
                 if custom_ins.lang == "fr-FR":
                     path = "notification/2fa_auth/2FA-auth-fr.html"
-                    object = "Code d'authentification"
+                    object = "Code d'authentification" + "[" + current_datetime_string  + "]"
                 else:
                     path = "notification/2fa_auth/2FA-auth-en.html"
-                    object = "Authentication code"
+                    object = "Authentication code" + "[" + current_datetime_string  + "]"
 
                 path_txt = "notification/2fa_auth/2FA-auth.txt" 
 
