@@ -88,6 +88,11 @@ class ExigenceSerializer(serializers.Serializer):
         required=False,
         help_text="time de l'exigence"
     )
+    lang = serializers.CharField(
+        required=False,
+        help_text="time de l'exigence"
+    )
+
 
 
 
@@ -152,6 +157,10 @@ class TaskSerializer(serializers.Serializer):
     )
 
     type_task = serializers.CharField(
+        required=False,
+        help_text="time de l'exigence"
+    )
+    lang = serializers.CharField(
         required=False,
         help_text="time de l'exigence"
     )

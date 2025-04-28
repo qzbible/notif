@@ -12,9 +12,15 @@ import uuid
 import secrets
 from django.conf import settings 
 
-def exigence_approver(object, description, dest_email, sender_name, dest_name, company, url, back_url=None):
-     
-    path = "notification/tasks/new-email-approbateur.html" 
+def exigence_approver(object, description, dest_email, sender_name, dest_name, company, url, back_url=None, lang=None):
+    
+    if lang == "fr-FR" :
+        path = "notification/tasks/new-email-approbateur-fr.html" 
+    elif lang == "en-US":
+        path = "notification/tasks/new-email-approbateur-en.html" 
+    else:
+        path = "notification/tasks/new-email-approbateur-fr.html" 
+
     path_txt = "notification/tasks/new-email-approbateur.txt" 
     context = {
         "sender_name":sender_name, 
@@ -120,7 +126,7 @@ def add_calendar(title, description, date_begin, date_end, company):
 
     return filename
 
-def exigence_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None ):
+def exigence_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None, lang=None ):
     # object and description
 
     deadline_text = "non défini" 
@@ -151,8 +157,13 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
             filename = add_calendar(
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         
-
-    path = "notification/evaluation/responsable-exigence.html" 
+    if lang == "fr-FR" :
+        path = "notification/evaluation/responsable-exigence-fr.html" 
+    elif lang == "en-US":
+        path = "notification/evaluation/responsable-exigence-en.html" 
+    else:
+        path = "notification/evaluation/responsable-exigence-fr.html" 
+    print("path", lang)
     path_txt = "notification/evaluation/responsable-exigence.txt" 
     context = {
         "sender_name":sender_name, 
@@ -166,23 +177,12 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         "company": company,
         "type_task": type_task,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
-    }
-    header_path = "notification/tasks/header.html"
-    header_content = render_to_string(
-        header_path,
-        context
-    )
-    footer_path = "notification/tasks/footer.html"
-    footer_content = render_to_string(
-        footer_path,
-        context
-    )
+    } 
     body_content = render_to_string(
         path,
         context
     )
  
-
     text_content = render_to_string(
             path_txt,
             context
@@ -198,7 +198,7 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
     
     return True
 
-def task_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], during="", start_date="", back_url=None ):
+def task_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], during="", start_date="", back_url=None, lang=None ):
     # object and description
     deadline_text = "non défini" 
     filename = None
@@ -222,9 +222,15 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
         else:
             filename = add_calendar(
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
-        
-    path = "notification/evaluation/tache_conformite.html" 
-    path_txt = "notification/evaluation/tache_conformite.txt" 
+    
+    if lang == "fr-FR" :
+        path = "notification/evaluation/tache-conformite-fr.html" 
+    elif lang == "en-US":
+        path = "notification/evaluation/tache-conformite-en.html" 
+    else:
+        path = "notification/evaluation/tache-conformite-fr.html" 
+
+    path_txt = "notification/evaluation/tache-conformite.txt" 
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
@@ -260,7 +266,7 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
 
 
 
-def exigence_approver( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None ):
+def exigence_approver( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None, lang=None ):
     # object and description
 
     deadline_text = "non défini" 
@@ -291,8 +297,15 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
             filename = add_calendar(
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         
+    
+    if lang == "fr-FR" :
+        path = "notification/evaluation/exigence-approbation-fr.html" 
+    elif lang == "en-US":
+        path = "notification/evaluation/exigence-approbation-en.html" 
+    else:
+        path = "notification/evaluation/exigence-approbation-fr.html" 
 
-    path = "notification/evaluation/exigence-approbation.html" 
+    # path = "notification/evaluation/exigence-approbation.html" 
     path_txt = "notification/evaluation/exigence-approbation.txt" 
     context = {
         "sender_name":sender_name, 
@@ -330,7 +343,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
 
 
 
-def exigence_notification( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None ):
+def exigence_notification( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None, lang=None ):
     # object and description
 
     deadline_text = "non défini" 
@@ -362,7 +375,15 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         
 
-    path = "notification/evaluation/exigence-notification.html" 
+
+    if lang == "fr-FR" :
+        path = "notification/evaluation/exigence-notification-fr.html" 
+    elif lang == "en-US":
+        path = "notification/evaluation/exigence-notification-en.html" 
+    else:
+        path = "notification/evaluation/exigence-notification-fr.html" 
+
+    # path = "notification/evaluation/exigence-notification.html" 
     path_txt = "notification/evaluation/exigence-notification.txt" 
     context = {
         "sender_name":sender_name, 

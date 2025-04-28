@@ -67,7 +67,8 @@ class ExigenceResponsableView(APIView):
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20",
-                    "type_task" : "EXIGENCE"
+                    "type_task" : "EXIGENCE",
+                    "lang":"en-US"
                     
                 },
                 request_only=True,
@@ -88,9 +89,7 @@ class ExigenceResponsableView(APIView):
         tags=["Exigences"],
     )
     def post(self, request):
-         
         serializer = ExigenceSerializer(data=request.data)
-        
         if not serializer.is_valid():
             return Response(
                 {
@@ -99,10 +98,8 @@ class ExigenceResponsableView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
         # Récupération des données validées
-        validated_data = serializer.validated_data 
-        
+        validated_data = serializer.validated_data  
         # 2025-04-03T22:23:52.900Z
         try:
             # Sauvegarde des données dans le modèle
@@ -125,6 +122,7 @@ class ExigenceResponsableView(APIView):
                 start_date = validated_data.get("start_date"),
                 time = validated_data.get("time"),
                 type_task = validated_data.get("type_task"),
+                lang = validated_data.get("lang", "fr-FR"),
             )
             
             
@@ -136,6 +134,7 @@ class ExigenceResponsableView(APIView):
              
             if validated_data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
+                print("exigence_responsable", validated_data.get("lang"))
                 mail = exigence_responsable(
                     object= validated_data.get("object"),
                     type_task = type_task,
@@ -148,7 +147,9 @@ class ExigenceResponsableView(APIView):
                     time= validated_data.get("time"),
                     deadline= validated_data.get("dealine"),
                     start_date= validated_data.get("start_date"),
-                    scope= validated_data.get("scope", [])
+                    scope= validated_data.get("scope", []),
+                    lang=validated_data.get("lang")
+
                 )
             elif validated_data.get("type_task") == "CORRECT_ACTION":
                 type_task = "Action corrective"
@@ -163,7 +164,8 @@ class ExigenceResponsableView(APIView):
                     url= validated_data.get("url"),
                     during= validated_data.get("time"), 
                     start_date= validated_data.get("start_date"),
-                    scope= validated_data.get("scope", [])
+                    scope= validated_data.get("scope", []),
+                    lang=validated_data.get("lang")
                 )
             # Envoi de l'email 
             return Response(
@@ -213,20 +215,16 @@ class ExigenceApprobatorView(APIView):
                     'sender_name': 'Jean Dupont',
                     'dest_name': 'Marie Martin',
                     'url': 'https://example.com/exigence/123',
-                    'method': 'POST',
                     'base_url': 'https://api.example.com',
                     'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                     'scope': ['Périmètre 1', 'Périmètre 2'],
                     'id_action':"10",
-                    'id_analysis':"10",
-                    'id_reporting':"10",
-                    'id_indicateur':"10",
+                    'id_answer':"10",
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20",
-                    'is_answer':"1",
-                    'id_answer' :"2",
-                    "type_task" : "EXIGENCE"
+                    "type_task" : "EXIGENCE",
+                    "lang":"en-US"
                 },
                 request_only=True,
             ),
@@ -245,19 +243,9 @@ class ExigenceApprobatorView(APIView):
         summary="Créer une exigence",
         tags=["Exigences"],
     )
-    def post(self, request):
-        serializer = ExigenceSerializer(data=request.data)
+    def post(self, request): 
         data= request.data
-        # if not serializer.is_valid():
-        #     return Response(
-        #         {
-        #             "message": "Erreur de validation des données",
-        #             "errors": serializer.errors
-        #         },
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     ) 
-        # Récupération des données validées
-        # validated_data = serializer.validated_data 
+         
         # Création de la tâche Celery
         try:
             # Sauvegarde des données dans le modèle
@@ -272,16 +260,14 @@ class ExigenceApprobatorView(APIView):
                 method=data.get("method", "Sondage"),
                 base_url=data.get("base_url"),
                 jwt_token=data.get("jwt_token"),
-                id_action = data.get("id_action", None),
-                id_analysis = data.get("id_analysis", None),
-                id_reporting = data.get("id_reporting", None),
-                id_indicateur = data.get("id_indicateur", None),
+                id_action = data.get("id_action", None), 
                 dealine = data.get("dealine", None),
                 start_date = data.get("start_date", None),
                 time = data.get("time", None),
                 type_task = data.get("type_task", None),
-                is_answer = True,
-                id_answer = data.get("id_answer", None)
+             
+                id_answer = data.get("id_answer", None),
+                lang = data.get("lang", "fr-FR"),
 
             )
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
@@ -304,7 +290,8 @@ class ExigenceApprobatorView(APIView):
                     time= data.get("time"),
                     deadline= data.get("dealine"),
                     start_date= data.get("start_date"),
-                    scope= data.get("scope", [])
+                    scope= data.get("scope", []),
+                    lang=data.get("lang")
                 )
             elif data.get("type_task") == "CORRECT_ACTION":
                 type_task = "Action corrective"
@@ -356,13 +343,12 @@ class ExigenceNotificationView(APIView):
                     'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                     'scope': ['Périmètre 1', 'Périmètre 2'],
                     'id_action':"10",
-                    'id_analysis':"10",
-                    'id_reporting':"10",
-                    'id_indicateur':"10",
+                    'id_answer':"10",
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20",
-                    "type_task" : "EXIGENCE"
+                    "type_task" : "EXIGENCE",
+                    "lang":"en-US"
                 },
                 request_only=True,
             ),
@@ -382,67 +368,57 @@ class ExigenceNotificationView(APIView):
         tags=["Exigences"],
     )
     def post(self, request):
-        serializer = ExigenceSerializer(data=request.data)
         
-        if not serializer.is_valid():
-            return Response(
-                {
-                    "message": "Erreur de validation des données",
-                    "errors": serializer.errors
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            ) 
-        # Récupération des données validées
-        validated_data = serializer.validated_data 
+        data = request.data
  
         # Création de la tâche Celery
         try:
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
-                object=validated_data.get("object"),
-                description=validated_data.get("description"),
-                company=validated_data.get("company"),
-                dest_email=validated_data.get("dest_email"),
-                sender_name=validated_data.get("sender_name"),
-                dest_name=validated_data.get("dest_name"),
-                url=validated_data.get("url"),
-                method=validated_data.get("method"),
-                base_url=validated_data.get("base_url"),
-                jwt_token=validated_data.get("jwt_token"),
-                id_action = validated_data.get("id_action"),
-                id_analysis = validated_data.get("id_analysis"),
-                id_reporting = validated_data.get("id_reporting"),
-                id_indicateur = validated_data.get("id_indicateur"),
-                dealine = validated_data.get("dealine"),
-                start_date = validated_data.get("start_date"),
-                time = validated_data.get("time"),
-                type_task = validated_data.get("type_task"),
+                object=data.get("object"),
+                description=data.get("description"),
+                company=data.get("company"),
+                dest_email=data.get("dest_email"),
+                sender_name=data.get("sender_name"),
+                dest_name=data.get("dest_name"),
+                url=data.get("url"),
+                id_answer = data.get("id_answer", None),
+                base_url=data.get("base_url"),
+                jwt_token=data.get("jwt_token"),
+                id_action = data.get("id_action"),
+                is_notification = True,
+                dealine = data.get("dealine"),
+                start_date = data.get("start_date"),
+                time = data.get("time"),
+                type_task = data.get("type_task"),
+                lang = data.get("lang", "fr-FR"),
             )
             
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
-            if "scope" in validated_data and validated_data.get("scope"):
-                exigence.scope = validated_data.get("scope")
+            if "scope" in data and data.get("scope"):
+                exigence.scope = data.get("scope")
                 exigence.save()
             
              
-            if validated_data.get("type_task") == "EXIGENCE":
+            if data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
                 mail = exigence_notification(
-                    object= validated_data.get("object"),
+                    object= data.get("object"),
                     type_task = type_task,
-                    description= validated_data.get("description"),
-                    dest_email=validated_data.get("dest_email"),
-                    sender_name=validated_data.get("sender_name"),
-                    dest_name= validated_data.get("dest_name"),
-                    company= validated_data.get("company"), 
-                    url= validated_data.get("url"),
-                    time= validated_data.get("time"),
-                    deadline= validated_data.get("dealine"),
-                    start_date= validated_data.get("start_date"),
-                    scope= validated_data.get("scope", [])
+                    description= data.get("description"),
+                    dest_email=data.get("dest_email"),
+                    sender_name=data.get("sender_name"),
+                    dest_name= data.get("dest_name"),
+                    company= data.get("company"), 
+                    url= data.get("url"),
+                    time= data.get("time"),
+                    deadline= data.get("dealine"),
+                    start_date= data.get("start_date"),
+                    scope= data.get("scope", []),
+                    lang=data.get("lang")
                 )
-            elif validated_data.get("type_task") == "CORRECT_ACTION":
-                type_task = "Action corrective"
+            elif data.get("type_task") == "CORRECT_ACTION":
+                type_task = "Action"
                 # mail = task_responsable(
                 #     object= validated_data.get("object"),
                 #     type_task = type_task,
@@ -481,7 +457,7 @@ class sendMailAuthCodeView(APIView):
             # Générer le code de vérification
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
             expires_at =  timezone.now() + timezone.timedelta(minutes=30)
-            
+            custom_ins = ExigenceMail.objects.all().filter(jwt_token=jwt_token).first()
             nbr = (
                 auth_code.objects.all()
                 .filter(
@@ -491,13 +467,19 @@ class sendMailAuthCodeView(APIView):
             ) 
             
             if nbr == 0: 
+                
                 auth_code_instance = auth_code.objects.create(
                     code=verification_code, 
                     token=jwt_token, 
                     expires_at=expires_at
                 )
-                
-                path = "notification/2fa_auth/2FA-auth.html"
+                if custom_ins.lang == "fr-FR":
+                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    object = "Code d'authentification"
+                else:
+                    path = "notification/2fa_auth/2FA-auth-en.html"
+                    object = "Authentication code"
+
                 path_txt = "notification/2fa_auth/2FA-auth.txt"
                 
                 context = {  
@@ -507,10 +489,8 @@ class sendMailAuthCodeView(APIView):
                 
                 html_content = render_to_string(path, context)
                 text_content = render_to_string(path_txt, context) 
-                object = "code d'authentification"
                 
-              
-                custom_ins = ExigenceMail.objects.all().filter(jwt_token=jwt_token).first()
+                
                 send_mail_created(
                     [custom_ins.dest_email], 
                     object, 
@@ -524,9 +504,15 @@ class sendMailAuthCodeView(APIView):
                 auth_code_instance.expires_at = expires_at
                 auth_code_instance.save() 
                 
-                path = "notification/2fa_auth/2FA-auth.html"
+                if custom_ins.lang == "fr-FR":
+                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    object = "Code d'authentification"
+                else:
+                    path = "notification/2fa_auth/2FA-auth-en.html"
+                    object = "Authentication code"
+
                 path_txt = "notification/2fa_auth/2FA-auth.txt" 
-                
+
                 context = {  
                     "user_name": "",
                     "code_auth": verification_code,
@@ -534,7 +520,6 @@ class sendMailAuthCodeView(APIView):
                 
                 html_content = render_to_string(path, context)
                 text_content = render_to_string(path_txt, context) 
-                object = "code d'authentification"
                 
                 custom_ins = ExigenceMail.objects.all().filter(jwt_token=jwt_token).first()
                 send_mail_created(
@@ -543,8 +528,7 @@ class sendMailAuthCodeView(APIView):
                     text_content, 
                     html_content,
                     custom_ins.company
-                )
-                
+                ) 
             # Inclure le token JWT dans la réponse si récupéré
             response_data = {
                 "message": "your request was do successfully",
@@ -564,8 +548,6 @@ class sendMailAuthCodeView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-
-    
 
 # Vue API
 class ValidateAuthCodeView(APIView):
@@ -594,8 +576,11 @@ class ValidateAuthCodeView(APIView):
             id_reporting = instance_customUser.id_reporting
             id_indicateur = instance_customUser.id_indicateur
             type_task = instance_customUser.type_task
+
+            if instance_customUser.is_notification:
+                return Response({"id_answer":instance_customUser.id_answer, "id_task" :instance_customUser.id_action  }, status.HTTP_200_OK)  
             if instance_customUser.is_answer:
-                return Response({"id":instance_customUser.id_answer }, status.HTTP_200_OK)  
+                return Response({"id_answer":instance_customUser.id_answer, "id_task" :instance_customUser.id_action  }, status.HTTP_200_OK)  
             # auth_code_instance.delete()
             return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope, "id_reporting": id_reporting, "id_indicateur":id_indicateur, "type_task":type_task }, status.HTTP_200_OK)  
         except  Exception as e:

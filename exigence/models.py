@@ -68,6 +68,7 @@ class ExigenceMail(models.Model):
         auto_now_add=True,
         verbose_name="Date de création"
     )
+    is_notification =  models.BooleanField(default=False)
     is_send =  models.BooleanField(default=False)
     is_answer =  models.BooleanField(default=False)
     id_action = models.CharField(max_length=255, null=True, blank=True)
@@ -95,6 +96,7 @@ class ExigenceMail(models.Model):
         verbose_name="Date de début",
          null=True,
     )
+    lang = models.CharField(max_length=255, default="fr-FR") #fr/en
     
     class Meta:
         verbose_name = "Exigence"
