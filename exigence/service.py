@@ -11,49 +11,7 @@ import os
 import uuid
 import secrets
 from django.conf import settings 
-
-def exigence_approver(object, description, dest_email, sender_name, dest_name, company, url, back_url=None, lang=None):
-    
-    if lang == "fr-FR" :
-        path = "notification/tasks/new-email-approbateur-fr.html" 
-    elif lang == "en-US":
-        path = "notification/tasks/new-email-approbateur-en.html" 
-    else:
-        path = "notification/tasks/new-email-approbateur-fr.html" 
-
-    path_txt = "notification/tasks/new-email-approbateur.txt" 
-    context = {
-        "sender_name":sender_name, 
-        "dest_name": dest_name,
-        "task_title": object, 
-        "url": url,
-        "description":description,
-        "back_url" :"https://dev-backend.app.klivar.com/" if back_url == None else back_url
-    }
-    header_path = "notification/tasks/header.html"
-    header_content = render_to_string(
-        header_path,
-        context
-    )
-    footer_path = "notification/tasks/footer.html"
-    footer_content = render_to_string(
-        footer_path,
-        context
-    )
-    body_content = render_to_string(
-        path,
-        context
-    )
-    html_content  = header_content + body_content + footer_content
-
-    text_content = render_to_string(
-            path_txt,
-            context
-    )
-    # send_mail_created([dest_email], object, text_content, html_content, company)
-    x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, html_content, company,))
-    x.start() 
-
+ 
 def is_valid_date_string(date_string, format="%Y-%m-%dT%H:%M:%S.%fZ"):
     try:
         if date_string == "" or date_string == None:

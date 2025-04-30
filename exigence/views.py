@@ -245,7 +245,7 @@ class ExigenceApprobatorView(APIView):
     )
     def post(self, request): 
         data= request.data
-         
+       
         # Création de la tâche Celery
         try:
             # Sauvegarde des données dans le modèle
@@ -265,11 +265,11 @@ class ExigenceApprobatorView(APIView):
                 start_date = data.get("start_date", None),
                 time = data.get("time", None),
                 type_task = data.get("type_task", None),
-             
                 id_answer = data.get("id_answer", None),
                 lang = data.get("lang", "fr-FR"),
 
             )
+            
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in data and data.get("scope"):
                 exigence.scope = data.get("scope")
@@ -278,6 +278,7 @@ class ExigenceApprobatorView(APIView):
              
             if data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
+                print("data", data)
                 mail = exigence_approver(
                     object= data.get("object"),
                     type_task = type_task,

@@ -24,6 +24,8 @@ from datetime import datetime
 import secrets
 import urllib.request
 
+ 
+
 
  
 def send_mail(to_emails, title, text_content, html_content, company):
@@ -53,32 +55,87 @@ def send_mail(to_emails, title, text_content, html_content, company):
         msg.send()
     return True
 
+# def send_mail_created(to_emails, title, text_content, html_content, company=None):
+#     """Docstring for send_mail."""
+#     from_email = settings.EMAIL_HOST_USER
+#     for to_email in to_emails: 
+#         if company :
+#             msg = EmailMultiAlternatives(
+#                 title,
+#                 text_content,
+#                 company+' Via Klivar <' + from_email + '>',
+#                 [to_email],
+#                 reply_to=None,
+#             )
+#         else:
+#             msg = EmailMultiAlternatives(
+#                 title,
+#                 text_content,
+#                 'Klivar <' + from_email + '>',
+#                 [to_email],
+#                 reply_to=None,
+#             )
+#         if html_content:
+#             msg.attach_alternative(html_content, 'text/html')
+
+#         msg.send()
+#     return True
+
 def send_mail_created(to_emails, title, text_content, html_content, company=None):
-    """Docstring for send_mail."""
+    """
+    Envoie un email à plusieurs destinataires en utilisant Django's EmailMultiAlternatives.
+    
+    Args:
+        to_emails (list): Liste des adresses email des destinataires
+        title (str): Sujet de l'email
+        text_content (str): Contenu en format texte
+        html_content (str): Contenu en format HTML (optionnel)
+        company (str, optional): Nom de l'entreprise expéditrice. Défaut à None.
+    
+    Returns:
+        bool: True si l'envoi a réussi
+    """
+    from django.core.mail import EmailMultiAlternatives
+    from django.conf import settings
+    import uuid
+    
     from_email = settings.EMAIL_HOST_USER
-    for to_email in to_emails: 
-        if company :
+    sender_name = company + ' Via Klivar' if company else 'Klivar'
+    from_formatted = f'{sender_name} <{from_email}>'
+    
+    # Ajout d'options d'en-têtes pour améliorer la délivrabilité
+    headers = {
+        'Reply-To': from_email,
+        'X-Entity-Ref-ID': str(uuid.uuid4()),  # ID unique pour chaque message
+        'List-Unsubscribe': f'<mailto:{from_email}?subject=unsubscribe>'
+    }
+    
+    success = True
+    
+    for to_email in to_emails:
+        try:
+            # Création du message avec les en-têtes optimisés
             msg = EmailMultiAlternatives(
-                title,
-                text_content,
-                company+' Via Klivar <' + from_email + '>',
-                [to_email],
-                reply_to=None,
+                subject=title,
+                body=text_content,
+                from_email=from_formatted,
+                to=[to_email],
+                headers=headers
             )
-        else:
-            msg = EmailMultiAlternatives(
-                title,
-                text_content,
-                'Klivar <' + from_email + '>',
-                [to_email],
-                reply_to=None,
-            )
-        if html_content:
-            msg.attach_alternative(html_content, 'text/html')
-
-        msg.send()
-    return True
-
+            
+            # Ajout de la version HTML si disponible
+            if html_content:
+                msg.attach_alternative(html_content, 'text/html')
+            
+            # Envoi du message
+            msg.send(fail_silently=False)
+            
+        except Exception as e:
+            # Journalisation des erreurs sans arrêter le processus
+            print(f"Erreur lors de l'envoi à {to_email}: {str(e)}")
+            success = False
+    
+    return success
 def send_mail_test(to_emails, title, text_content, html_content, filename):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
@@ -129,54 +186,148 @@ def send_mail_file(to_emails, title, text_content, html_content, files, company)
     return True
 
 
+# def send_mail_with_ics(to_emails, title, text_content, html_content, filename, company):
+#     """Docstring for send_mail."""
+
+#     from_email = settings.EMAIL_HOST_USER
+
+#     for to_email in to_emails:
+
+#         # Create a multipart message and set headers
+#         msg = MIMEMultipart()
+#         # message = EmailMultiAlternatives()
+#         msg["From"] = company + ' Via Klivar <' + from_email + '>'
+#         msg["To"] = to_email
+#         msg["Subject"] = title
+#         if html_content:
+#             # msg.attach_alternative(html_content, 'text/html')
+#             msg.attach(MIMEText(html_content, "html"))
+#             msg.attach(MIMEText("", "plain"))
+#             if os.path.exists(filename):
+#                 with open(filename, "rb") as attachment:
+#                     # Add file as application/octet-stream
+#                     # Email client can usually download this automatically as attachment
+#                     part = MIMEBase("application", "octet-stream")
+#                     part.set_payload(attachment.read())
+#                 # Encode file in ASCII characters to send by email
+#                 encoders.encode_base64(part)
+
+#                 # Add header as key/value pair to attachment part
+#                 file_name = filename.rsplit('/', 1)[-1]
+#                 part.add_header(
+#                     "Content-Disposition",
+#                     f"attachment; filename= {file_name}",
+#                 )
+
+#                 msg.attach(part)
+
+#                 text = msg.as_string()
+#                 # Log in to server using secure context and send email
+#                 context = ssl.create_default_context()
+#                 # server smtp and port
+#                 EMAIL_HOST = settings.EMAIL_HOST
+#                 EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+#                 with smtplib.SMTP_SSL(EMAIL_HOST, context=context) as server:
+#                     server.login(from_email, EMAIL_HOST_PASSWORD)
+#                     server.sendmail(from_email, to_email, text)
+#             else:
+#                 return False
+#     os.remove(filename)
+#     return True
+
+
 def send_mail_with_ics(to_emails, title, text_content, html_content, filename, company):
-    """Docstring for send_mail."""
+    """
+    Envoie un email avec une pièce jointe ICS (calendrier) à plusieurs destinataires.
+    
+    Args:
+        to_emails (list): Liste des adresses email des destinataires
+        title (str): Sujet de l'email
+        text_content (str): Contenu en format texte (important pour éviter le spam)
+        html_content (str): Contenu en format HTML (optionnel)
+        filename (str): Chemin vers le fichier ICS à joindre
+        company (str): Nom de l'entreprise expéditrice
+    
+    Returns:
+        bool: True si l'envoi a réussi, False sinon
+    """
+   
 
     from_email = settings.EMAIL_HOST_USER
-
+    
+    # Vérification préalable que le fichier existe
+    if not os.path.exists(filename):
+        return False
+    
+    # Configuration pour la connexion SMTP
+    EMAIL_HOST = settings.EMAIL_HOST
+    EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+    
+    # Création du contexte SSL pour une connexion sécurisée
+    context = ssl.create_default_context()
+    
+    # Préparation de la pièce jointe ICS
+    with open(filename, "rb") as attachment:
+        part = MIMEBase("text", "calendar", method="REQUEST", name="meeting.ics")
+        part.set_payload(attachment.read())
+    
+    # Encodage et ajout des en-têtes pour la pièce jointe
+    encoders.encode_base64(part)
+    file_name = filename.rsplit('/', 1)[-1]
+    part.add_header("Content-Disposition", f"attachment; filename={file_name}")
+    part.add_header("Content-ID", f"<{file_name}@klivar>")
+    
+    # Préparation de l'en-tête DKIM (si disponible)
+    # Cette ligne est optionnelle et dépend de votre configuration
+    # dkim_header = settings.EMAIL_DKIM_HEADER if hasattr(settings, 'EMAIL_DKIM_HEADER') else None
+    
+    success = True
+    
     for to_email in to_emails:
-
-        # Create a multipart message and set headers
-        msg = MIMEMultipart()
-        # message = EmailMultiAlternatives()
-        msg["From"] = company + ' Via Klivar <' + from_email + '>'
-        msg["To"] = to_email
-        msg["Subject"] = title
-        if html_content:
-            # msg.attach_alternative(html_content, 'text/html')
-            msg.attach(MIMEText(html_content, "html"))
-            msg.attach(MIMEText("", "plain"))
-            if os.path.exists(filename):
-                with open(filename, "rb") as attachment:
-                    # Add file as application/octet-stream
-                    # Email client can usually download this automatically as attachment
-                    part = MIMEBase("application", "octet-stream")
-                    part.set_payload(attachment.read())
-                # Encode file in ASCII characters to send by email
-                encoders.encode_base64(part)
-
-                # Add header as key/value pair to attachment part
-                file_name = filename.rsplit('/', 1)[-1]
-                part.add_header(
-                    "Content-Disposition",
-                    f"attachment; filename= {file_name}",
-                )
-
-                msg.attach(part)
-
-                text = msg.as_string()
-                # Log in to server using secure context and send email
-                context = ssl.create_default_context()
-                # server smtp and port
-                EMAIL_HOST = settings.EMAIL_HOST
-                EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
-                with smtplib.SMTP_SSL(EMAIL_HOST, context=context) as server:
-                    server.login(from_email, EMAIL_HOST_PASSWORD)
-                    server.sendmail(from_email, to_email, text)
-            else:
-                return False
-    os.remove(filename)
-    return True
+        try:
+            # Création du message multipart
+            msg = MIMEMultipart("mixed")
+            
+            # Ajout des en-têtes essentiels
+            msg["From"] = f"{company} Via Klivar <{from_email}>"
+            msg["To"] = to_email
+            msg["Subject"] = title
+            msg["Reply-To"] = from_email
+            msg["Message-ID"] = f"<{os.urandom(16).hex()}@klivar>"
+            
+            # Création d'une partie alternative pour le HTML et le texte
+            alt_part = MIMEMultipart("alternative")
+            
+            # Toujours attacher une version texte (important pour éviter le spam)
+            alt_part.attach(MIMEText(text_content or "Voir le contenu HTML", "plain"))
+            
+            # Attacher la version HTML si disponible
+            if html_content:
+                alt_part.attach(MIMEText(html_content, "html"))
+            
+            # Attacher la partie alternative au message principal
+            msg.attach(alt_part)
+            
+            # Attacher la pièce jointe ICS
+            msg.attach(part)
+            
+            # Conversion en chaîne de caractères
+            text = msg.as_string()
+            
+            # Envoi du message
+            with smtplib.SMTP_SSL(EMAIL_HOST, 465, context=context) as server:
+                server.login(from_email, EMAIL_HOST_PASSWORD)
+                server.sendmail(from_email, to_email, text)
+        
+        except Exception as e:
+            print(f"Erreur lors de l'envoi à {to_email}: {str(e)}")
+            success = False
+    
+    # Suppression du fichier ICS
+    if os.path.exists(filename):
+        os.remove(filename)
+    
+    return success
 
 
 def send_mail_with_ics_file(to_emails, title, files, html_content, filename, company):
