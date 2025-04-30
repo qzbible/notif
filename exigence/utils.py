@@ -23,6 +23,7 @@ from icalendar import Calendar, Event, vCalAddress, vText
 from datetime import datetime
 import secrets
 import urllib.request
+import re
 
  
 
@@ -330,78 +331,223 @@ def send_mail_with_ics(to_emails, title, text_content, html_content, filename, c
     return success
 
 
-def send_mail_with_ics_file(to_emails, title, files, html_content, filename, company):
-    """Docstring for send_mail."""
+# def send_mail_with_ics_file(to_emails, title, files, html_content, filename, company):
+#     """Docstring for send_mail."""
 
+#     from_email = settings.EMAIL_HOST_USER
+
+#     for to_email in to_emails:
+
+#         # Create a multipart message and set headers
+#         msg = MIMEMultipart()
+#         # message = EmailMultiAlternatives()
+#         msg["From"] = company + ' Via Klivar <' + from_email + '>'
+#         msg["To"] = to_email
+#         msg["Subject"] = title
+
+#         if html_content:
+#             # msg.attach_alternative(html_content, 'text/html')
+#             msg.attach(MIMEText(html_content, "html"))
+#             msg.attach(MIMEText("", "plain")) 
+#             if files:
+#                 for file in files:
+#                     with open(file, "rb") as attachment:
+#                         # Add file as application/octet-stream
+#                         # Email client can usually download this automatically as attachment
+#                         part = MIMEBase("application", "octet-stream")
+#                         part.set_payload(attachment.read())
+#                     # Encode file in ASCII characters to send by email
+#                     encoders.encode_base64(part)
+#                     # Add header as key/value pair to attachment part
+#                     """part.add_header(
+#                         "Content-Disposition",
+#                         f"attachment; file= {file}",
+#                     )"""
+#                     part.add_header('content-disposition',
+#                                     'attachment', filename=file.split('/')[-1])
+#                     msg.attach(part)
+#                     text = msg.as_string()
+
+#                     # print(msg)
+
+#             if os.path.exists(filename):
+#                 with open(filename, "rb") as attachment:
+#                     # Add file as application/octet-stream
+#                     # Email client can usually download this automatically as attachment
+#                     part = MIMEBase("application", "octet-stream")
+#                     part.set_payload(attachment.read())
+#                 # Encode file in ASCII characters to send by email
+#                 encoders.encode_base64(part)
+
+#                 # Add header as key/value pair to attachment part
+#                 file_name = filename.rsplit('/', 1)[-1]
+#                 part.add_header(
+#                     "Content-Disposition",
+#                     f"attachment; filename= {file_name}",
+#                 )
+
+#                 msg.attach(part)
+
+#                 text = msg.as_string()
+#                 # Log in to server using secure context and send email
+#                 context = ssl.create_default_context()
+#                 # server smtp and port
+#                 EMAIL_HOST = settings.EMAIL_HOST
+#                 EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+#                 with smtplib.SMTP_SSL(EMAIL_HOST, context=context) as server:
+#                     server.login(from_email, EMAIL_HOST_PASSWORD)
+#                     server.sendmail(from_email, to_email, text)
+#             else:
+#                 return False
+#     os.remove(filename)
+#     return True
+
+
+def send_mail_with_ics_file(to_emails, title, files, html_content, filename, company, text_content=None):
+    """
+    Envoie un email avec un fichier ICS et d'autres pièces jointes optionnelles.
+    
+    Args:
+        to_emails (list): Liste des adresses email des destinataires
+        title (str): Sujet de l'email
+        files (list): Liste des chemins vers les fichiers à joindre
+        html_content (str): Contenu en format HTML
+        filename (str): Chemin vers le fichier ICS à joindre
+        company (str): Nom de l'entreprise expéditrice
+        text_content (str, optional): Contenu en format texte. Si non fourni, une version sera générée.
+    
+    Returns:
+        bool: True si l'envoi a réussi, False sinon
+    """
+
+    # Fonction pour extraire du texte depuis le HTML si aucun texte n'est fourni
+    def html_to_text(html):
+        # Suppression basique des balises HTML
+        text = re.sub('<.*?>', ' ', html)
+        # Remplacement des entités HTML courantes
+        text = text.replace('&nbsp;', ' ').replace('&amp;', '&')
+        # Suppression des espaces multiples
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+    
     from_email = settings.EMAIL_HOST_USER
-
+    
+    # Vérification préalable que le fichier ICS existe
+    if not os.path.exists(filename):
+        return False
+    
+    # Si aucun contenu texte n'est fourni, extraire du HTML
+    if not text_content and html_content:
+        text_content = html_to_text(html_content)
+    elif not text_content:
+        text_content = "Veuillez consulter la version HTML de cet email."
+    
+    # Préparation des variables pour la connexion SMTP
+    EMAIL_HOST = settings.EMAIL_HOST
+    EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+    
+    # Création du contexte SSL pour une connexion sécurisée
+    context = ssl.create_default_context()
+    
+    success = True
+    
     for to_email in to_emails:
-
-        # Create a multipart message and set headers
-        msg = MIMEMultipart()
-        # message = EmailMultiAlternatives()
-        msg["From"] = company + ' Via Klivar <' + from_email + '>'
-        msg["To"] = to_email
-        msg["Subject"] = title
-
-        if html_content:
-            # msg.attach_alternative(html_content, 'text/html')
-            msg.attach(MIMEText(html_content, "html"))
-            msg.attach(MIMEText("", "plain")) 
+        try:
+            # Création du message multipart
+            msg = MIMEMultipart('mixed')
+            
+            # Ajout des en-têtes essentiels
+            msg["From"] = f"{company} Via Klivar <{from_email}>"
+            msg["To"] = to_email
+            msg["Subject"] = title
+            msg["Reply-To"] = from_email
+            msg["Message-ID"] = f"<{uuid.uuid4()}@klivar>"
+            msg["List-Unsubscribe"] = f"<mailto:{from_email}?subject=unsubscribe>"
+            
+            # Création d'une partie alternative pour le HTML et le texte
+            alt_part = MIMEMultipart('alternative')
+            
+            # Toujours attacher une version texte (important pour éviter le spam)
+            alt_part.attach(MIMEText(text_content, 'plain'))
+            
+            # Attacher la version HTML si disponible
+            if html_content:
+                alt_part.attach(MIMEText(html_content, 'html'))
+            
+            # Attacher la partie alternative au message principal
+            msg.attach(alt_part)
+            
+            # Ajout des pièces jointes standard
             if files:
-                for file in files:
-                    with open(file, "rb") as attachment:
-                        # Add file as application/octet-stream
-                        # Email client can usually download this automatically as attachment
-                        part = MIMEBase("application", "octet-stream")
-                        part.set_payload(attachment.read())
-                    # Encode file in ASCII characters to send by email
-                    encoders.encode_base64(part)
-                    # Add header as key/value pair to attachment part
-                    """part.add_header(
-                        "Content-Disposition",
-                        f"attachment; file= {file}",
-                    )"""
-                    part.add_header('content-disposition',
-                                    'attachment', filename=file.split('/')[-1])
-                    msg.attach(part)
-                    text = msg.as_string()
-
-                    # print(msg)
-
-            if os.path.exists(filename):
-                with open(filename, "rb") as attachment:
-                    # Add file as application/octet-stream
-                    # Email client can usually download this automatically as attachment
-                    part = MIMEBase("application", "octet-stream")
-                    part.set_payload(attachment.read())
-                # Encode file in ASCII characters to send by email
+                for file_path in files:
+                    if os.path.exists(file_path):
+                        with open(file_path, "rb") as attachment:
+                            # Détecter le type MIME en fonction de l'extension
+                            file_name = os.path.basename(file_path)
+                            file_ext = os.path.splitext(file_name)[1].lower()
+                            
+                            # Déterminer le type MIME basé sur l'extension
+                            mime_type = "application/octet-stream"
+                            if file_ext in ['.pdf']:
+                                mime_type = "application/pdf"
+                            elif file_ext in ['.jpg', '.jpeg']:
+                                mime_type = "image/jpeg"
+                            elif file_ext in ['.png']:
+                                mime_type = "image/png"
+                            elif file_ext in ['.doc', '.docx']:
+                                mime_type = "application/msword"
+                            elif file_ext in ['.xls', '.xlsx']:
+                                mime_type = "application/vnd.ms-excel"
+                            
+                            # Créer la pièce jointe avec le bon type MIME
+                            part = MIMEBase(*mime_type.split('/'))
+                            part.set_payload(attachment.read())
+                            
+                            # Encoder la pièce jointe
+                            encoders.encode_base64(part)
+                            
+                            # Ajouter l'en-tête pour la pièce jointe
+                            part.add_header('Content-Disposition', 'attachment', filename=file_name)
+                            
+                            # Ajouter la pièce jointe au message
+                            msg.attach(part)
+            
+            # Ajout de la pièce jointe ICS
+            with open(filename, "rb") as attachment:
+                # Pour les fichiers ICS, utiliser le type MIME approprié
+                part = MIMEBase("text", "calendar", method="REQUEST")
+                part.set_payload(attachment.read())
+                
+                # Encoder la pièce jointe
                 encoders.encode_base64(part)
-
-                # Add header as key/value pair to attachment part
-                file_name = filename.rsplit('/', 1)[-1]
-                part.add_header(
-                    "Content-Disposition",
-                    f"attachment; filename= {file_name}",
-                )
-
+                
+                # Ajouter l'en-tête pour la pièce jointe ICS
+                file_name = os.path.basename(filename)
+                part.add_header('Content-Disposition', 'attachment', filename=file_name)
+                
+                # Ajouter la pièce jointe ICS au message
                 msg.attach(part)
-
-                text = msg.as_string()
-                # Log in to server using secure context and send email
-                context = ssl.create_default_context()
-                # server smtp and port
-                EMAIL_HOST = settings.EMAIL_HOST
-                EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
-                with smtplib.SMTP_SSL(EMAIL_HOST, context=context) as server:
-                    server.login(from_email, EMAIL_HOST_PASSWORD)
-                    server.sendmail(from_email, to_email, text)
-            else:
-                return False
-    os.remove(filename)
-    return True
-
-
+            
+            # Conversion en chaîne de caractères
+            text = msg.as_string()
+            
+            # Envoi du message
+            with smtplib.SMTP_SSL(EMAIL_HOST, 465, context=context) as server:
+                server.login(from_email, EMAIL_HOST_PASSWORD)
+                server.sendmail(from_email, to_email, text)
+                
+        except Exception as e:
+            print(f"Erreur lors de l'envoi à {to_email}: {str(e)}")
+            success = False
+    
+    # Supprimer le fichier ICS après envoi
+    try:
+        if os.path.exists(filename):
+            os.remove(filename)
+    except Exception as e:
+        print(f"Erreur lors de la suppression du fichier ICS: {str(e)}")
+    
+    return success
 def start_date(in_date, time):
     """This function return start time for activity"""
 

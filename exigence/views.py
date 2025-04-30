@@ -475,12 +475,16 @@ class sendMailAuthCodeView(APIView):
                     token=jwt_token, 
                     expires_at=expires_at
                 )
-                if custom_ins.lang == "fr-FR":
+                if custom_ins !=None and custom_ins.lang == "fr-FR":
                     path = "notification/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification" + "[" + current_datetime_string  + "]"
-                else:
+                elif custom_ins !=None and custom_ins.lang == "en-US":
                     path = "notification/2fa_auth/2FA-auth-en.html"
                     object = "Authentication code" + "[" + current_datetime_string  + "]"
+
+                else:
+                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    object = "Code d'authentification" + "[" + current_datetime_string  + "]"
 
                 path_txt = "notification/2fa_auth/2FA-auth.txt"
                 
