@@ -459,6 +459,14 @@ class sendMailAuthCodeView(APIView):
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
             expires_at =  timezone.now() + timezone.timedelta(minutes=30)
             custom_ins = ExigenceMail.objects.all().filter(jwt_token=jwt_token).first()
+            if custom_ins == None:
+                return  Response({
+                    "message": "Token not found",
+                    "status": "error", 
+                    "code": status.HTTP_404_NOT_FOUND,
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
             nbr = (
                 auth_code.objects.all()
                 .filter(
