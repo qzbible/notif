@@ -468,8 +468,7 @@ class sendMailAuthCodeView(APIView):
             ) 
             current_datetime = datetime.now()
             current_datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
-            if nbr == 0: 
-                
+            if nbr == 0:  
                 auth_code_instance = auth_code.objects.create(
                     code=verification_code, 
                     token=jwt_token, 
@@ -494,12 +493,9 @@ class sendMailAuthCodeView(APIView):
                     "company": custom_ins.company,
                     "name" : custom_ins.sender_name,
                     "back_url" :  "https://dev-backend.app.klivar.com/"
-                }
-                
+                } 
                 html_content = render_to_string(path, context)
-                text_content = render_to_string(path_txt, context) 
-                
-                
+                text_content = render_to_string(path_txt, context)  
                 send_mail_created(
                     [custom_ins.dest_email], 
                     object, 
@@ -513,12 +509,16 @@ class sendMailAuthCodeView(APIView):
                 auth_code_instance.expires_at = expires_at
                 auth_code_instance.save() 
                 
-                if custom_ins.lang == "fr-FR":
+                if custom_ins !=None and custom_ins.lang == "fr-FR":
                     path = "notification/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification" + "[" + current_datetime_string  + "]"
-                else:
+                elif custom_ins !=None and custom_ins.lang == "en-US":
                     path = "notification/2fa_auth/2FA-auth-en.html"
                     object = "Authentication code" + "[" + current_datetime_string  + "]"
+
+                else:
+                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    object = "Code d'authentification" + "[" + current_datetime_string  + "]"
 
                 path_txt = "notification/2fa_auth/2FA-auth.txt" 
 
