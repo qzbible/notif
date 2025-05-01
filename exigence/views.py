@@ -151,7 +151,7 @@ class ExigenceResponsableView(APIView):
                     lang=validated_data.get("lang")
 
                 )
-            elif validated_data.get("type_task") == "CORRECT_ACTION":
+            elif validated_data.get("type_task") == "ACTION":
                 type_task = "Action corrective"
                 mail = task_responsable(
                     object= validated_data.get("object"),
