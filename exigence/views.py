@@ -455,7 +455,7 @@ class sendMailAuthCodeView(APIView):
             
             if auth_header and auth_header.startswith('Bearer '):
                 jwt_token = auth_header[7:]  # Enlever le préfixe 'Bearer '
-            auth_code.objects.all().delete()
+             
             # Générer le code de vérification
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
             expires_at =  timezone.now() + timezone.timedelta(minutes=3)
