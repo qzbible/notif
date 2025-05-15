@@ -597,11 +597,12 @@ class ValidateAuthCodeView(APIView):
             id_indicateur = instance_customUser.id_indicateur
             type_task = instance_customUser.type_task
             if instance_customUser.is_notification==True or instance_customUser.is_answer==True or instance_customUser.id_answer != None:
-                return Response({"id_answer":instance_customUser.id_answer, "id_task" :instance_customUser.id_action, "type_task":type_task   }, status.HTTP_200_OK)  
+                auth_code_instance.delete()
+                return Response({"id_answer":instance_customUser.id_answer, "id_task" :instance_customUser.id_action, "type_task":type_task, "is_read":True }, status.HTTP_200_OK)  
             # if instance_customUser.is_answer:
             #     return Response({"id_answer":instance_customUser.id_answer, "id_task" :instance_customUser.id_action  }, status.HTTP_200_OK)  
-            # auth_code_instance.delete()
-            return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope, "id_reporting": id_reporting, "id_indicateur":id_indicateur, "type_task":type_task }, status.HTTP_200_OK)  
+            auth_code_instance.delete()
+            return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope, "id_reporting": id_reporting, "id_indicateur":id_indicateur, "type_task":type_task, "is_read":False  }, status.HTTP_200_OK)  
         except  Exception as e:
             return Response(
                 {
