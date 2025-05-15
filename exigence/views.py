@@ -267,6 +267,7 @@ class ExigenceApprobatorView(APIView):
                 type_task = data.get("type_task", None),
                 id_answer = data.get("id_answer", None),
                 lang = data.get("lang", "fr-FR"),
+                is_notification=False
 
             )
             
@@ -454,10 +455,10 @@ class sendMailAuthCodeView(APIView):
             
             if auth_header and auth_header.startswith('Bearer '):
                 jwt_token = auth_header[7:]  # Enlever le préfixe 'Bearer '
-            
+            auth_code.objects.all().delete()
             # Générer le code de vérification
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-            expires_at =  timezone.now() + timezone.timedelta(minutes=30)
+            expires_at =  timezone.now() + timezone.timedelta(minutes=3)
             custom_ins = ExigenceMail.objects.all().filter(jwt_token=jwt_token).first()
             if custom_ins == None:
                 return  Response({
@@ -568,14 +569,13 @@ class sendMailAuthCodeView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-
 # Vue API
 class ValidateAuthCodeView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
         """
-        Envoie un code d'authentification à 2 facteurs par email
+        Valide un code d'authentification à 2 facteurs
         """
         try:  
             auth_header = request.headers.get('Authorization')
@@ -583,37 +583,93 @@ class ValidateAuthCodeView(APIView):
             
             if auth_header and auth_header.startswith('Bearer '):
                 jwt_token = auth_header[7:]  
-            auth_code_instance = auth_code.objects.get(token=jwt_token) 
-            date_str = auth_code_instance.expires_at 
-            now = datetime.now() 
-        
+            
+            data = request.data
+            
+            try:
+                auth_code_instance = auth_code.objects.get(token=jwt_token, code=data['code'])
+            except auth_code.DoesNotExist:
+                return Response(
+                    {
+                        "message": "Code d'authentification invalide",
+                        "status": "error",
+                        "code": status.HTTP_404_NOT_FOUND,
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            
+            # Vérification de l'expiration
+            now = timezone.now()
+            
+            if auth_code_instance.expires_at < now:
+                return Response(
+                    {
+                        "message": "Le code d'authentification a expiré",
+                        "status": "error",
+                        "code": status.HTTP_408_REQUEST_TIMEOUT,
+                    },
+                    status=status.HTTP_408_REQUEST_TIMEOUT,
+                )
+            
+            # Le code est valide et non expiré
             id_action = None 
         
             instance_customUser = ExigenceMail.objects.filter(jwt_token=jwt_token).last() 
+            
+            if not instance_customUser:
+                return Response(
+                    {
+                        "message": "Données utilisateur non trouvées",
+                        "status": "error",
+                        "code": status.HTTP_404_NOT_FOUND,
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+                
             id_action = instance_customUser.id_action
             id_analysis = instance_customUser.id_analysis
             scope = instance_customUser.scope
             id_reporting = instance_customUser.id_reporting
             id_indicateur = instance_customUser.id_indicateur
             type_task = instance_customUser.type_task
-            if instance_customUser.is_notification==True or instance_customUser.is_answer==True or instance_customUser.id_answer != None:
-                auth_code_instance.delete()
-                return Response({"id_answer":instance_customUser.id_answer, "id_task" :instance_customUser.id_action, "type_task":type_task, "is_read":True }, status.HTTP_200_OK)  
-            # if instance_customUser.is_answer:
-            #     return Response({"id_answer":instance_customUser.id_answer, "id_task" :instance_customUser.id_action  }, status.HTTP_200_OK)  
+            
+            # Suppression du code d'authentification après utilisation
             auth_code_instance.delete()
-            return Response({"id":id_action, "id_analysis" : id_analysis, "scope":scope, "id_reporting": id_reporting, "id_indicateur":id_indicateur, "type_task":type_task, "is_read":False  }, status.HTTP_200_OK)  
-        except  Exception as e:
+            
+            if instance_customUser.is_notification :
+                return Response(
+                    {
+                        "id_answer": instance_customUser.id_answer, 
+                        "id_task": instance_customUser.id_action, 
+                        "type_task": type_task, 
+                        "is_read": True
+                    }, 
+                    status=status.HTTP_200_OK
+                )  
+            
             return Response(
                 {
-                    "message": "validation auth Not Found",
-                    "status": "Not Found",
+                    "id": id_action, 
+                    "id_analysis": id_analysis, 
+                    "scope": scope, 
+                    "id_reporting": id_reporting, 
+                    "id_indicateur": id_indicateur, 
+                    "type_task": type_task, 
+                    "is_read": False
+                }, 
+                status=status.HTTP_200_OK
+            )  
+                
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Erreur lors de la validation du code",
+                    "status": "error",
                     "error": str(e),
-                    "code": status.HTTP_404_NOT_FOUND,
-                }
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
-
 
 @api_view(["POST"]) 
 def validateAuthCode(request, token=None):
