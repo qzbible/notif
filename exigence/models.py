@@ -69,6 +69,7 @@ class ExigenceMail(models.Model):
         verbose_name="Date de création"
     )
     is_notification =  models.BooleanField(default=False)
+    is_approver =  models.BooleanField(default=False)
     is_send =  models.BooleanField(default=False)
     is_answer =  models.BooleanField(default=False)
     id_action = models.CharField(max_length=255, null=True, blank=True)

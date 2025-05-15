@@ -267,7 +267,8 @@ class ExigenceApprobatorView(APIView):
                 type_task = data.get("type_task", None),
                 id_answer = data.get("id_answer", None),
                 lang = data.get("lang", "fr-FR"),
-                is_notification=False
+                is_notification=False,
+                is_approver=True,
 
             )
             
@@ -279,7 +280,7 @@ class ExigenceApprobatorView(APIView):
              
             if data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
-                print("data", data)
+            
                 mail = exigence_approver(
                     object= data.get("object"),
                     type_task = type_task,
@@ -645,7 +646,18 @@ class ValidateAuthCodeView(APIView):
                         "is_read": True
                     }, 
                     status=status.HTTP_200_OK
-                )  
+                )
+            if instance_customUser.is_approver :
+                return Response(
+                    {
+                        "id_answer": instance_customUser.id_answer, 
+                        "id_task": instance_customUser.id_action, 
+                        "type_task": type_task, 
+                        "is_read": False
+                    }, 
+                    status=status.HTTP_200_OK
+                )
+          
             
             return Response(
                 {
