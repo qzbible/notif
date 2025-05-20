@@ -7,7 +7,7 @@ on:
       - develop
       - play
       - main
-      - play2
+      - beta
     tags:
       - "*"
 
@@ -87,18 +87,18 @@ jobs:
         run: |
           ansible-playbook -e env=dev -e tmp_back_image=${IMAGE_TAG} deploy.yml
 
-  play2:
+  beta:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/play2' || startsWith(github.ref, 'refs/tags/')
+    if: github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/')
     needs:
       - build-images
     concurrency:
-      group: play2
+      group: beta
       cancel-in-progress: false
 
     environment:
-      name: play2
-      url: https://play2-backend.app.klivar.com/__healthcheck/ 
+      name: beta
+      url: https://beta-notify.back.klivar.com/__healthcheck/ 
 
     env:
       IMAGE_TAG: ${{needs.build-images.outputs.api-image-tags}}
@@ -108,7 +108,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup ansible
-        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v2.0.0
+        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v2.1.1
         with:
           ssh_private_key: ${{ secrets.OVH_MANAGER_SSH_PRIVATE_KEY }}
           ansible_vault_pass: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
@@ -120,7 +120,7 @@ jobs:
       - name: Running ansible
         working-directory: deploy
         run: |
-          ansible-playbook -e env=play2 -e tmp_back_image=${IMAGE_TAG} deploy.yml
+          ansible-playbook -e env=beta -e tmp_back_image=${IMAGE_TAG} deploy-beta.yml
 
   play:
     runs-on: ubuntu-latest

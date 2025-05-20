@@ -1,0 +1,14 @@
+---
+- name: Deploy Backend
+  hosts: ovh_manager_beta
+  vars_files:
+    - environments/all.yml
+    - environments/{{ env }}/vars.yml
+    - environments/{{ env }}/vault
+
+  roles:
+    - role: tmp-back
+      tmp_back_stack_name: "{{ env }}-tmp-back"
+      tmp_back_dest_folder: "/apps"
+      tmp_back_hostname: "{{ backend_app_hostname }}"
+
