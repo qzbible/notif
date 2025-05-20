@@ -47,6 +47,49 @@
     chdir: "{{ final_dest_folder }}"
   changed_when: stack_file.changed
 
+# Fix mode values in the final stack file before deployment
+- name: Fix mode values in configs
+  ansible.builtin.shell: |
+    # Check if file exists
+    if [ -f "{{ final_dest_folder }}/final-stack.yml" ]; then
+      # Fix mode with double quotes
+      sed -i 's/mode: "0440"/mode: 288/g' "{{ final_dest_folder }}/final-stack.yml"
+      # Fix mode with single quotes
+      sed -i "s/mode: '0440'/mode: 288/g" "{{ final_dest_folder }}/final-stack.yml"
+      # Fix mode without quotes
+      sed -i 's/mode: 0440/mode: 288/g' "{{ final_dest_folder }}/final-stack.yml"
+      
+      # More generic replacements for other potential octal values
+      sed -i 's/mode: "0[0-7][0-7][0-7]"/mode: 288/g' "{{ final_dest_folder }}/final-stack.yml"
+      sed -i "s/mode: '0[0-7][0-7][0-7]'/mode: 288/g" "{{ final_dest_folder }}/final-stack.yml"
+      sed -i 's/mode: 0[0-7][0-7][0-7]/mode: 288/g' "{{ final_dest_folder }}/final-stack.yml"
+      
+      echo "Mode values fixed in {{ final_dest_folder }}/final-stack.yml"
+    else
+      echo "File {{ final_dest_folder }}/final-stack.yml not found"
+    fi
+  args:
+    executable: /bin/bash
+  register: fix_result
+  changed_when: "'Mode values fixed' in fix_result.stdout"
+
+# Debug to show the changes made
+- name: Show configs section after fix
+  ansible.builtin.shell: |
+    if [ -f "{{ final_dest_folder }}/final-stack.yml" ] && grep -q "configs:" "{{ final_dest_folder }}/final-stack.yml"; then
+      grep -A 5 "configs:" "{{ final_dest_folder }}/final-stack.yml"
+    else
+      echo "No configs section found"
+    fi
+  args:
+    executable: /bin/bash
+  register: configs_section
+  changed_when: false
+
+- name: Display configs section
+  ansible.builtin.debug:
+    var: configs_section.stdout_lines
+
 - name: Deploy the stack
   community.docker.docker_stack:
     name: "{{ tmp_back_stack_name }}"
