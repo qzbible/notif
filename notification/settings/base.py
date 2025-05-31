@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     # 'drf_yasg',
+    'authClient',
     'mailing', 
     'exigence',
     # Healthchecks
@@ -239,4 +240,5 @@ APP_NAME = 'Klivar'
 
 
 
+ 
  

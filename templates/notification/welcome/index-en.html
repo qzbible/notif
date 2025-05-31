@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Klivar </title>
+    <style>
+        /* Reset */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8f8fc;
+            width: 100% !important;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        
+        img {
+            border: 0;
+            height: auto;
+            line-height: 100%;
+            outline: none;
+            text-decoration: none;
+            -ms-interpolation-mode: bicubic;
+            max-width: 100%;
+        }
+        
+        .hero-bg {
+            background: linear-gradient(135deg, #7A1CAC, #4F0A84);
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #7A1CAC, #4F0A84);
+            color: white !important;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            margin: 8px 4px;
+        }
+        
+        .icon-placeholder {
+            width: 15px;
+            height: 15px;
+            background-color: #7A1CAC;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        a[x-apple-data-detectors] {
+            color: inherit !important;
+            text-decoration: inherit !important;
+        }
+
+        #MessageViewBody a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        p {
+            line-height: inherit;
+        }
+
+        .desktop_hide,
+        .desktop_hide table {
+            mso-hide: all;
+            display: none;
+            max-height: 0px;
+            overflow: hidden;
+        }
+
+        .image_block img+div {
+            display: none;
+        }
+
+        sup, sub {
+            font-size: 75%;
+            line-height: 0;
+        }
+
+        .protected-image {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
+            -webkit-context-menu: none;
+            pointer-events: none;
+            position: relative;
+        }
+
+        .image-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 10;
+        }
+        /* Responsive Styles */
+        @media screen and (max-width: 700px) {
+            .main-table {
+                width: 100% !important;
+                min-width: 320px !important;
+            }
+            
+            .mobile_hide {
+                display: none !important;
+                min-height: 0 !important;
+                max-height: 0 !important;
+                max-width: 0 !important;
+                overflow: hidden !important;
+                font-size: 0px !important;
+            }
+
+            .desktop_hide,
+            .desktop_hide table {
+                display: table !important;
+                max-height: none !important;
+            }
+            
+            .hero-bg {
+                padding: 30px 20px !important;
+            }
+            
+            .hero-title {
+                font-size: 32px !important;
+                text-align: center !important;
+            }
+            
+            .content-padding {
+                padding: 30px 20px !important;
+            }
+            
+            .logo-container {
+                width: 120px !important;
+                height: 48px !important;
+            }
+            
+            .logo-text {
+                font-size: 16px !important;
+            }
+            
+            .feature-table {
+                width: 100% !important;
+            }
+            
+            .feature-icon {
+                width: 20px !important;
+                padding-right: 12px !important;
+            }
+            
+            .feature-text {
+                width: calc(100% - 32px) !important;
+            }
+            
+            .checklist-table {
+                width: 100% !important;
+            }
+            
+            .check-icon {
+                width: 20px !important;
+                padding-right: 10px !important;
+            }
+            
+            .check-text {
+                width: calc(100% - 30px) !important;
+            }
+            
+            body {
+                padding: 10px !important;
+            }
+            
+            .main-container {
+                margin: 0 !important;
+                border-radius: 4px !important;
+            }
+            
+            .footer-padding {
+                padding: 15px 10px !important;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .hero-bg {
+                padding: 25px 15px !important;
+            }
+            
+            .hero-title {
+                font-size: 28px !important;
+            }
+            
+            .content-padding {
+                padding: 25px 15px !important;
+            }
+            
+            .welcome-text {
+                font-size: 14px !important;
+            }
+            
+            .body-text {
+                font-size: 11px !important;
+                line-height: 1.6 !important;
+            }
+            
+            .feature-text-content {
+                font-size: 11px !important;
+                line-height: 1.6 !important;
+            }
+            
+            .logo-container {
+                width: 100px !important;
+                height: 40px !important;
+            }
+            
+            .logo-text {
+                font-size: 14px !important;
+            }
+        }
+    </style>
+</head>
+<body style="background-color: #f8f8fc; margin: 0; padding: 20px;">
+    
+    <!-- Container principal -->
+    <table class="main-table main-container" width="640" cellpadding="0" cellspacing="0" border="0" align="center" style="background-color: #f8f8fc; max-width: 640px;">
+        
+        <!-- Header avec logo -->
+        <tr>
+            <td align="center" style="padding: 20px 0;">
+                <table class="logo-container" width="144" height="56" cellpadding="0" cellspacing="0" border="0" style="  border-radius: 4px;">
+                    <tr>
+                        <td align="center" valign="middle" class="logo-text" style="color: white; font-weight: bold; font-size: 18px;">
+                            <img 
+                             
+                            src="{{back_url}}media/icons/cropped-Logo-Klivar-1.png" 
+                            class="protected-image"
+                            oncontextmenu="return false;"
+                            ondragstart="return false;"
+                            onselectstart="return false;"
+                            />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Section Hero -->
+        <tr>
+            <td class=" " style=" background-color: white; color: white; ">
+                <img 
+
+                class="protected-image"
+                oncontextmenu="return false;"
+                ondragstart="return false;"
+                onselectstart="return false;"
+                 src="{{back_url}}media/icons/Illustration-header.png"
+                  />
+            </td>
+        </tr>
+        
+        <!-- Contenu principal -->
+        <tr style=" ">
+            <td class="content-padding" style="background-color: white; border-radius: 0 0 8px 8px; padding: 40px; ">
+                <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    
+                    <!-- Texte de bienvenue -->
+                    <tr>
+                        <td style="padding-bottom: 20px;">
+                            <p class="welcome-text" style="font-size: 15px; font-weight: 600; color: #000; margin: 0; line-height: 1.8;">
+                                Welcome to the Klivar user community!
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Message d'accueil -->
+                    <tr>
+                        <td style="padding-bottom: 10px;">
+                            <p class="body-text" style="font-size: 12px; color: #353739; margin: 0; line-height: 1.5; letter-spacing: 0.2px;">
+                                Hello <strong>{{name}}</strong>,<br><br>
+                                Klivar is a platform designed to simplify compliance, risk and best practice management. To get you off to a good start, we have put together some essential links for you:
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Section des fonctionnalités -->
+                    <tr>
+                        <td style="padding: 14px 0;">
+                            <table class="feature-table" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td class="feature-icon" width="25" valign="top">
+                                        <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+                                            <tr><td style="padding-bottom: 8px;"> <img class="img" src="{{back_url}}media/icons/key-01.png" alt="Clé" width="15" height="15" /></td></tr>
+                                            <tr><td style="padding-bottom: 8px;"> <img class="img" src="{{back_url}}media/icons/link-03.png" alt="Lien" width="15" height="15" /></td></tr>
+                                            <tr><td> <img class="img" src="{{back_url}}media/icons/box.png" alt="Boîte" width="15" height="15" style="display: block" /></td></tr>
+                                        </table>
+                                    </td>
+                                    <td class="feature-text" valign="top" style="padding-left: 8px;">
+                                        <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+                                            <tr><td class="feature-text-content" style="padding-bottom: 4px; font-size: 12px; font-weight: 500; color: #000; margin: 0; line-height: 1.8; letter-spacing: 0.2px;"> Access to your personal space</td></tr>
+                                            <tr><td class="feature-text-content" style="padding-bottom: 8px; font-size: 12px; font-weight: 500; color: #000; margin: 0; line-height: 1.8; letter-spacing: 0.2px;"> Secure login link  – <a href="{{url_connect}}" style="color: #7A1CAC; text-decoration: none;">click here</a><br></td></tr>
+                                            <tr><td class="feature-text-content" style="font-size: 12px; font-weight: 500; color: #000; margin: 0; line-height: 1.8; letter-spacing: 0.2px;"> Community Starter Kit</td></tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Description du kit -->
+                    <tr>
+                        <td style="padding-bottom: 10px;">
+                            <p class="body-text" style="font-size: 12px; color: #353739; margin: 0; line-height: 1.7; letter-spacing: 0.2px;">
+                                This kit contains everything you need to make the most out of your experience:<br>
+                                • Step-by-step instructions<br>
+                                • Best practices by sector<br>
+                                • Compliance & audit reflex sheets<br>
+                                • Access to technical assistance<br>
+                                • Community advice
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Bouton CTA Kit -->
+                    <tr>
+                        <td align="left" style="padding: 24px 0;">
+                            Access the Community Kit :
+                        </td>
+                    </tr>
+                    
+                    <!-- Section vidéos de soutien -->
+                    <tr>
+                        <td>
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                
+                                <!-- Titre de la section vidéo -->
+                                <tr>
+                                    <td style="padding-bottom: 8px;">
+                                        <table cellpadding="0" cellspacing="0" border="0" style="width: 100%;">
+                                            <tr>
+                                                <td width="25" valign="top">
+                                                    <img class="img" src="{{back_url}}media/icons/calendar-check-01.png" alt="Calendrier" width="15" height="15" />
+                                                </td>
+                                                <td valign="top" style="padding-left: 8px;">
+                                                    <p class="feature-text-content" style="font-size: 12px; font-weight: 500; color: #000; margin: 0;">
+                                                        User support videos - live with our team.
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Description vidéo -->
+                                <tr>
+                                    <td style="padding-bottom: 16px;">
+                                        <p class="body-text" style="font-size: 12px; color: #353739; margin: 0; line-height: 1.7; letter-spacing: 0.2px;">
+                                            Join our interactive sessions to ask your questions, discover real-life use cases and exchange ideas with other members.
+                                        </p>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Checklist -->
+                                <tr>
+                                    <td>
+                                        <table class="checklist-table" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td class="check-icon" width="25" valign="top" style="padding-bottom: 8px;">
+                                                    <img class="img" src="{{back_url}}media/icons/check.png" alt="Check" width="15" height="15" /> 
+                                                </td>
+                                                <td class="check-text" valign="top" style="padding-left: 6px; padding-bottom: 8px;">
+                                                    <p class="body-text" style="font-size: 12px; color: #353739; margin: 0; line-height: 1.8;">
+                                                        Consult the Visios schedule
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class="check-icon" width="25" valign="top">
+                                                    <img class="img" src="{{back_url}}media/icons/check.png" alt="Check" width="15" height="15" /> 
+                                                </td>
+                                                <td class="check-text" valign="top" style="padding-left: 6px;">
+                                                    <p class="body-text" style="font-size: 12px; color: #353739; margin: 0; line-height: 1.8;">
+                                                        Join the next session
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Message de clôture -->
+                    <tr>
+                        <td style="padding: 24px 0;">
+                            <p class="body-text" style="font-size: 12px; color: #353739; margin: 0; line-height: 1.7; letter-spacing: 0.2px;">
+                                Our team is available to assist you at any time at <a href="mailto:avotreecoute@klivar.com" style="color: #7A1CAC; text-decoration: none;">avotreecoute@klivar.com</a> pour vous accompagner.<br><br>
+                                
+                                Once again, welcome aboard!<br>
+                                We're delighted to have you with us.<br>
+                                We hope to see you soon,
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Signature -->
+                    <tr>
+                        <td style="padding-top: 16px;">
+                            <p class="body-text" style="font-size: 12px; color: #353739; margin: 0; line-height: 1.8; letter-spacing: 0.2px;">
+                                <strong>Suzy NGUESSONG</strong><br>
+                                User Relations Team<br>
+                                <strong>KLIVAR</strong>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Footer -->
+        <tr>
+            <td align="center" class="footer-padding" style="padding: 20px;">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td align="center" style="padding-bottom: 4px;">
+                            <p style="font-size: 12px; color: #9d9d9d; margin: 0;">
+                                https://www.klivar.fr/
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">
+                            <p style="font-size: 14px; color: #9d9d9d; margin: 0;">
+                                📩 avotreecoute@klivar.com
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+    </table>
+    
+</body>
+</html>

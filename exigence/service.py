@@ -1,7 +1,7 @@
 
 
 import threading
-from exigence.utils import send_mail_created, send_mail_with_ics
+# from exigence.utils import send_mail_created, send_mail_with_ics
 
 from django.template.loader import render_to_string
  
@@ -10,7 +10,9 @@ from icalendar import Calendar, Event, vCalAddress, vText
 import os
 import uuid
 import secrets
-from django.conf import settings 
+from django.conf import settings
+
+from service.utils import send_mail_created, send_mail_with_ics 
  
 def is_valid_date_string(date_string, format="%Y-%m-%dT%H:%M:%S.%fZ"):
     try:

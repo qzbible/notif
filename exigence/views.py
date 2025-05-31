@@ -3,7 +3,7 @@ from exigence.models import ExigenceMail, auth_code
 from exigence.serializers import ErrorResponseSerializer, ExigenceResponseSerializer, TaskSerializer
 from exigence.service import exigence_approver, exigence_notification, exigence_responsable, task_responsable
 from exigence.serializers import ExigenceSerializer
-from exigence.utils import send_mail_created
+# from exigence.utils import send_mail_created
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
@@ -30,6 +30,8 @@ from rest_framework.decorators import api_view
 from django.template.loader import render_to_string
 
 from django.utils import timezone
+
+from service.utils import send_mail_created
 
 
 
@@ -445,6 +447,12 @@ class ExigenceNotificationView(APIView):
 # Vue API
 class sendMailAuthCodeView(APIView):
     permission_classes = [AllowAny]
+
+    @extend_schema( 
+        description=" ",
+        summary="Créer une exigence",
+        tags=["Exigences"],
+    )
     
     def get(self, request):
         """
@@ -573,6 +581,12 @@ class sendMailAuthCodeView(APIView):
 # Vue API
 class ValidateAuthCodeView(APIView):
     permission_classes = [AllowAny]
+
+    @extend_schema( 
+        description=" ",
+        summary="Créer une exigence",
+        tags=["Exigences"],
+    )
     
     def post(self, request):
         """
