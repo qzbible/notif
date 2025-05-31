@@ -58,3 +58,6 @@ class ClientAuthMailSerializer(serializers.Serializer):
         default=False,
         help_text="Indique si l'email a été envoyé"
     )
+
+
+ 
