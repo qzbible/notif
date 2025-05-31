@@ -28,7 +28,7 @@ class ClientAuthMailSerializer(serializers.Serializer):
         help_text="URL de base"
     )
    
-    jwt_token = serializers.CharField(
+    token = serializers.CharField(
         required=False,
         allow_blank=True,
         help_text="Token JWT pour l'authentification"

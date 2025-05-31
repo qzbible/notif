@@ -54,9 +54,10 @@ class welcomeMailView(APIView):
                     'email': 'client@example.com',
                     'name': 'Jean Dupont',
                     'url_connect': 'https://auth.example.com/connect',
+                    'url_verification': 'https://auth.example.com/connect',
                     'base_url': 'https://api.example.com',
                  
-                    'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
+                    'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c',
                     'client_id': 'client_12345',
                     'company' :"",
                     'surfix' :"",
@@ -87,17 +88,18 @@ class welcomeMailView(APIView):
         """
         try:  
             auth_header = request.headers.get('Authorization')
-            jwt_token = None
+            token = ""
             
             if auth_header and auth_header.startswith('Bearer '):
-                jwt_token = auth_header[7:]  # Enlever le préfixe 'Bearer '
+                token = auth_header[7:]  # Enlever le préfixe 'Bearer '
             data = request.data
             # Générer le code de vérification 
             custom_ins = ClientAuthMail.objects.create(
-                jwt_token=jwt_token,
+                token=token,
                 email = data.get('email', None),
                 name = data.get('name', None),
                 url_connect = data.get('url_connect', None),
+                url_verification = data.get('url_verification', None),
                 base_url = data.get('base_url', None),
                 # url_auth_code = data.get('url_auth_code', None),
                 client_id = data.get('client_id', None),
@@ -109,7 +111,7 @@ class welcomeMailView(APIView):
                 name = data.get('name', 'Client'),
                 dest_email = data.get('email', None),
                 company = data.get('company', 'klivar'),
-                url=data.get('url_connect', None),
+                url=data.get('url_verification', None) + str(token) ,
                 back_url=data.get('base_url', None),
                 lang=data.get('lang', None)
             )
@@ -149,15 +151,15 @@ class sendAuthClientCodeView(APIView):
         """
         try:  
             auth_header = request.headers.get('Authorization')
-            jwt_token = None
+            token = None
             
             if auth_header and auth_header.startswith('Bearer '):
-                jwt_token = auth_header[7:]  # Enlever le préfixe 'Bearer '
+                token = auth_header[7:]  # Enlever le préfixe 'Bearer '
              
             # Générer le code de vérification
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
             expires_at =  timezone.now() + timezone.timedelta(minutes=3)
-            custom_ins = ClientAuthMail.objects.all().filter(jwt_token=jwt_token).first()
+            custom_ins = ClientAuthMail.objects.all().filter(token=token).first()
             if custom_ins == None:
                 return  Response({
                     "message": "Token not found",
@@ -169,7 +171,7 @@ class sendAuthClientCodeView(APIView):
             nbr = (
                 authCodeClient.objects.all()
                 .filter(
-                    token=jwt_token,
+                    token=token,
                 )
                 .count()
             ) 
@@ -178,7 +180,7 @@ class sendAuthClientCodeView(APIView):
             if nbr == 0:  
                 auth_code_instance = authCodeClient.objects.create(
                     code=verification_code, 
-                    token=jwt_token, 
+                    token=token, 
                     expires_at=expires_at
                 )
                 if custom_ins !=None and custom_ins.lang == "fr-FR":
@@ -210,7 +212,7 @@ class sendAuthClientCodeView(APIView):
                     custom_ins.company
                 )
             else: 
-                auth_code_instance = authCodeClient.objects.get(token=jwt_token)
+                auth_code_instance = authCodeClient.objects.get(token=token)
                 auth_code_instance.code = verification_code
                 auth_code_instance.expires_at = expires_at
                 auth_code_instance.save() 
@@ -239,7 +241,7 @@ class sendAuthClientCodeView(APIView):
                 html_content = render_to_string(path, context)
                 text_content = render_to_string(path_txt, context) 
                 
-                custom_ins = ClientAuthMail.objects.all().filter(jwt_token=jwt_token).first()
+                custom_ins = ClientAuthMail.objects.all().filter(token=token).first()
                 send_mail_created(
                     [custom_ins.email], 
                     object, 
@@ -278,12 +280,12 @@ class ValidateAuthCodeView(APIView):
         """
         try:  
             auth_header = request.headers.get('Authorization')
-            jwt_token = None
+            token = None
             if auth_header and auth_header.startswith('Bearer '):
-                jwt_token = auth_header[7:]  
+                token = auth_header[7:]  
             data = request.data
             try:
-                auth_code_instance = authCodeClient.objects.get(token=jwt_token, code=data['code'])
+                auth_code_instance = authCodeClient.objects.get(token=token, code=data['code'])
             except authCodeClient.DoesNotExist:
                 return Response(
                     {
@@ -307,10 +309,10 @@ class ValidateAuthCodeView(APIView):
                 )
             # Suppression du code d'authentification après utilisation
             auth_code_instance.delete()
-            instance = ClientAuthMail.objects.get(jwt_token=jwt_token) 
+            instance = ClientAuthMail.objects.get(token=token) 
             return Response( 
                 {
-                    "path":instance.surfix, 
+                    "path":instance.url_connect, 
                 },
                 status=status.HTTP_200_OK
             )   
