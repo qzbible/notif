@@ -336,7 +336,7 @@ class MailVerificationView(APIView):
        tags=["Mail verification"],
     )
 
-    def get(self, request):
+    def post(self, request):
         """
         Envoie un code d'authentification à 2 facteurs par email
         """
