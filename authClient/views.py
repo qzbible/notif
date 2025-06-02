@@ -2,7 +2,7 @@ import random
  
 # from exigence.utils import send_mail_created
 from authClient.models import ClientAuthMail, EmailVerification, authCodeClient
-from authClient.serializers import ClientAuthMailSerializer
+from authClient.serializers import ClientAuthMailSerializer, MailVerificationSendSerializer
 from authClient.service import  mail_service
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
@@ -142,6 +142,7 @@ class sendAuthClientCodeView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema(
+       
        tags=["Authentification Client"],
     )
     

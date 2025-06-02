@@ -61,3 +61,32 @@ class ClientAuthMailSerializer(serializers.Serializer):
 
 
  
+
+
+# Serializer pour valider les données d'entrée
+class MailVerificationSendSerializer(serializers.Serializer):
+    email = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+        help_text="Adresse email du client"
+    )
+   
+
+# Serializer pour valider les données d'entrée
+class MailVerificationValidationSerializer(serializers.Serializer):
+    email = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+        help_text="Adresse email du client"
+    )
+    code = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+        help_text="code reçu par mail"
+    )
+   
+
+ 
