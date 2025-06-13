@@ -136,7 +136,9 @@ class ExigenceResponsableView(APIView):
              
             if validated_data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
-                print("exigence_responsable", validated_data.get("lang"))
+                # Envoi de l'email
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="Requirement"
                 mail = exigence_responsable(
                     object= validated_data.get("object"),
                     type_task = type_task,
@@ -155,6 +157,8 @@ class ExigenceResponsableView(APIView):
                 )
             elif validated_data.get("type_task") == "ACTION":
                 type_task = "Action corrective"
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="Corrective action"
                 mail = task_responsable(
                     object= validated_data.get("object"),
                     type_task = type_task,
@@ -282,6 +286,8 @@ class ExigenceApprobatorView(APIView):
              
             if data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
+                if data.get("lang") != "fr-FR":
+                    type_task="Requirement"
             
                 mail = exigence_approver(
                     object= data.get("object"),
@@ -407,6 +413,8 @@ class ExigenceNotificationView(APIView):
              
             if data.get("type_task") == "EXIGENCE":
                 type_task = "Exigence"
+                if data.get("lang") != "fr-FR":
+                    type_task="Requirement"
                 mail = exigence_notification(
                     object= data.get("object"),
                     type_task = type_task,
