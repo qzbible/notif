@@ -166,6 +166,29 @@ class TaskSerializer(serializers.Serializer):
     )
 
 
+
+# Serializer pour valider les données d'entrée
+class ExigenceSheduleSerializer(serializers.Serializer):
+    id = serializers.CharField(
+        required=True, 
+        help_text="Objet de l'exigence"
+    )
+    
+
+
+
+
+# Serializer pour valider les données d'entrée
+class ExigenceUpdateSheduleSerializer(serializers.Serializer):
+    id = serializers.CharField(
+        required=True, 
+        help_text="Objet de l'exigence"
+    )
+    new_date = serializers.CharField(
+        required=True, 
+        help_text="Objet de l'exigence"
+    )
+    
 # Serializer pour la réponse
 class ExigenceResponseSerializer(serializers.Serializer):
     message = serializers.CharField(default="Exigence créée avec succès")

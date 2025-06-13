@@ -98,6 +98,10 @@ class ExigenceMail(models.Model):
          null=True,
     )
     lang = models.CharField(max_length=255, default="fr-FR") #fr/en
+
+    sent = models.BooleanField(default=False)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    task_id = models.CharField(max_length=255, null=True, blank=True)
     
     class Meta:
         verbose_name = "Exigence"

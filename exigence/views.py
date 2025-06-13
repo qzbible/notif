@@ -1,7 +1,7 @@
 import random
 from exigence.models import ExigenceMail, auth_code
-from exigence.serializers import ErrorResponseSerializer, ExigenceResponseSerializer, TaskSerializer
-from exigence.service import exigence_approver, exigence_notification, exigence_responsable, task_responsable
+from exigence.serializers import ErrorResponseSerializer, ExigenceResponseSerializer, ExigenceSheduleSerializer, ExigenceUpdateSheduleSerializer, TaskSerializer
+from exigence.service import exigence_approver, exigence_notification, exigence_responsable, send_exigence_responsable_scheduled, task_responsable
 from exigence.serializers import ExigenceSerializer
 # from exigence.utils import send_mail_created
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -32,6 +32,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from service.utils import send_mail_created
+from celery import current_app
 
 
 
@@ -104,6 +105,11 @@ class ExigenceResponsableView(APIView):
         validated_data = serializer.validated_data  
         # 2025-04-03T22:23:52.900Z
         try:
+
+            type_task = "Exigence"
+            # Envoi de l'email
+            if validated_data.get("lang") != "fr-FR":
+                type_task="Requirement"
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
                 object=validated_data.get("object"),
@@ -123,7 +129,7 @@ class ExigenceResponsableView(APIView):
                 dealine = validated_data.get("dealine"),
                 start_date = validated_data.get("start_date"),
                 time = validated_data.get("time"),
-                type_task = validated_data.get("type_task"),
+                type_task = type_task,
                 lang = validated_data.get("lang", "fr-FR"),
             )
             
@@ -135,26 +141,32 @@ class ExigenceResponsableView(APIView):
             
              
             if validated_data.get("type_task") == "EXIGENCE":
-                type_task = "Exigence"
-                # Envoi de l'email
-                if validated_data.get("lang") != "fr-FR":
-                    type_task="Requirement"
-                mail = exigence_responsable(
-                    object= validated_data.get("object"),
-                    type_task = type_task,
-                    description= validated_data.get("description"),
-                    dest_email=validated_data.get("dest_email"),
-                    sender_name=validated_data.get("sender_name"),
-                    dest_name= validated_data.get("dest_name"),
-                    company= validated_data.get("company"), 
-                    url= validated_data.get("url"),
-                    time= validated_data.get("time"),
-                    deadline= validated_data.get("dealine"),
-                    start_date= validated_data.get("start_date"),
-                    scope= validated_data.get("scope", []),
-                    lang=validated_data.get("lang")
+                
 
+                target_time = timezone.now() + timedelta(minutes=3)
+               
+                task = exigence_responsable.apply_async(
+                    args=[
+                        validated_data.get("object"),
+                        type_task,
+                        validated_data.get("description"),
+                        validated_data.get("dest_email"),
+                        validated_data.get("sender_name"),
+                        validated_data.get("dest_name"),
+                        validated_data.get("company"), 
+                        validated_data.get("url"),
+                        validated_data.get("scope", []),
+                        validated_data.get("time"),
+                        validated_data.get("dealine"),
+                        validated_data.get("start_date"),
+                        None,
+                        validated_data.get("lang")
+                    ],
+                    eta=target_time
                 )
+                # Sauvegarder l'ID de la tâche
+                exigence.task_id = task.id
+                exigence.save()
             elif validated_data.get("type_task") == "ACTION":
                 type_task = "Action corrective"
                 if validated_data.get("lang") != "fr-FR":
@@ -324,9 +336,6 @@ class ExigenceApprobatorView(APIView):
         except Exception as e:
             return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
         
-
-
-
 # Vue API
 class ExigenceNotificationView(APIView):
     permission_classes = [AllowAny]
@@ -450,8 +459,6 @@ class ExigenceNotificationView(APIView):
         except Exception as e:
             return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
         
-
-
 # Vue API
 class sendMailAuthCodeView(APIView):
     permission_classes = [AllowAny]
@@ -705,6 +712,7 @@ class ValidateAuthCodeView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+
 @api_view(["POST"]) 
 def validateAuthCode(request, token=None):
     """
@@ -749,7 +757,176 @@ def validateAuthCode(request, token=None):
             }
         )
 
-
-            
-
  
+
+      
+# Vue API
+class GetExigeneTaskView(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema( 
+        description=" ",
+        summary="Créer une exigence",
+       
+        tags=["Exigences"],
+    )
+    
+    def get(self, request):
+        """
+        Valide un code d'authentification à 2 facteurs
+        """
+  
+    
+        # Récupérer les tâches actives
+        inspect = current_app.control.inspect()
+        active_tasks = inspect.active()
+        scheduled_tasks = inspect.scheduled()
+        
+        return Response({
+            'active': active_tasks,
+            'scheduled': scheduled_tasks
+        })
+
+
+
+  
+# Vue API
+class EndExigeneTaskView(APIView):
+    permission_classes = [AllowAny]
+    @extend_schema(  
+        request=ExigenceSheduleSerializer,
+        responses={
+            201: ExigenceSheduleSerializer,
+            400: ErrorResponseSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        description=" ",
+        summary="Créer une exigence",
+         examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'id': 2
+                    
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        tags=["Exigences"],
+    )
+    
+    def post(self, request):
+        """
+        Valide un code d'authentification à 2 facteurs
+        """
+        reporting_id = request.data.get('id')
+     
+        if not reporting_id:
+            return Response({'error': 'id requis'}, status=400)
+        
+        task_exigences = ExigenceMail.objects.filter(id_reporting=str(reporting_id))
+        for task in task_exigences:
+            try:
+                current_app.control.revoke(task.task_id, terminate=True)
+                print(f"Tâche {task.task_id} annulée avec succès")
+            except Exception as e:
+                print(f"Impossible d'annuler la tâche {task.task_id}: {str(e)}")
+
+        return Response({
+            'message': f'Tâches reporting  annulée'
+        })
+    
+
+
+# Vue API
+class UpdateExigeneTaskView(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema(  
+        request=ExigenceUpdateSheduleSerializer,
+        responses={
+            201: ExigenceUpdateSheduleSerializer,
+            400: ErrorResponseSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        description=" ",
+        summary="Créer une exigence",
+         examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'id': 2,
+                    'new_date': '2025-02-12T22:23:52.900Z'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        tags=["Exigences"],
+    )
+    
+    def post(self, request):
+        """
+        Valide un code d'authentification à 2 facteurs
+        """
+        reporting_id = request.data.get('id')
+    
+        if not reporting_id:
+            return Response({'error': 'id requis'}, status=400)
+        
+        task_exigences = ExigenceMail.objects.filter(id_reporting=str(reporting_id))
+        for task in task_exigences:
+            try:
+                current_app.control.revoke(task.task_id, terminate=True)
+                print(f"Tâche {task.task_id} annulée avec succès")
+            except Exception as e:
+                print(f"Impossible d'annuler la tâche {task.task_id}: {str(e)}")
+
+            target_time = timezone.now() + timedelta(minutes=3)
+            task_revoke = exigence_responsable.apply_async(
+                args=[
+                    task.object, 
+                    task.type_task,
+                    task.description,
+                    task.dest_email,
+                    task.sender_name,
+                    task.dest_name,
+                    task.company,
+                    task.url,
+                    task.scope,
+                    task.time,
+                    task.dealine,
+                    task.start_date,
+                    None,
+                    task.lang
+                ],
+                eta=target_time
+            )
+            # Sauvegarder l'ID de la tâche
+            task.task_id = task_revoke.id
+            task.save()
+        # Récupérer l'ID de la tâche à annuler 
+        return Response({
+            'message': f'Tâche reprogrammer avec succès',
+        })

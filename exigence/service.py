@@ -13,6 +13,7 @@ import secrets
 from django.conf import settings
 
 from service.utils import send_mail_created, send_mail_with_ics 
+from celery import shared_task
  
 def is_valid_date_string(date_string, format="%Y-%m-%dT%H:%M:%S.%fZ"):
     try:
@@ -86,29 +87,28 @@ def add_calendar(title, description, date_begin, date_end, company):
 
     return filename
 
+@shared_task
 def exigence_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None, lang=None ):
     # object and description
 
     deadline_text = "non défini" 
+    if lang == "fr-FR" :
+        deadline_text = "non défini"
+    elif lang == "en-US":
+        deadline_text = "not defined"
+    
     if is_valid_date_string(deadline):
         parsed_date = datetime.strptime(deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
         deadline_text = parsed_date.strftime("%Y-%m-%d")
-
     filename = None
-
     if is_valid_date_string(start_date):
         start_date = start_date.split(" ")[0]
-
         # Analyser la date ISO 8601
         parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
-
         # Reformater au format souhaité
         formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
-
         date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
         date_end = date_begin + timedelta(minutes=int(time))
-        
-    
         # configuration iCalendar
         if company != None: 
             filename = add_calendar(
@@ -123,7 +123,7 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         path = "notification/evaluation/responsable-exigence-en.html" 
     else:
         path = "notification/evaluation/responsable-exigence-fr.html" 
-    print("path", lang)
+
     path_txt = "notification/evaluation/responsable-exigence.txt" 
     context = {
         "sender_name":sender_name, 
@@ -132,7 +132,7 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         "url": url,
         "description":description,
         "time": time,
-        "scope":scope,
+        "scope": scope,
         "deadline": deadline_text,
         "company": company,
         "type_task": type_task,
@@ -142,12 +142,10 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         path,
         context
     )
- 
     text_content = render_to_string(
             path_txt,
             context
     )
-    # send_mail_created([dest_email], object, text_content, html_content, company)
     if filename != None:
         print("filename", filename)
         x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
@@ -155,8 +153,8 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
     else:
         x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
         x.start() 
-    
     return True
+
 
 def task_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], during="", start_date="", back_url=None, lang=None ):
     # object and description
@@ -166,15 +164,11 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
         start_date = start_date.split(" ")[0]
         # Analyser la date ISO 8601
         parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
-
         # Reformater au format souhaité
         formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
-
         date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
         date_end = date_begin + timedelta(minutes=int(during))
-        
         deadline_text = date_end.strftime("%Y-%m-%d %H:%M" )
-    
         # configuration iCalendar
         if company != None: 
             filename = add_calendar(
@@ -222,8 +216,6 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
         x.start() 
     
     return True
-
-
 
 
 def exigence_approver( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None, lang=None ):
@@ -302,7 +294,6 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
     return True
 
 
-
 def exigence_notification( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None, lang=None ):
     # object and description
 
@@ -378,4 +369,6 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
         x.start() 
     
     return True
+ 
+
  
