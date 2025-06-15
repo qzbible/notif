@@ -37,23 +37,40 @@ from dateutil.parser import parse as dateutil_parse
 
 
 def parse_date_to_730(date_str):
-    """Convertit une date en datetime à 7h30"""
+    """
+    Convertit une date en datetime à 7h30.
+    Si la date est dans le passé, retourne None pour exécution immédiate.
+    """
     try:
         if '/' in date_str:
             # Format: '26/04/2025'
             day, month, year = date_str.split('/')
-            return timezone.make_aware(
-                datetime(int(year), int(month), int(day), 5, 20, 0)
+            target_datetime = timezone.make_aware(
+                datetime(int(year), int(month), int(day), 5, 55, 0)
             )
         else:
             # Format ISO: '2025-02-12T22:23:52.900Z' ou autres formats
             parsed_date = dateutil_parse(date_str)
             # Remplacer l'heure par 7h30
-            return timezone.make_aware(
-                datetime(parsed_date.year, parsed_date.month, parsed_date.day, 7, 30, 0)
+            target_datetime = timezone.make_aware(
+                datetime(parsed_date.year, parsed_date.month, parsed_date.day, 17, 40, 0)
             )
+        
+        # Vérifier si la date est dans le passé
+        now = timezone.now()
+        print(f"✅ Date actuelle: {now}")
+        if target_datetime <= now:
+            print(f"⚠️ Date dans le passé détectée: {target_datetime}")
+            print(f"   Heure actuelle: {now}")
+            print("   → Exécution immédiate programmée")
+            return None  # None = exécution immédiate pour Celery
+        
+        print(f"✅ Tâche programmée pour: {target_datetime}")
+        return target_datetime
+        
     except (ValueError, AttributeError) as e:
         raise ValueError(f"Format de date non supporté: {date_str}")
+
 # Vue API
 class ExigenceResponsableView(APIView):
     permission_classes = [AllowAny]
@@ -159,26 +176,52 @@ class ExigenceResponsableView(APIView):
             
              
             if validated_data.get("type_task") == "EXIGENCE":
-                
-                task = exigence_responsable.apply_async(
-                    args=[
-                        validated_data.get("object"),
-                        type_task,
-                        validated_data.get("description"),
-                        validated_data.get("dest_email"),
-                        validated_data.get("sender_name"),
-                        validated_data.get("dest_name"),
-                        validated_data.get("company"), 
-                        validated_data.get("url"),
-                        validated_data.get("scope", []),
-                        validated_data.get("time"),
-                        validated_data.get("dealine"),
-                        validated_data.get("start_date"),
-                        None,
-                        validated_data.get("lang")
-                    ],
-                    eta=parse_date_to_730(validated_data.get("start_date"))
-                )
+                print('Exigence data start', parse_date_to_730(validated_data.get("start_date")))
+                target_time = timezone.now() + timedelta(minutes=2)
+                print('Exigence data start 2',  target_time)
+                print('Exigence data start 3',  timezone.now() )
+
+                eta_datetime = parse_date_to_730(validated_data.get("start_date"))
+                if eta_datetime is None:
+                    task = exigence_responsable.apply_async(
+                        args=[
+                            validated_data.get("object"),
+                            type_task,
+                            validated_data.get("description"),
+                            validated_data.get("dest_email"),
+                            validated_data.get("sender_name"),
+                            validated_data.get("dest_name"),
+                            validated_data.get("company"), 
+                            validated_data.get("url"),
+                            validated_data.get("scope", []),
+                            validated_data.get("time"),
+                            validated_data.get("dealine"),
+                            validated_data.get("start_date"),
+                            None,
+                            validated_data.get("lang")
+                        ],
+                        # eta=parse_date_to_730(validated_data.get("start_date"))
+                    )
+                else:
+                    task = exigence_responsable.apply_async(
+                        args=[
+                            validated_data.get("object"),
+                            type_task,
+                            validated_data.get("description"),
+                            validated_data.get("dest_email"),
+                            validated_data.get("sender_name"),
+                            validated_data.get("dest_name"),
+                            validated_data.get("company"), 
+                            validated_data.get("url"),
+                            validated_data.get("scope", []),
+                            validated_data.get("time"),
+                            validated_data.get("dealine"),
+                            validated_data.get("start_date"),
+                            None,
+                            validated_data.get("lang")
+                        ],
+                        eta=parse_date_to_730(validated_data.get("start_date"))
+                    )
                 # Sauvegarder l'ID de la tâche
                 exigence.task_id = task.id
                 exigence.save()
