@@ -33,14 +33,27 @@ from django.utils import timezone
 
 from service.utils import send_mail_created
 from celery import current_app
+from dateutil.parser import parse as dateutil_parse
 
 
 def parse_date_to_730(date_str):
-    """Convertit '26/04/2025' en datetime à 7h30"""
-    day, month, year = date_str.split('/')
-    return timezone.make_aware(
-        datetime(int(year), int(month), int(day), 7, 30, 0)
-    )
+    """Convertit une date en datetime à 7h30"""
+    try:
+        if '/' in date_str:
+            # Format: '26/04/2025'
+            day, month, year = date_str.split('/')
+            return timezone.make_aware(
+                datetime(int(year), int(month), int(day), 7, 30, 0)
+            )
+        else:
+            # Format ISO: '2025-02-12T22:23:52.900Z' ou autres formats
+            parsed_date = dateutil_parse(date_str)
+            # Remplacer l'heure par 7h30
+            return timezone.make_aware(
+                datetime(parsed_date.year, parsed_date.month, parsed_date.day, 7, 30, 0)
+            )
+    except (ValueError, AttributeError) as e:
+        raise ValueError(f"Format de date non supporté: {date_str}")
 # Vue API
 class ExigenceResponsableView(APIView):
     permission_classes = [AllowAny]
@@ -760,34 +773,6 @@ def validateAuthCode(request, token=None):
         )
 
  
-
-      
-# Vue API
-class GetExigeneTaskView(APIView):
-    permission_classes = [AllowAny]
-
-    @extend_schema( 
-        description=" ",
-        summary="Créer une exigence",
-       
-        tags=["Exigences"],
-    )
-    
-    def get(self, request):
-        """
-        Valide un code d'authentification à 2 facteurs
-        """
-  
-    
-        # Récupérer les tâches actives
-        inspect = current_app.control.inspect()
-        active_tasks = inspect.active()
-        scheduled_tasks = inspect.scheduled()
-        
-        return Response({
-            'active': active_tasks,
-            'scheduled': scheduled_tasks
-        })
 
 
 
