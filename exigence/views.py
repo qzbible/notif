@@ -53,7 +53,7 @@ def parse_date_to_730(date_str):
             parsed_date = dateutil_parse(date_str)
             # Remplacer l'heure par 7h30
             target_datetime = timezone.make_aware(
-                datetime(parsed_date.year, parsed_date.month, parsed_date.day, 16, 55, 0)
+                datetime(parsed_date.year, parsed_date.month, parsed_date.day, 7, 30, 0)
             )
         
         # Vérifier si la date est dans le passé
