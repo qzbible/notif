@@ -815,10 +815,6 @@ def validateAuthCode(request, token=None):
             }
         )
 
- 
-
-
-
   
 # Vue API
 class EndExigeneTaskView(APIView):
@@ -935,25 +931,50 @@ class UpdateExigeneTaskView(APIView):
                 print(f"Impossible d'annuler la tâche {task.task_id}: {str(e)}")
 
             # target_time = timezone.now() + timedelta(minutes=3)
-            task_revoke = exigence_responsable.apply_async(
-                args=[
-                    task.object, 
-                    task.type_task,
-                    task.description,
-                    task.dest_email,
-                    task.sender_name,
-                    task.dest_name,
-                    task.company,
-                    task.url,
-                    task.scope,
-                    task.time,
-                    task.dealine,
-                    task.start_date,
-                    None,
-                    task.lang
-                ],
-                eta=parse_date_to_730(new_date)
-            )
+            label = " [ Période de rapport mise à jour ]"
+            if task.lang != "fr-FR":
+                label = " [ Updated reporting period ]"
+            eta_datetime = parse_date_to_730(new_date)
+            if eta_datetime is None:
+                task_revoke = exigence_responsable.apply_async(
+                    args=[
+                        task.object + label, 
+                        task.type_task,
+                        task.description,
+                        task.dest_email,
+                        task.sender_name,
+                        task.dest_name,
+                        task.company,
+                        task.url,
+                        task.scope,
+                        task.time,
+                        task.dealine,
+                        task.start_date,
+                        None,
+                        task.lang
+                    ],
+                    # eta=parse_date_to_730(validated_data.get("start_date"))
+                )
+            else:
+                task_revoke = exigence_responsable.apply_async(
+                    args=[
+                        task.object + label, 
+                        task.type_task,
+                        task.description,
+                        task.dest_email,
+                        task.sender_name,
+                        task.dest_name,
+                        task.company,
+                        task.url,
+                        task.scope,
+                        task.time,
+                        task.dealine,
+                        task.start_date,
+                        None,
+                        task.lang
+                    ],
+                    eta=eta_datetime
+                )
             # Sauvegarder l'ID de la tâche
             task.task_id = task_revoke.id
             task.save()
