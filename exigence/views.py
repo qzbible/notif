@@ -43,7 +43,7 @@ def parse_date_to_730(date_str):
             # Format: '26/04/2025'
             day, month, year = date_str.split('/')
             return timezone.make_aware(
-                datetime(int(year), int(month), int(day), 7, 30, 0)
+                datetime(int(year), int(month), int(day), 5, 20, 0)
             )
         else:
             # Format ISO: '2025-02-12T22:23:52.900Z' ou autres formats
