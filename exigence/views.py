@@ -1,7 +1,7 @@
 import random
 from exigence.models import ExigenceMail, auth_code
 from exigence.serializers import ErrorResponseSerializer, ExigenceResponseSerializer, ExigenceSheduleSerializer, ExigenceUpdateSheduleSerializer, TaskSerializer
-from exigence.service import exigence_approver, exigence_notification, exigence_responsable, send_exigence_responsable_scheduled, task_responsable
+from exigence.service import exigence_approver, exigence_notification, exigence_responsable, task_responsable
 from exigence.serializers import ExigenceSerializer
 # from exigence.utils import send_mail_created
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -35,7 +35,12 @@ from service.utils import send_mail_created
 from celery import current_app
 
 
-
+def parse_date_to_730(date_str):
+    """Convertit '26/04/2025' en datetime à 7h30"""
+    day, month, year = date_str.split('/')
+    return timezone.make_aware(
+        datetime(int(year), int(month), int(day), 7, 30, 0)
+    )
 # Vue API
 class ExigenceResponsableView(APIView):
     permission_classes = [AllowAny]
@@ -142,9 +147,6 @@ class ExigenceResponsableView(APIView):
              
             if validated_data.get("type_task") == "EXIGENCE":
                 
-
-                target_time = timezone.now() + timedelta(minutes=3)
-               
                 task = exigence_responsable.apply_async(
                     args=[
                         validated_data.get("object"),
@@ -162,7 +164,7 @@ class ExigenceResponsableView(APIView):
                         None,
                         validated_data.get("lang")
                     ],
-                    eta=target_time
+                    eta=parse_date_to_730(validated_data.get("start_date"))
                 )
                 # Sauvegarder l'ID de la tâche
                 exigence.task_id = task.id
@@ -891,6 +893,7 @@ class UpdateExigeneTaskView(APIView):
         Valide un code d'authentification à 2 facteurs
         """
         reporting_id = request.data.get('id')
+        new_date = request.data.get('new_date')
     
         if not reporting_id:
             return Response({'error': 'id requis'}, status=400)
@@ -903,7 +906,7 @@ class UpdateExigeneTaskView(APIView):
             except Exception as e:
                 print(f"Impossible d'annuler la tâche {task.task_id}: {str(e)}")
 
-            target_time = timezone.now() + timedelta(minutes=3)
+            # target_time = timezone.now() + timedelta(minutes=3)
             task_revoke = exigence_responsable.apply_async(
                 args=[
                     task.object, 
@@ -921,7 +924,7 @@ class UpdateExigeneTaskView(APIView):
                     None,
                     task.lang
                 ],
-                eta=target_time
+                eta=parse_date_to_730(new_date)
             )
             # Sauvegarder l'ID de la tâche
             task.task_id = task_revoke.id

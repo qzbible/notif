@@ -14,6 +14,6 @@ urlpatterns = [
     path("api/user-auth-code/", sendMailAuthCodeView.as_view(), name="create-email-task"),
     path("api/validation-code/", ValidateAuthCodeView.as_view(), name="create-email-task"),
 
-    path("api/get-exigence-scheduled/", GetExigeneTaskView.as_view(), name="exigence-scheduled"),
-    path("api/down-exigence-scheduled/", UpdateExigeneTaskView.as_view(), name="exigence-down-scheduled"),
+    path("api/end-exigence-scheduled/", EndExigeneTaskView.as_view(), name="exigence-down-scheduled"),
+    path("api/update-exigence-scheduled/", UpdateExigeneTaskView.as_view(), name="exigence-down-scheduled"),
 ]
