@@ -190,7 +190,7 @@ class ExigenceResponsableView(APIView):
                 print('Exigence data start', parse_date_to_730(validated_data.get("start_date")))
                 target_time = timezone.now() + timedelta(minutes=2)
                 print('Exigence data start 2',  target_time)
-                print('Exigence data start 3',  timezone.now() )
+                print('Exigence data start 3',  timezone.now())
 
                 eta_datetime = parse_date_to_730(validated_data.get("start_date"))
                 if eta_datetime is None:
