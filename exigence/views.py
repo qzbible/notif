@@ -141,10 +141,19 @@ class ExigenceResponsableView(APIView):
         # 2025-04-03T22:23:52.900Z
         try:
 
-            type_task = "Exigence"
+            
+            if validated_data.get("type_task") == "EXIGENCE":
             # Envoi de l'email
-            if validated_data.get("lang") != "fr-FR":
-                type_task="Requirement"
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="Requirement"
+                else :
+                    type_task="Exigence"
+            elif validated_data.get("type_task") == "ACTION":
+                type_task = "Action corrective"
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="Corrective action"
+
+            
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
                 object=validated_data.get("object"),
