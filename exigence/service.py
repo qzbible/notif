@@ -15,6 +15,8 @@ from django.conf import settings
 from service.utils import send_mail_created, send_mail_with_ics 
 from celery import shared_task
  
+#  Exigence data start 2025-06-16
+
 def is_valid_date_string(date_string, format="%Y-%m-%dT%H:%M:%S.%fZ"):
     try:
         if date_string == "" or date_string == None:
@@ -96,13 +98,15 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         deadline_text = "non défini"
     elif lang == "en-US":
         deadline_text = "not defined"
-    
-    if is_valid_date_string(deadline):
-        parsed_date = datetime.strptime(deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
+    new_deadline = deadline+"T07:30:00.000Z"
+    new_start_date = start_date+"T07:30:00.000Z"
+    if is_valid_date_string(new_deadline):
+        parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
         deadline_text = parsed_date.strftime("%Y-%m-%d")
+    
     filename = None
-    if is_valid_date_string(start_date):
-        start_date = start_date.split(" ")[0]
+    if is_valid_date_string(new_start_date):
+        start_date = new_start_date.split(" ")[0]
         # Analyser la date ISO 8601
         parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
         # Reformater au format souhaité
