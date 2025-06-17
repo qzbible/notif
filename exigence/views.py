@@ -173,7 +173,7 @@ class ExigenceResponsableView(APIView):
                 dealine = validated_data.get("dealine"),
                 start_date = validated_data.get("start_date"),
                 time = validated_data.get("time"),
-                type_task = type_task,
+                type_task = validated_data.get("type_task"),
                 lang = validated_data.get("lang", "fr-FR"),
             )
             
@@ -756,7 +756,6 @@ class ValidateAuthCodeView(APIView):
                     status=status.HTTP_200_OK
                 )
           
-            
             return Response(
                 {
                     "id": id_action, 
