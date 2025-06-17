@@ -46,7 +46,7 @@ def parse_date_to_730(date_str):
             # Format: '26/04/2025'
             day, month, year = date_str.split('/')
             target_datetime = timezone.make_aware(
-                datetime(int(year), int(month), int(day), 5, 55, 0)
+                datetime(int(year), int(month), int(day), 7, 30, 0)
             )
         else:
             # Format ISO: '2025-02-12T22:23:52.900Z' ou autres formats
@@ -174,6 +174,8 @@ class ExigenceResponsableView(APIView):
                 exigence.scope = validated_data.get("scope")
                 exigence.save()
             
+            print("Exigence data start", validated_data.get("start_date"))
+            print("Exigence data end 2", validated_data.get("dealine"))
              
             if validated_data.get("type_task") == "EXIGENCE":
                 print('Exigence data start', parse_date_to_730(validated_data.get("start_date")))
@@ -873,7 +875,6 @@ class EndExigeneTaskView(APIView):
             'message': f'Tâches reporting  annulée'
         })
     
-
 
 # Vue API
 class UpdateExigeneTaskView(APIView):
