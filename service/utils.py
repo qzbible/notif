@@ -25,6 +25,8 @@ import secrets
 import urllib.request
 import re
 
+from urllib.parse import urlparse
+import requests
  
 
 def get_lang_request(request):
@@ -560,6 +562,8 @@ def send_mail_with_ics_file(to_emails, title, files, html_content, filename, com
         print(f"Erreur lors de la suppression du fichier ICS: {str(e)}")
     
     return success
+
+
 def start_date(in_date, time):
     """This function return start time for activity"""
 
@@ -811,6 +815,216 @@ def add_calendar_with_multiple_date(events):
     return filename
 
  
+
+
+def send_mail_with_files(to_emails, title, files, html_content, company, text_content=None):
+    """
+    Envoie un email avec des fichiers téléchargés depuis des URLs et d'autres pièces jointes optionnelles.
+    
+    Args:
+        to_emails (list): Liste des adresses email des destinataires
+        title (str): Sujet de l'email
+        files (list): Liste des URLs ou chemins vers les fichiers à joindre
+        html_content (str): Contenu en format HTML
+        company (str): Nom de l'entreprise expéditrice
+        text_content (str, optional): Contenu en format texte. Si non fourni, une version sera générée.
+    
+    Returns:
+        bool: True si l'envoi a réussi, False sinon
+    """
+
+    def is_url(string):
+        """Vérifie si une chaîne est une URL valide"""
+        try:
+            result = urlparse(string)
+            return all([result.scheme, result.netloc])
+        except:
+            return False
+
+    def download_file_from_url(url, timeout=30):
+        """
+        Télécharge un fichier depuis une URL et retourne son contenu et nom
+        
+        Args:
+            url (str): URL du fichier à télécharger
+            timeout (int): Timeout en secondes pour la requête
+            
+        Returns:
+            tuple: (content, filename) ou (None, None) en cas d'erreur
+        """
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+            response = requests.get(url, headers=headers, timeout=timeout, stream=True)
+            response.raise_for_status()
+            
+            # Extraire le nom du fichier depuis l'URL ou les headers
+            filename = None
+            
+            # D'abord essayer depuis Content-Disposition header
+            if 'content-disposition' in response.headers:
+                import re
+                cd = response.headers['content-disposition']
+                filename_match = re.findall('filename=(.+)', cd)
+                if filename_match:
+                    filename = filename_match[0].strip('"\'')
+            
+            # Sinon extraire depuis l'URL
+            if not filename:
+                parsed_url = urlparse(url)
+                filename = os.path.basename(parsed_url.path)
+                
+            # Si toujours pas de nom, utiliser un nom par défaut
+            if not filename or filename == '':
+                filename = f"attachment_{uuid.uuid4().hex[:8]}"
+                
+            # Lire le contenu
+            content = response.content
+            return content, filename
+            
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur lors du téléchargement de {url}: {str(e)}")
+            return None, None
+        except Exception as e:
+            print(f"Erreur inattendue lors du téléchargement de {url}: {str(e)}")
+            return None, None
+
+    def get_mime_type_from_filename(filename):
+        """Détermine le type MIME basé sur l'extension du fichier"""
+        file_ext = os.path.splitext(filename)[1].lower()
+        
+        mime_types = {
+            '.pdf': 'application/pdf',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.png': 'image/png',
+            '.gif': 'image/gif',
+            '.doc': 'application/msword',
+            '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            '.xls': 'application/vnd.ms-excel',
+            '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            '.ppt': 'application/vnd.ms-powerpoint',
+            '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            '.txt': 'text/plain',
+            '.csv': 'text/csv',
+            '.zip': 'application/zip',
+            '.rar': 'application/x-rar-compressed',
+            '.mp3': 'audio/mpeg',
+            '.mp4': 'video/mp4',
+            '.avi': 'video/x-msvideo'
+        }
+        
+        return mime_types.get(file_ext, 'application/octet-stream')
+
+    # Fonction pour extraire du texte depuis le HTML si aucun texte n'est fourni
+    def html_to_text(html):
+        # Suppression basique des balises HTML
+        text = re.sub('<.*?>', ' ', html)
+        # Remplacement des entités HTML courantes
+        text = text.replace('&nbsp;', ' ').replace('&amp;', '&')
+        # Suppression des espaces multiples
+        text = re.sub(r'\s+', ' ', text).strip()
+        return text
+    
+    from_email = settings.EMAIL_HOST_USER
+    
+    # Si aucun contenu texte n'est fourni, extraire du HTML
+    if not text_content and html_content:
+        text_content = html_to_text(html_content)
+    elif not text_content:
+        text_content = "Veuillez consulter la version HTML de cet email."
+    
+    # Préparation des variables pour la connexion SMTP
+    EMAIL_HOST = settings.EMAIL_HOST
+    EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
+    
+    # Création du contexte SSL pour une connexion sécurisée
+    context = ssl.create_default_context() 
+    success = True
+    
+    for to_email in to_emails:
+        try:
+            # Création du message multipart
+            msg = MIMEMultipart('mixed') 
+            # Ajout des en-têtes essentiels
+            msg["From"] = f"{company} via Klivar <{from_email}>"
+            msg["To"] = to_email
+            msg["Subject"] = title
+            msg["Reply-To"] = from_email
+            msg["Message-ID"] = f"<{uuid.uuid4()}@klivar>"
+            msg["List-Unsubscribe"] = f"<mailto:{from_email}?subject=unsubscribe>" 
+            
+            # Création d'une partie alternative pour le HTML et le texte
+            alt_part = MIMEMultipart('alternative') 
+            # Toujours attacher une version texte (important pour éviter le spam)
+            alt_part.attach(MIMEText(text_content, 'plain')) 
+            # Attacher la version HTML si disponible
+            if html_content:
+                alt_part.attach(MIMEText(html_content, 'html')) 
+            # Attacher la partie alternative au message principal
+            msg.attach(alt_part) 
+            
+            # Ajout des pièces jointes (URLs ou fichiers locaux)
+            if files:
+                for file_item in files:
+                    try:
+                        if is_url(file_item):
+                            # C'est une URL, télécharger le fichier
+                            print(f"Téléchargement du fichier depuis: {file_item}")
+                            file_content, file_name = download_file_from_url(file_item)
+                            
+                            if file_content is None:
+                                print(f"Impossible de télécharger {file_item}, ignoré.")
+                                continue
+                                
+                            # Déterminer le type MIME
+                            mime_type = get_mime_type_from_filename(file_name)
+                            
+                        else:
+                            # C'est un chemin local, procéder comme avant
+                            if not os.path.exists(file_item):
+                                print(f"Fichier local {file_item} non trouvé, ignoré.")
+                                continue
+                                
+                            with open(file_item, "rb") as attachment:
+                                file_content = attachment.read()
+                                file_name = os.path.basename(file_item)
+                                mime_type = get_mime_type_from_filename(file_name)
+
+                        # Créer la pièce jointe avec le bon type MIME
+                        part = MIMEBase(*mime_type.split('/'))
+                        part.set_payload(file_content)
+                        
+                        # Encoder la pièce jointe
+                        encoders.encode_base64(part)
+                        
+                        # Ajouter l'en-tête pour la pièce jointe
+                        part.add_header('Content-Disposition', 'attachment', filename=file_name)
+                        
+                        # Ajouter la pièce jointe au message
+                        msg.attach(part)
+                        print(f"Pièce jointe ajoutée: {file_name}")
+                        
+                    except Exception as e:
+                        print(f"Erreur lors de l'ajout de la pièce jointe {file_item}: {str(e)}")
+                        continue
+            
+            # Conversion en chaîne de caractères
+            text = msg.as_string()
+            
+            # Envoi du message
+            with smtplib.SMTP_SSL(EMAIL_HOST, 465, context=context) as server:
+                server.login(from_email, EMAIL_HOST_PASSWORD)
+                server.sendmail(from_email, to_email, text)
+                print(f"Email envoyé avec succès à {to_email}")
+                
+        except Exception as e:
+            print(f"Erreur lors de l'envoi à {to_email}: {str(e)}")
+            success = False
+            
+    return success
+
 
 
  

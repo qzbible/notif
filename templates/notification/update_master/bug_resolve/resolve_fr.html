@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problème résolu - KLIVAR</title>
+    <style>
+        /* Reset pour emails */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        /* Styles généraux */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f8f8fc;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+        .email-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #f8f8fc;
+        }
+        
+        .email-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            border-top: 2px solid #97bf0d;
+            margin: 20px;
+            overflow: hidden;
+        }
+        
+        .header-section {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .header-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        .header-title {
+            display: inline-block;
+            vertical-align: middle;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #000000;
+            margin: 0;
+        }
+        
+        .content-section {
+            padding: 20px 30px 30px 30px;
+        }
+        
+        .greeting {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .main-text {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin: 20px 0;
+        }
+        
+        .signature {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin-top: 20px;
+        }
+        
+        .footer-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8fc;
+        }
+        
+        .footer-link {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #9d9d9d;
+            text-decoration: none;
+            display: block;
+            margin: 5px 0;
+        }
+        
+        .logo-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8fc;
+        }
+        
+        .logo-img {
+            max-width: 120px;
+            height: auto;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            .email-content {
+                margin: 10px !important;
+            }
+            .header-section,
+            .content-section {
+                padding: 20px !important;
+            }
+            .header-title {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td style="background-color: #f8f8fc; padding: 20px 0;">
+                <!-- Logo Section -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td class="logo-section">
+                            <img src="https://dev-backend.app.klivar.com/media/icons/97a07cae-f702-49b6-b6cf-d46929e90027.png" 
+                                 alt="KLIVAR Logo" 
+                                 class="logo-img">
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Main Content -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td>
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-content">
+                                <!-- Header -->
+                                <tr>
+                                    <td class="header-section">
+                                        <div class="header-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M7.5 12L10.5 15L16.5 9M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z" stroke="#97bf0d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                        <h1 class="header-title">Problème résolu</h1>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Content -->
+                                <tr>
+                                    <td class="content-section">
+                                        <p class="greeting">
+                                            Cher client,<br><br>
+                                            Nous avons le plaisir de vous informer que le problème détecté sur <strong>{{module}}</strong>, signalé le <strong>{{date}}</strong>, a été résolu.
+                                        </p>
+                                        
+                                        <p class="main-text">
+                                            Vous pouvez désormais utiliser la fonctionnalité sans interruption. Nous restons à votre écoute si vous constatez un comportement inattendu, ou si vous avez besoin d'une assistance complémentaire.<br><br>
+                                            Merci de votre patience et de votre confiance.
+                                        </p>
+                                        
+                                        <div class="signature">
+                                            Cordialement,<br>
+                                            <strong>KLIVAR</strong>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Footer -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td class="footer-section">
+                            <a href="https://www.klivar.fr/" class="footer-link">https://www.klivar.fr/</a>
+                            <a href="mailto:avotreecoute@klivar.com" class="footer-link">📩 avotreecoute@klivar.com</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

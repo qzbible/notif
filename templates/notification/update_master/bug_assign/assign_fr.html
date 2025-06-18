@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problème détecté - KLIVAR</title>
+    <style>
+        /* Reset pour emails */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        /* Styles généraux */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f8f8fc;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+        .email-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #f8f8fc;
+        }
+        
+        .email-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            border-top: 2px solid #e69138;
+            margin: 20px;
+            overflow: hidden;
+        }
+        
+        .header-section {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .header-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        .header-title {
+            display: inline-block;
+            vertical-align: middle;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #000000;
+            margin: 0;
+        }
+        
+        .content-section {
+            padding: 20px 30px 30px 30px;
+        }
+        
+        .greeting {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .problem-box {
+            border: 1px solid #e69138;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            background-color: #fafafa;
+        }
+        
+        .problem-title {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 11px;
+            color: #000000;
+            margin: 0 0 10px 0;
+        }
+        
+        .problem-details {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            color: #000000;
+            line-height: 20px;
+            margin: 0;
+        }
+        
+        .problem-label {
+            font-weight: 500;
+        }
+        
+        .problem-value {
+            font-weight: 400;
+        }
+        
+        .closing-text {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin: 20px 0;
+        }
+        
+        .signature {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin-top: 20px;
+        }
+        
+        .footer-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8fc;
+        }
+        
+        .footer-link {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #9d9d9d;
+            text-decoration: none;
+            display: block;
+            margin: 5px 0;
+        }
+        
+        .logo-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8fc;
+        }
+        
+        .logo-img {
+            max-width: 120px;
+            height: auto;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            .email-content {
+                margin: 10px !important;
+            }
+            .header-section,
+            .content-section {
+                padding: 20px !important;
+            }
+            .header-title {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td style="background-color: #f8f8fc; padding: 20px 0;">
+                <!-- Logo Section -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td class="logo-section">
+                            <img src="https://dev-backend.app.klivar.com/media/icons/97a07cae-f702-49b6-b6cf-d46929e90027.png" 
+                                 alt="KLIVAR Logo" 
+                                 class="logo-img">
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Main Content -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td>
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-content">
+                                <!-- Header -->
+                                <tr>
+                                    <td class="header-section">
+                                        <div class="header-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#e69138" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.2583 9.77251 19.9887C9.5799 19.7191 9.31074 19.5118 9 19.39C8.69838 19.2569 8.36381 19.2172 8.03941 19.276C7.71502 19.3348 7.41568 19.4895 7.18 19.72L7.12 19.78C6.93425 19.966 6.71368 20.1135 6.47088 20.2141C6.22808 20.3148 5.96783 20.3666 5.705 20.3666C5.44217 20.3666 5.18192 20.3148 4.93912 20.2141C4.69632 20.1135 4.47575 19.966 4.29 19.78C4.10405 19.5943 3.95653 19.3737 3.85588 19.1309C3.75523 18.8881 3.70343 18.6278 3.70343 18.365C3.70343 18.1022 3.75523 17.8419 3.85588 17.5991C3.95653 17.3563 4.10405 17.1357 4.29 16.95L4.35 16.89C4.58054 16.6543 4.73519 16.355 4.794 16.0306C4.85282 15.7062 4.81312 15.3716 4.68 15.07C4.55324 14.7742 4.34276 14.522 4.07447 14.3443C3.80618 14.1666 3.49179 14.0713 3.17 14.07H3C2.46957 14.07 1.96086 13.8593 1.58579 13.4842C1.21071 13.1091 1 12.6004 1 12.07C1 11.5396 1.21071 11.0309 1.58579 10.6558C1.96086 10.2807 2.46957 10.07 3 10.07H3.09C3.42099 10.0623 3.742 9.95512 4.01162 9.76251C4.28123 9.5699 4.48854 9.30074 4.61 8.99C4.74312 8.68838 4.78282 8.35381 4.724 8.02941C4.66519 7.70502 4.51054 7.40568 4.28 7.17L4.22 7.11C4.03405 6.92425 3.88653 6.70368 3.78588 6.46088C3.68523 6.21808 3.63343 5.95783 3.63343 5.695C3.63343 5.43217 3.68523 5.17192 3.78588 4.92912C3.88653 4.68632 4.03405 4.46575 4.22 4.28C4.40575 4.09405 4.62632 3.94653 4.86912 3.84588C5.11192 3.74523 5.37217 3.69343 5.635 3.69343C5.89783 3.69343 6.15808 3.74523 6.40088 3.84588C6.64368 3.94653 6.86425 4.09405 7.05 4.28L7.11 4.34C7.34568 4.57054 7.64502 4.72519 7.96941 4.784C8.29381 4.84282 8.62838 4.80312 8.93 4.67H9C9.29577 4.54324 9.54802 4.33276 9.72569 4.06447C9.90337 3.79618 9.99872 3.48179 10 3.16V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="#e69138" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </div>
+                                        <h1 class="header-title">Problème détecté</h1>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Content -->
+                                <tr>
+                                    <td class="content-section">
+                                        <p class="greeting">
+                                            Cher client,<br><br>
+                                            Nous souhaitons vous informer qu'un dysfonctionnement a été détecté sur la fonctionnalité <strong>{{name}}</strong>.
+                                        </p>
+                                        
+                                        <div class="problem-box">
+                                            <h3 class="problem-title">Détail de l'anomalie :</h3>
+                                            <p class="problem-details">
+                                                <span class="problem-label">Impact :</span> <span class="problem-value">{{description}}</span><br>
+                                                <span class="problem-label">Zone concernée :</span> <span class="problem-value">{{module}}</span><br>
+                                                <span class="problem-label">Statut :</span> <span class="problem-value">{{status}}</span>
+                                            </p>
+                                        </div>
+                                        
+                                        <p class="closing-text">
+                                            Nous mettons tout en œuvre pour résoudre ce problème dans les plus brefs délais.<br>
+                                            Nous vous prions de nous excuser pour la gêne occasionnée, et restons disponibles pour toute question complémentaire.
+                                        </p>
+                                        
+                                        <div class="signature">
+                                            Cordialement,<br>
+                                            <strong>KLIVAR</strong>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Footer -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td class="footer-section">
+                            <a href="https://www.klivar.fr/" class="footer-link">https://www.klivar.fr/</a>
+                            <a href="mailto:avotreecoute@klivar.com" class="footer-link">📩 avotreecoute@klivar.com</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

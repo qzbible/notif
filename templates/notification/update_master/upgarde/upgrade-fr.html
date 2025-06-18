@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelles améliorations sur Klivar</title>
+    <style>
+        /* Reset pour emails */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        /* Styles généraux */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f8f8fc;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+        .email-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #f8f8fc;
+        }
+        
+        .email-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            border-top: 2px solid #7a1cac;
+            margin: 20px;
+            overflow: hidden;
+        }
+        
+        .header-section {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .header-title {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #000000;
+            margin: 0;
+        }
+        
+        .content-section {
+            padding: 20px 30px 30px 30px;
+        }
+        
+        .greeting {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .improvements-list {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            color: #353739;
+            line-height: 22px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 6px;
+            border-left: 4px solid #7a1cac;
+        }
+        
+        .info-text {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f0f8ff;
+            border-radius: 6px;
+        }
+        
+        .thank-you-text {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin: 20px 0;
+        }
+        
+        .contact-text {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 9px;
+            font-style: italic;
+            color: #737373;
+            line-height: 16px;
+            margin: 20px 0;
+        }
+        
+        .signature {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin-top: 20px;
+        }
+        
+        .footer-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8fc;
+        }
+        
+        .footer-link {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #9d9d9d;
+            text-decoration: none;
+            display: block;
+            margin: 5px 0;
+        }
+        
+        .logo-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8fc;
+        }
+        
+        .logo-img {
+            max-width: 120px;
+            height: auto;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            .email-content {
+                margin: 10px !important;
+            }
+            .header-section,
+            .content-section {
+                padding: 20px !important;
+            }
+            .header-title {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td style="background-color: #f8f8fc; padding: 20px 0;">
+                <!-- Logo Section -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td class="logo-section">
+                            <img src="https://dev-backend.app.klivar.com/media/icons/97a07cae-f702-49b6-b6cf-d46929e90027.png" 
+                                 alt="KLIVAR Logo" 
+                                 class="logo-img">
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Main Content -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td>
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-content">
+                                <!-- Header -->
+                                <tr>
+                                    <td class="header-section">
+                                        <h1 class="header-title">Nouvelles améliorations sur Klivar</h1>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Content -->
+                                <tr>
+                                    <td class="content-section">
+                                        <p class="greeting">
+                                            Bonjour <strong>{{name}}</strong>,<br><br>
+                                            Nous sommes heureux de vous informer que de nouvelles améliorations ont été apportées à notre plateforme, dans le but de renforcer l'efficacité et la fluidité de vos opérations. Vous pouvez dès à présent :
+                                        </p>
+                                        
+                                        <div class="improvements-list">
+                                            {% for item in improvements %}
+                                            ✅ {{ item }}<br>
+                                            {% endfor %}
+                                        </div>
+                                        
+                                        <div class="info-text">
+                                            ℹ️ Vous n'avez aucune action à effectuer : les mises à jour ont été déployées automatiquement et sont déjà disponibles dans votre espace.
+                                        </div>
+                                        
+                                        <p class="thank-you-text">
+                                            Merci pour votre confiance et votre collaboration continue
+                                        </p>
+                                        
+                                        <p class="contact-text">
+                                            Notre équipe reste bien entendu à votre disposition pour vous accompagner ou répondre à vos questions. N'hésitez pas à nous contacter à l'adresse suivante : avotreecoute@klivar.com.
+                                        </p>
+                                        
+                                        <div class="signature">
+                                            Cordialement,<br>
+                                            <strong>L'équipe KLIVAR</strong>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Footer -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td class="footer-section">
+                            <a href="https://www.klivar.fr/" class="footer-link">https://www.klivar.fr/</a>
+                            <a href="mailto:avotreecoute@klivar.com" class="footer-link">📩 avotreecoute@klivar.com</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

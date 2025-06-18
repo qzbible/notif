@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem detected - KLIVAR</title>
+    <style>
+        /* Reset pour emails */
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        img {
+            -ms-interpolation-mode: bicubic;
+            border: 0;
+            outline: none;
+            text-decoration: none;
+        }
+        
+        /* Styles généraux */
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f8f8fc;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+        
+        .email-container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #f8f8fc;
+        }
+        
+        .email-content {
+            background-color: #ffffff;
+            border-radius: 10px;
+            border-top: 2px solid #e69138;
+            margin: 20px;
+            overflow: hidden;
+        }
+        
+        .header-section {
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .header-icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        .header-title {
+            display: inline-block;
+            vertical-align: middle;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #000000;
+            margin: 0;
+        }
+        
+        .content-section {
+            padding: 20px 30px 30px 30px;
+        }
+        
+        .greeting {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .problem-box {
+            border: 1px solid #e69138;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+            background-color: #fafafa;
+        }
+        
+        .problem-title {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 11px;
+            color: #000000;
+            margin: 0 0 10px 0;
+        }
+        
+        .problem-details {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            color: #000000;
+            line-height: 20px;
+            margin: 0;
+        }
+        
+        .problem-label {
+            font-weight: 500;
+        }
+        
+        .problem-value {
+            font-weight: 400;
+        }
+        
+        .closing-text {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin: 20px 0;
+        }
+        
+        .signature {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #353739;
+            line-height: 20px;
+            margin-top: 20px;
+        }
+        
+        .footer-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8fc;
+        }
+        
+        .footer-link {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            color: #9d9d9d;
+            text-decoration: none;
+            display: block;
+            margin: 5px 0;
+        }
+        
+        .logo-section {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f8fc;
+        }
+        
+        .logo-img {
+            max-width: 120px;
+            height: auto;
+        }
+        
+        .settings-icon {
+            width: 24px;
+            height: auto;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+            .email-content {
+                margin: 10px !important;
+            }
+            .header-section,
+            .content-section {
+                padding: 20px !important;
+            }
+            .header-title {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+        <tr>
+            <td style="background-color: #f8f8fc; padding: 20px 0;">
+                <!-- Logo Section -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td class="logo-section">
+                            <img src="{{back_url}}media/icons/97a07cae-f702-49b6-b6cf-d46929e90027.png" 
+                                 alt="KLIVAR Logo" 
+                                 class="logo-img">
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Main Content -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td>
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-content">
+                                <!-- Header -->
+                                <tr>
+                                    <td class="header-section">
+                                        <div class="header-icon">
+                                            <img src="{{back_url}}media/icons/settings-01.png" 
+                                                 alt="Settings Icon" 
+                                                 class="settings-icon">
+                                        </div>
+                                        <h1 class="header-title">Problem detected</h1>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Content -->
+                                <tr>
+                                    <td class="content-section">
+                                        <p class="greeting">
+                                            Dear client,<br><br>
+                                            We wish to inform you that a dysfunction has been detected on the <strong>{{name}}</strong>.
+                                        </p>
+                                        
+                                        <div class="problem-box">
+                                            <h3 class="problem-title">Anomaly details:</h3>
+                                            <p class="problem-details">
+                                                <span class="problem-label">Impact:</span> <span class="problem-value">{{description}}</span><br>
+                                                <span class="problem-label">Zone concerned:</span> <span class="problem-value">{{module}}</span><br>
+                                                <span class="problem-label">Status:</span> <span class="problem-value">{{status}}</span>
+                                            </p>
+                                        </div>
+                                        
+                                        <p class="closing-text">
+                                            We will do our very best to solve this problem as quickly as possible.<br>
+                                            We apologize for any inconvenience caused, and remain at your disposal for any further questions.
+                                        </p>
+                                        
+                                        <div class="signature">
+                                            Sincerely,<br>
+                                            <strong>KLIVAR Team</strong>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Footer -->
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-container">
+                    <tr>
+                        <td class="footer-section">
+                            <a href="https://www.klivar.fr/" class="footer-link">https://www.klivar.fr/</a>
+                            <a href="mailto:avotreecoute@klivar.com" class="footer-link">📩 avotreecoute@klivar.com</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

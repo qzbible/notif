@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'authClient',
     'mailing', 
     'exigence',
+    'updateMaster',
     # Healthchecks
     'health_check',  # required
     'health_check.db',  
