@@ -86,10 +86,14 @@ class AssignBugView(APIView):
         lang = validated_data.get('lang', 'fr-FR')
         if lang != "fr-FR" :
             object = "🚨 [URGENT] Incident on module " + validated_data.get("name", '')
+        url_file = []
+        for file_url in validated_data.get('fichiers_urls', []): 
+            url_file.append("https://dev-backend.app.klivar.com/media/" + file_url) 
+        # Enregistrer l'email dans la base de données
         resultat = send_bug_mail(
             to_emails=validated_data.get('to_emails', []),
             object=object + " [" + current_datetime_string  + "]",
-            fichiers_urls= validated_data.get('fichiers_urls', []),
+            fichiers_urls= url_file,
             description= validated_data.get('description', ''),
             name=validated_data.get('name', ''),
             module=validated_data.get('module', ''),
