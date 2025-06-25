@@ -63,7 +63,7 @@ def mail_forgrt_service(  name, dest_email, company, url, back_url=None, lang=No
         path = "notification/resetPassword/index-fr.html"
         path_txt = "notification/welcome/index-fr.txt"  
         object = "Modifier votre mot de passe"
-
+    print("URL ==>",url)
     context = {
         "name":name,  
         "title": object, 
