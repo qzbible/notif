@@ -2,8 +2,8 @@ import random
  
 # from exigence.utils import send_mail_created
 from authClient.models import ClientAuthMail, EmailVerification, authCodeClient
-from authClient.serializers import ClientAuthMailSerializer, MailVerificationSendSerializer
-from authClient.service import  mail_service
+from authClient.serializers import ClientAuthMailSerializer, MailVerificationSendSerializer, frogetPwdSerializer
+from authClient.service import  mail_forgrt_service, mail_service
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
@@ -134,9 +134,6 @@ class welcomeMailView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-
-
-
 # Vue API
 class sendAuthClientCodeView(APIView):
     permission_classes = [AllowAny]
@@ -471,3 +468,152 @@ class MailCodeValidationView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
       
+
+class MailResetPassword(APIView):
+    permission_classes = [AllowAny]
+    @extend_schema(
+        examples=[
+        OpenApiExample(
+            'Exemple de requête valide',
+        value={
+            'email': 'client@example.com'
+        },
+            request_only=True,
+        ),
+        OpenApiExample(
+            'Réponse de succès',
+            value={
+                'message': 'Mail créée avec succès',
+                'status': 'success',
+                'code': 201
+            },
+            response_only=True,
+            status_codes=['201'],
+        ),
+    ],
+       tags=["Mail verification"],
+    )
+    def post(self, request):
+        """
+        Valide un code d'authentification à 2 facteurs
+        """
+        try:  
+            
+            data = request.data
+            try:
+                auth_code_instance = EmailVerification.objects.get(email=data.get("email", None), code=data['code'])
+            except EmailVerification.DoesNotExist:
+                return Response(
+                    {
+                        "message": "Code d'authentification invalide",
+                        "status": "error",
+                        "code": status.HTTP_404_NOT_FOUND,
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                ) 
+            # Vérification de l'expiration
+            now = timezone.now() 
+            if auth_code_instance.expires_at < now:
+                auth_code_instance.delete()
+                return Response(
+                    {
+                        "message": "Le code d'authentification a expiré",
+                        "status": "error",
+                        "code": status.HTTP_408_REQUEST_TIMEOUT,
+                    },
+                    status=status.HTTP_408_REQUEST_TIMEOUT,
+                )
+            # Suppression du code d'authentification après utilisation
+            auth_code_instance.delete()
+            return Response(   status=status.HTTP_200_OK )   
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Erreur lors de la validation du code",
+                    "status": "error",
+                    "error": str(e),
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+
+
+# Vue API
+class changePwdMailView(APIView):
+    permission_classes = [AllowAny]
+
+    @extend_schema(
+        request=frogetPwdSerializer,
+        responses={
+            201: frogetPwdSerializer,
+            400: ClientAuthMailSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+                OpenApiExample(
+                    'Exemple de requête valide',
+                value={
+                    'email': 'client@example.com', 
+                    'name': 'samuel', 
+                    'url': 'https://auth.example.com/connect',
+                    "lang":"fr-FR"
+                },
+                    request_only=True,
+                ),
+                OpenApiExample(
+                    'Réponse de succès',
+                    value={
+                        'message': 'Mail créée avec succès',
+                        'status': 'success',
+                        'code': 201
+                    },
+                    response_only=True,
+                    status_codes=['201'],
+                ),
+            ],
+            description="",
+            summary="Créer une auth code auth",
+            tags=["Froget pwd Client"],
+        )
+    
+    def post(self, request):
+        """
+            Envoie un code d'authentification à 2 facteurs par email
+        """
+        try:  
+            auth_header = request.headers.get('Authorization')
+            token = ""
+            
+            if auth_header and auth_header.startswith('Bearer '):
+                token = auth_header[7:]  # Enlever le préfixe 'Bearer '
+            data = request.data
+            
+            mail_forgrt_service( 
+                name = data.get('name', 'Client'),
+                dest_email = data.get('email', None),
+                company = data.get('company', 'klivar'),
+                url=data.get('url', None) ,
+                back_url=data.get('base_url', None),
+                lang=data.get('lang', None)
+            )
+            # Inclure le token JWT dans la réponse si récupéré
+            response_data = {
+                "message": "your request was do successfully",
+                "status": "success", 
+                "code": status.HTTP_200_OK,
+            } 
+            return Response(response_data, status.HTTP_200_OK)
+                
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Erreur lors de l'envoi du code d'authentification",
+                    "status": "error",
+                    "error": str(e),
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        

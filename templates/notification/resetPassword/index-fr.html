@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <style>
+        @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+        
+        * {
+            -webkit-font-smoothing: antialiased;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0px;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #fcfcfc;
+            padding: 49px 0;
+        }
+        
+        /* Table styles pour compatibilité email */
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        
+        td {
+            border-collapse: collapse;
+            mso-line-height-rule: exactly;
+        }
+        
+        /* Container principal */
+        .main-container {
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto;
+            background-color: #fcfcfc;
+        }
+        
+        /* Email template */
+        .email-card {
+            width: 787px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        
+        /* Header avec logo et titre */
+        .header-section {
+            padding: 25px 45px 30px 45px;
+            text-align: center;
+        }
+        
+        .logo {
+            width: 150px;
+            height: 65px;
+            margin: 0 auto 20px auto;
+        }
+        
+        .title {
+            font-family: "Poppins", Arial, sans-serif;
+            font-weight: 700;
+            color: #000000;
+            font-size: 22px;
+            line-height: 35px;
+            margin: 0;
+        }
+        
+        /* Contenu principal */
+        .content-section {
+            padding: 0 45px;
+        }
+        
+        .greeting {
+            font-family: "Poppins", Arial, sans-serif;
+            font-weight: 400;
+            color: #000000;
+            font-size: 16px;
+            margin: 6px 0;
+            text-align: left;
+        }
+        
+        .message {
+            font-family: "Poppins", Arial, sans-serif;
+            font-weight: 400;
+            color: #000000;
+            font-size: 16px;
+            line-height: 30px;
+            margin: 6px 0 30px 0;
+            text-align: left;
+        }
+        
+        /* Bouton */
+        .button-container {
+            margin: 30px 0;
+        }
+        
+        .cta-button {
+            background-color: #4c0c84;
+            border-radius: 5.89px;
+            padding: 7px 14px;
+            display: inline-block;
+            text-decoration: none;
+            min-width: 188px;
+            text-align: center;
+        }
+        
+        .cta-button-text {
+            font-family: "Poppins", Arial, sans-serif;
+            font-weight: 600;
+            color: #ffffff;
+            font-size: 13px;
+            line-height: 23.6px;
+            text-decoration: none;
+        }
+        
+        .validity-note {
+            font-family: "Poppins", Arial, sans-serif;
+            font-weight: 400;
+            color: #000000;
+            font-size: 16px;
+            line-height: 40px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        /* Signature */
+        .signature-section {
+            padding: 20px 45px;
+        }
+        
+        .signature {
+            font-family: "Poppins", Arial, sans-serif;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 35px;
+            text-align: left;
+        }
+        
+        .signature .team-name {
+            color: #000000;
+        }
+        
+        .signature .company-name {
+            color: #7a1cac;
+        }
+        
+        /* Footer */
+        .footer-section {
+            padding: 30px 48px;
+            text-align: center;
+        }
+        
+        .footer-website {
+            font-family: "Poppins", Arial, sans-serif;
+            font-weight: 400;
+            color: #9d9d9d;
+            font-size: 12px;
+            letter-spacing: 0.20px;
+            line-height: 24px;
+            margin: 5px 0;
+        }
+        
+        .footer-email {
+            font-family: "Poppins", Arial, sans-serif;
+            font-weight: 400;
+            color: #9d9d9d;
+            font-size: 14px;
+            letter-spacing: 0.20px;
+            line-height: 22.4px;
+            margin: 5px 0;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 800px) {
+            .email-card {
+                width: 95% !important;
+                margin: 0 auto;
+            }
+            
+            .content-section,
+            .header-section,
+            .signature-section {
+                padding-left: 20px !important;
+                padding-right: 20px !important;
+            }
+            
+            .title {
+                font-size: 18px !important;
+            }
+            
+            .cta-button {
+                min-width: 150px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0" class="main-container">
+        <tr>
+            <td align="center">
+                <!-- Email Card -->
+                <table width="787" cellpadding="0" cellspacing="0" class="email-card">
+                    <!-- Header Section -->
+                    <tr>
+                        <td class="header-section">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center">
+                                        <img src="https://dev-backend.app.klivar.com/media/icons/97a07cae-f702-49b6-b6cf-d46929e90027.png" alt="Klivar Logo" class="logo" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <h1 class="title">Modifier votre mot de passe</h1>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Content Section -->
+                    <tr>
+                        <td class="content-section">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        <div class="greeting">Bonjour {{name}},</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="message">
+                                            Vous avez demandé à modifier votre mot de passe. Cliquez sur le bouton ci-dessous pour entrer votre nouveau mot de passe.<br><br>
+                                            <strong>NB:</strong> Si vous n'êtes pas à l'origine de ce mail, veuillez l'ignorer s'il vous plaît.
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="button-container">
+                                        <a href="{{url}}" class="cta-button">
+                                            <span class="cta-button-text">Cliquer ici</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <p class="validity-note"><strong>NB:</strong> Ce lien a une durée de validité de 24h à la réception</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- Signature Section -->
+                    <tr>
+                        <td class="signature-section">
+                            <div class="signature">
+                                <span class="team-name">Votre équipe </span><span class="company-name">Klivar</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                
+                <!-- Footer Section -->
+                <table width="787" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td class="footer-section">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center">
+                                        <div class="footer-website">www.klivar.fr</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td align="center">
+                                        <div class="footer-email">📩 avotreecoute@klivar.com</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

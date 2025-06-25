@@ -90,3 +90,31 @@ class MailVerificationValidationSerializer(serializers.Serializer):
    
 
  
+
+# Serializer pour valider les données d'entrée
+class frogetPwdSerializer(serializers.Serializer):
+    name = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+        help_text="Adresse email du client"
+    )
+    email = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+        help_text="Adresse email du client"
+    )
+    url = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+        help_text="Nom du client"
+    )
+    lang = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+        help_text="Nom du client"
+    )
+   

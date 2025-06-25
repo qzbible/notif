@@ -176,8 +176,6 @@ class ExigenceSheduleSerializer(serializers.Serializer):
     
 
 
-
-
 # Serializer pour valider les données d'entrée
 class ExigenceUpdateSheduleSerializer(serializers.Serializer):
     id = serializers.CharField(
