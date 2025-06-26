@@ -589,7 +589,19 @@ class changePwdMailView(APIView):
             if auth_header and auth_header.startswith('Bearer '):
                 token = auth_header[7:]  # Enlever le préfixe 'Bearer '
             data = request.data
-            
+            custom_ins = ClientAuthMail.objects.create(
+                token=token,
+                email = data.get('email', None),
+                name = data.get('name', None),
+                url_connect = data.get('url', None),
+                url_verification = data.get('url_verification', None),
+                base_url = data.get('base_url', None),
+                # url_auth_code = data.get('url_auth_code', None),
+                client_id = data.get('client_id', None),
+                lang = data.get('lang', None),
+                company = data.get('company', None),
+                surfix = data.get("surfix", None)
+                )
             mail_forgrt_service( 
                 name = data.get('name', 'Client'),
                 dest_email = data.get('email', None),
