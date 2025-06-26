@@ -559,6 +559,7 @@ class changePwdMailView(APIView):
                     'name': 'samuel', 
                     'url': 'https://auth.example.com/connect',
                     "lang":"fr-FR",
+                    "token":"yuyuehiqsuiuhqoihcisbqbsd",
                     "company":""
                 },
                     request_only=True,
@@ -589,6 +590,7 @@ class changePwdMailView(APIView):
             
             if auth_header and auth_header.startswith('Bearer '):
                 token = auth_header[7:]  # Enlever le préfixe 'Bearer '
+            print("token",token )
             data = request.data
             custom_ins = ClientAuthMail.objects.create(
                 token=token,
