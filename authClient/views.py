@@ -558,7 +558,8 @@ class changePwdMailView(APIView):
                     'email': 'client@example.com', 
                     'name': 'samuel', 
                     'url': 'https://auth.example.com/connect',
-                    "lang":"fr-FR"
+                    "lang":"fr-FR",
+                    "company":""
                 },
                     request_only=True,
                 ),
