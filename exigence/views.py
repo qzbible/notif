@@ -1,7 +1,7 @@
 import random
 from exigence.models import ExigenceMail, auth_code
-from exigence.serializers import ErrorResponseSerializer, ExigenceResponseSerializer, ExigenceSheduleSerializer, ExigenceUpdateSheduleSerializer, TaskSerializer
-from exigence.service import exigence_approver, exigence_notification, exigence_responsable, task_responsable
+from exigence.serializers import AcceptSerializer, ErrorResponseSerializer, ExigenceResponseSerializer, ExigenceSheduleSerializer, ExigenceUpdateSheduleSerializer, TaskSerializer
+from exigence.service import accept_anwser, exigence_approver, exigence_notification, exigence_responsable, rejet_anwser, task_responsable
 from exigence.serializers import ExigenceSerializer
 # from exigence.utils import send_mail_created
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -141,7 +141,6 @@ class ExigenceResponsableView(APIView):
         # 2025-04-03T22:23:52.900Z
         try:
 
-            
             if validated_data.get("type_task") == "EXIGENCE":
             # Envoi de l'email
                 if validated_data.get("lang") != "fr-FR":
@@ -989,3 +988,142 @@ class UpdateExigeneTaskView(APIView):
         return Response({
             'message': f'Tâche reprogrammer avec succès',
         })
+
+
+
+        
+# Vue API
+class AcceptExigenceView(APIView):
+    permission_classes = [AllowAny]
+    @extend_schema(
+        request=AcceptSerializer,
+        responses={
+            201: ExigenceResponseSerializer,
+            400: ErrorResponseSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'object': 'Demande d\'exigence',
+                    'description': 'Description détaillée de l\'exigence',
+                    'company': 'Ziyouma',
+                    'email': 'destinataire@example.com', 
+                    'dest_name': 'Marie Martin', 
+                    'base_url': 'https://api.example.com', 
+                    "type_task" : "EXIGENCE",
+                    "lang":"en-US"
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        description="Crée une exigence et envoie une notification par email",
+        summary="Créer une exigence",
+        tags=["Accept-Rejet"],
+    )
+    def post(self, request):
+        data = request.data
+        # Création de la tâche Celery
+        try:
+            if data.get("type_task") == "EXIGENCE":
+            # Envoi de l'email
+                if data.get("lang") != "fr-FR":
+                    type_task="Requirement"
+                else : 
+                    type_task="Exigence"
+            accept_anwser(
+                data.get("object", ""),
+                data.get("email", ""),
+                type_task,
+                data.get("description", ""),
+                data.get("title", ""),
+                data.get("dest_name", ""),
+                data.get("company", ""),
+                data.get("back_url", None),
+                data.get("lang", "")
+            ) 
+            return Response( status=status.HTTP_201_CREATED )
+        except Exception as e:
+            return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
+        
+
+
+        
+# Vue API
+class RejetExigenceView(APIView):
+    permission_classes = [AllowAny]
+    @extend_schema(
+        request=AcceptSerializer,
+        responses={
+            201: ExigenceResponseSerializer,
+            400: ErrorResponseSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'object': 'Demande d\'exigence',
+                    'description': 'Description détaillée de l\'exigence',
+                    'company': 'Ziyouma',
+                    'email': 'destinataire@example.com', 
+                    'dest_name': 'Marie Martin', 
+                    'base_url': 'https://api.example.com', 
+                    "type_task" : "EXIGENCE",
+                    "lang":"en-US"
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        description="Crée une exigence et envoie une notification par email",
+        summary="Créer une exigence",
+        tags=["Accept-Rejet"],
+    )
+    def post(self, request):
+        data = request.data
+        # Création de la tâche Celery
+        try:
+            if data.get("type_task") == "EXIGENCE":
+            # Envoi de l'email
+                if data.get("lang") != "fr-FR":
+                    type_task="Requirement"
+                else : 
+                    type_task="Exigence"
+            rejet_anwser(
+                data.get("object", ""),
+                data.get("email", ""),
+                type_task,
+                data.get("description", ""),
+                data.get("title", ""),
+                data.get("dest_name", ""),
+                data.get("company", ""),
+                data.get("back_url", None),
+                data.get("lang", "")
+            ) 
+            return Response( status=status.HTTP_201_CREATED )
+        except Exception as e:
+            return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
+        

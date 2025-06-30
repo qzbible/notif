@@ -198,3 +198,42 @@ class ExigenceResponseSerializer(serializers.Serializer):
 class ErrorResponseSerializer(serializers.Serializer):
     message = serializers.CharField()
     errors = serializers.JSONField(required=False)
+
+
+
+# Serializer pour valider les données d'entrée
+class AcceptSerializer(serializers.Serializer):
+    
+    object = serializers.CharField(
+        required=True, 
+        help_text="Objet de l'exigence"
+    )
+
+    description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Description détaillée de l'exigence"
+    )
+
+    company = serializers.CharField(
+        required=True,
+        allow_blank=True,
+        help_text="Nom de l'entreprise"
+    )
+
+    email = serializers.EmailField(
+        required=True,
+        help_text="Email du destinataire"
+    )
+
+    name = serializers.CharField(
+        required=True,
+         allow_blank=True,
+        help_text="Nom de l'expéditeur"
+    )
+
+    dest_name = serializers.CharField(
+        required=True,
+         allow_blank=True,
+        help_text="Nom du destinataire"
+    )

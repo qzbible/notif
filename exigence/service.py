@@ -375,4 +375,76 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
     return True
  
 
+def accept_anwser( object, email,  type_task, description, title, dest_name, company, back_url=None, lang=None ):
+    # object and description 
+    if lang == "fr-FR" :
+        path = "notification/evaluation/accept_answer-fr.html" 
+    elif lang == "en-US":
+        path = "notification/evaluation/accept_answer-en.html" 
+    else:
+        path = "notification/evaluation/accept_answer-fr.html"  
+
+    path_txt = "notification/evaluation/exigence-notification.txt" 
+    context = {
+        "name": dest_name,
+        "title": title,  
+        "description":description, 
+        "company": company,
+        "type_task": type_task,
+        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+    }
+    html_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+    send_mail_created(
+        [email], 
+        object, 
+        text_content, 
+        html_content,
+        company
+    )     
+    return True
+ 
+
+def rejet_anwser( object, email,  type_task, description, title, dest_name, company, back_url=None, lang=None ):
+    # object and description 
+    if lang == "fr-FR" :
+        path = "notification/evaluation/rejet_answer-fr.html" 
+    elif lang == "en-US":
+        path = "notification/evaluation/rejet_answer-en.html" 
+    else:
+        path = "notification/evaluation/rejet_answer-fr.html"  
+        
+    path_txt = "notification/evaluation/exigence-notification.txt" 
+    context = { 
+        "name": dest_name,
+        "title": title,  
+        "description":description, 
+        "company": company,
+        "type_task": type_task,
+        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+    }
+    html_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+    send_mail_created(
+        [email], 
+        object, 
+        text_content, 
+        html_content,
+        company
+    )
+    return True
+ 
+
  
