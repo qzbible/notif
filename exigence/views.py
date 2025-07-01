@@ -176,14 +176,10 @@ class ExigenceResponsableView(APIView):
                 lang = validated_data.get("lang", "fr-FR"),
             )
             
-            
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in validated_data and validated_data.get("scope"):
                 exigence.scope = validated_data.get("scope")
                 exigence.save()
-            
-            print("Exigence data start", validated_data.get("start_date"))
-            print("Exigence data end 2", validated_data.get("dealine"))
              
             if validated_data.get("type_task") == "EXIGENCE":
                 print('Exigence data start', parse_date_to_730(validated_data.get("start_date")))
@@ -990,8 +986,6 @@ class UpdateExigeneTaskView(APIView):
         })
 
 
-
-        
 # Vue API
 class AcceptExigenceView(APIView):
     permission_classes = [AllowAny]
@@ -1010,6 +1004,7 @@ class AcceptExigenceView(APIView):
                     'object': 'Demande d\'exigence',
                     'description': 'Description détaillée de l\'exigence',
                     'company': 'Ziyouma',
+                    'title': '',
                     'email': 'destinataire@example.com', 
                     'dest_name': 'Marie Martin', 
                     'base_url': 'https://api.example.com', 
@@ -1058,8 +1053,6 @@ class AcceptExigenceView(APIView):
         except Exception as e:
             return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
         
-
-
         
 # Vue API
 class RejetExigenceView(APIView):
@@ -1079,6 +1072,7 @@ class RejetExigenceView(APIView):
                     'object': 'Demande d\'exigence',
                     'description': 'Description détaillée de l\'exigence',
                     'company': 'Ziyouma',
+                     'title': '',
                     'email': 'destinataire@example.com', 
                     'dest_name': 'Marie Martin', 
                     'base_url': 'https://api.example.com', 

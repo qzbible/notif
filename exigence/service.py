@@ -89,6 +89,18 @@ def add_calendar(title, description, date_begin, date_end, company):
 
     return filename
 
+def verifier_presence_t(chaine):
+    """
+    Vérifie si le caractère 'T' est présent dans la chaîne donnée.
+    
+    Args:
+        chaine (str): La chaîne à vérifier
+        
+    Returns:
+        bool: True si 'T' est présent, False sinon
+    """
+    return 'T' in chaine
+
 @shared_task
 def exigence_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None, lang=None ):
     # object and description
@@ -98,7 +110,11 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         deadline_text = "non défini"
     elif lang == "en-US":
         deadline_text = "not defined"
-    new_deadline = deadline+"T07:30:00.000Z"
+    
+    if verifier_presence_t(deadline):
+        new_deadline = deadline 
+    else: 
+        new_deadline = deadline+"T07:30:00.000Z"
     new_start_date = start_date+"T07:30:00.000Z"
     if is_valid_date_string(new_deadline):
         parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
