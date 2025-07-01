@@ -180,6 +180,7 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
     # object and description
     deadline_text = "non défini" 
     filename = None
+    print("start data", start_date )
     if is_valid_date_string(start_date):
         start_date = start_date.split(" ")[0]
         # Analyser la date ISO 8601
