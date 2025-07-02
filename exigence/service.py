@@ -115,7 +115,7 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         new_deadline = deadline 
     else: 
         new_deadline = deadline+"T07:30:00.000Z"
-        
+
     new_start_date = start_date+"T07:30:00.000Z"
     if is_valid_date_string(new_deadline):
         parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -249,8 +249,15 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
     # object and description
 
     deadline_text = "non défini" 
-    if is_valid_date_string(deadline):
-        parsed_date = datetime.strptime(deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+
+    if verifier_presence_t(deadline):
+        new_deadline = deadline 
+    else: 
+        new_deadline = deadline+"T07:30:00.000Z"
+
+    if is_valid_date_string(new_deadline):
+        parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
         deadline_text = parsed_date.strftime("%Y-%m-%d")
 
     filename = None
