@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 # Update url_image to be a list of strings
 class AssignBugSerializer(serializers.Serializer):
     name = serializers.CharField(
-        required=True, 
+        required=False, 
         help_text="Objet de l'exigence"
     )
     description = serializers.CharField(
@@ -15,18 +15,18 @@ class AssignBugSerializer(serializers.Serializer):
         help_text="Description détaillée de l'exigence"
     )
     company = serializers.CharField(
-        required=True,
+        required=False,
         allow_blank=True,
         help_text="Nom de l'entreprise"
     )
     module = serializers.CharField(
-        required=True,
+        required=False,
         allow_blank=True,
         help_text="Nom de l'entreprise"
     )
     fichiers_urls = serializers.ListField(
         child=serializers.CharField(),
-        required=True,
+        required=False,
         help_text="Liste des noms des expéditeurs"
     )
     to_emails = serializers.ListField(
@@ -36,17 +36,17 @@ class AssignBugSerializer(serializers.Serializer):
     )
     status = serializers.CharField(
         required=False,
-        allow_blank=True,
+        allow_blank=False,
         help_text="Description détaillée de l'exigence"
     )
     back_url =  serializers.CharField(
         required=False,
-        allow_blank=True,
+        allow_blank=False,
         help_text="Description détaillée de l'exigence"
     )
     lang = serializers.CharField(
         required=False,
-        allow_blank=True,
+        allow_blank=False,
         help_text="Description détaillée de l'exigence"
     ) 
 
