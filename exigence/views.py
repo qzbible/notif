@@ -1038,6 +1038,7 @@ class AcceptExigenceView(APIView):
                     type_task="Requirement"
                 else : 
                     type_task="Exigence"
+            
             accept_anwser(
                 data.get("object", ""),
                 data.get("email", ""),

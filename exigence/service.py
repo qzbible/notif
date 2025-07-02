@@ -115,6 +115,7 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         new_deadline = deadline 
     else: 
         new_deadline = deadline+"T07:30:00.000Z"
+        
     new_start_date = start_date+"T07:30:00.000Z"
     if is_valid_date_string(new_deadline):
         parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
@@ -180,9 +181,14 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
     # object and description
     deadline_text = "non défini" 
     filename = None
-    print("start data", start_date )
-    if is_valid_date_string(start_date):
-        start_date = start_date.split(" ")[0]
+  
+    if verifier_presence_t(start_date):
+        new_deadline = start_date 
+    else: 
+        new_deadline = start_date+"T07:30:00.000Z"
+
+    if is_valid_date_string(new_deadline):
+        start_date = new_deadline.split(" ")[0]
         # Analyser la date ISO 8601
         parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
         # Reformater au format souhaité
@@ -319,8 +325,15 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
     # object and description
 
     deadline_text = "non défini" 
-    if is_valid_date_string(deadline):
-        parsed_date = datetime.strptime(deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+    
+    if verifier_presence_t(deadline):
+        new_deadline = deadline 
+    else: 
+        new_deadline = deadline+"T07:30:00.000Z"
+
+    if is_valid_date_string(new_deadline):
+        parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
         deadline_text = parsed_date.strftime("%Y-%m-%d")
 
     filename = None
