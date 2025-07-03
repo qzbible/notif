@@ -51,14 +51,7 @@ INSTALLED_APPS = [
 
     'django_celery_results',
     'django_celery_beat',
-    'drf_spectacular',
-
-
-    'health_check',  # required
-    'health_check.db',  # stock Django health checkers: DatabaseBackend
-    'health_check.contrib.migrations',  # check if: MigrationsHealthCheck
-
-    'health_check.storage',
+    'drf_spectacular'
 ]
 
 
