@@ -1031,6 +1031,8 @@ class AcceptExigenceView(APIView):
     def post(self, request):
         data = request.data
         # Création de la tâche Celery
+        print(f"Approve or rejet a task ----> {data}")
+        
         try:
             if data.get("type_task") == "EXIGENCE":
             # Envoi de l'email
