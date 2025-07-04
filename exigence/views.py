@@ -586,7 +586,7 @@ class sendMailAuthCodeView(APIView):
                     "user_name": '',
                     "code_auth": auth_code_instance.code,
                     "company": custom_ins.company,
-                    "name" : custom_ins.sender_name,
+                    "name" : custom_ins.dest_name,
                     "back_url" :  "https://dev-backend.app.klivar.com/"
                 } 
                 html_content = render_to_string(path, context)
