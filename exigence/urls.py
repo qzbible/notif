@@ -7,6 +7,7 @@ from .views import *
 router = routers.DefaultRouter()
 
 urlpatterns = [
+    
     path('api/responsable/', ExigenceResponsableView.as_view(), name='create-email-task'),
     path('api/accept/', AcceptExigenceView.as_view(), name='create-email-task'),
     path('api/rejet/', RejetExigenceView.as_view(), name='create-email-task'),
