@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Email Template</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .email-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            opacity: 0.3;
+        }
+        
+        .notification-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .email-body {
+            padding: 40px 30px;
+        }
+        
+        .notification-content {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .notification-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        
+        .notification-message {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .notification-details {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #4f46e5;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .detail-value {
+            color: #6b7280;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-validate {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-validate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-reject {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+        
+        .btn-view {
+            background: white;
+            color: #4f46e5;
+            border: 2px solid #4f46e5;
+        }
+        
+        .btn-view:hover {
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            background: #f9fafb;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer-text {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-urgent {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .demo-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .demo-controls h3 {
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+        
+        .demo-btn {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px 16px;
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .demo-btn:hover {
+            background: #e5e7eb;
+        }
+        
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .demo-controls {
+                display: none;
+            }
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: #f0fdf4;
+            border: 2px solid #22c55e;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .success-icon {
+            font-size: 48px;
+            color: #22c55e;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-controls">
+        <h3>🎮 Démo</h3>
+        <button class="demo-btn" onclick="changeNotificationType('demande')">Demande d'approbation</button>
+        <button class="demo-btn" onclick="changeNotificationType('commande')">Nouvelle commande</button>
+        <button class="demo-btn" onclick="changeNotificationType('document')">Document à valider</button>
+        <button class="demo-btn" onclick="changeNotificationType('compte')">Nouveau compte</button>
+    </div>
+
+    <div class="email-container">
+        <div class="email-header">
+            <div class="notification-icon" id="headerIcon">
+                📋
+            </div>
+            <h1 id="emailTitle">Demande d'Approbation</h1>
+            <span class="status-indicator status-pending" id="statusBadge">En attente</span>
+        </div>
+        
+        <div class="email-body">
+            <div class="notification-content">
+                <h2 class="notification-title" id="notificationTitle">
+                    Nouvelle demande nécessitant votre validation
+                </h2>
+                <p class="notification-message" id="notificationMessage">
+                    Une demande a été soumise et nécessite votre approbation avant de pouvoir être traitée. 
+                    Veuillez examiner les détails ci-dessous et prendre une décision.
+                </p>
+            </div>
+            
+            <div class="notification-details" id="notificationDetails">
+                <div class="detail-item">
+                    <span class="detail-label">Demandeur :</span>
+                    <span class="detail-value" id="requester">Marie Dubois</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Type :</span>
+                    <span class="detail-value" id="requestType">Achat équipement</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Montant :</span>
+                    <span class="detail-value" id="amount">2 450,00 €</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Date :</span>
+                    <span class="detail-value" id="requestDate">28 juillet 2025</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Urgence :</span>
+                    <span class="detail-value" id="urgency">Normale</span>
+                </div>
+            </div>
+            
+            <div class="success-message" id="successMessage">
+                <div class="success-icon">✅</div>
+                <h3>Action effectuée avec succès !</h3>
+                <p id="successText">Votre validation a été enregistrée.</p>
+            </div>
+            
+            <div class="action-buttons" id="actionButtons">
+                <button class="btn btn-validate" onclick="handleValidation('validate')">
+                    ✓ Valider
+                </button>
+                <button class="btn btn-reject" onclick="handleValidation('reject')">
+                    ✗ Rejeter
+                </button>
+                <button class="btn btn-view" onclick="handleValidation('view')">
+                    👁 Voir détails
+                </button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p class="footer-text">
+                Ce message a été envoyé automatiquement par le système de gestion.<br>
+                Si vous avez des questions, contactez le support technique.<br><br>
+                <strong>Important :</strong> Cette demande expire dans 7 jours si aucune action n'est prise.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration des différents types de notifications
+        const notificationTypes = {
+            demande: {
+                icon: '📋',
+                title: 'Demande d\'Approbation',
+                message: 'Une demande a été soumise et nécessite votre approbation avant de pouvoir être traitée.',
+                details: {
+                    requester: 'Marie Dubois',
+                    type: 'Achat équipement',
+                    amount: '2 450,00 €',
+                    date: '28 juillet 2025',
+                    urgency: 'Normale'
+                },
+                status: 'En attente',
+                statusClass: 'status-pending'
+            },
+            commande: {
+                icon: '🛒',
+                title: 'Nouvelle Commande',
+                message: 'Une nouvelle commande a été passée et nécessite votre validation avant expédition.',
+                details: {
+                    requester: 'Client Premium SAS',
+                    type: 'Commande en ligne',
+                    amount: '15 670,00 €',
+                    date: '28 juillet 2025',
+                    urgency: 'Urgente'
+                },
+                status: 'Urgent',
+                statusClass: 'status-urgent'
+            },
+            document: {
+                icon: '📄',
+                title: 'Document à Valider',
+                message: 'Un nouveau document a été téléchargé et nécessite votre validation avant publication.',
+                details: {
+                    requester: 'Équipe Marketing',
+                    type: 'Contrat client',
+                    amount: 'N/A',
+                    date: '28 juillet 2025',
+                    urgency: 'Normale'
+                },
+                status: 'En attente',
+                statusClass: 'status-pending'
+            },
+            compte: {
+                icon: '👤',
+                title: 'Nouveau Compte Utilisateur',
+                message: 'Une demande de création de compte utilisateur nécessite votre approbation.',
+                details: {
+                    requester: 'Service RH',
+                    type: 'Compte employé',
+                    amount: 'N/A',
+                    date: '28 juillet 2025',
+                    urgency: 'Normale'
+                },
+                status: 'En attente',
+                statusClass: 'status-pending'
+            }
+        };
+
+        function changeNotificationType(type) {
+            const config = notificationTypes[type];
+            
+            // Mise à jour de l'en-tête
+            document.getElementById('headerIcon').textContent = config.icon;
+            document.getElementById('emailTitle').textContent = config.title;
+            
+            // Mise à jour du badge de statut
+            const statusBadge = document.getElementById('statusBadge');
+            statusBadge.textContent = config.status;
+            statusBadge.className = `status-indicator ${config.statusClass}`;
+            
+            // Mise à jour du contenu
+            document.getElementById('notificationTitle').textContent = `Nouvelle ${config.title.toLowerCase()}`;
+            document.getElementById('notificationMessage').textContent = config.message;
+            
+            // Mise à jour des détails
+            document.getElementById('requester').textContent = config.details.requester;
+            document.getElementById('requestType').textContent = config.details.type;
+            document.getElementById('amount').textContent = config.details.amount;
+            document.getElementById('requestDate').textContent = config.details.date;
+            document.getElementById('urgency').textContent = config.details.urgency;
+            
+            // Réinitialiser l'état des boutons
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('actionButtons').style.display = 'flex';
+        }
+
+        function handleValidation(action) {
+            const actionButtons = document.getElementById('actionButtons');
+            const successMessage = document.getElementById('successMessage');
+            const successText = document.getElementById('successText');
+            
+            let message = '';
+            let icon = '';
+            
+            switch(action) {
+                case 'validate':
+                    message = 'Votre validation a été enregistrée. La demande va être traitée.';
+                    icon = '✅';
+                    break;
+                case 'reject':
+                    message = 'La demande a été rejetée. Le demandeur en sera informé.';
+                    icon = '❌';
+                    break;
+                case 'view':
+                    message = 'Redirection vers les détails complets en cours...';
+                    icon = '👁';
+                    setTimeout(() => {
+                        alert('Dans une vraie application, ceci ouvrirait une page détaillée.');
+                        document.getElementById('successMessage').classList.remove('show');
+                        document.getElementById('actionButtons').style.display = 'flex';
+                    }, 2000);
+                    break;
+            }
+            
+            // Afficher le message de succès
+            document.querySelector('.success-icon').textContent = icon;
+            successText.textContent = message;
+            successMessage.classList.add('show');
+            actionButtons.style.display = 'none';
+            
+            // Simuler l'envoi des données
+            console.log(`Action "${action}" effectuée à ${new Date().toLocaleString()}`);
+            
+            // Dans une vraie application, vous feriez un appel API ici
+            // fetch('/api/validate', { method: 'POST', body: JSON.stringify({action, timestamp: Date.now()}) })
+        }
+
+        // Animation d'entrée
+        window.addEventListener('load', () => {
+            document.querySelector('.email-container').style.opacity = '0';
+            document.querySelector('.email-container').style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                document.querySelector('.email-container').style.transition = 'all 0.6s ease';
+                document.querySelector('.email-container').style.opacity = '1';
+                document.querySelector('.email-container').style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

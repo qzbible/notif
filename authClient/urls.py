@@ -13,7 +13,10 @@ urlpatterns = [
     path("api/validation-code/", ValidateAuthCodeView.as_view(), name="validate-email-auth-client"),
 
     path("api/otp-email/", MailVerificationView.as_view(), name="otp-emailt"),
-    path("api/validate-email/", MailCodeValidationView.as_view(), name="validate-emailt")
+    
+    path("api/validate-email/", MailCodeValidationView.as_view(), name="validate-emailt"),
+    
+    path("api/alert-security/", AlertSecurityView.as_view(), name="otp-emailt"),
 
     
 ]
