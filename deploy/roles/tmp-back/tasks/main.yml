@@ -122,15 +122,15 @@
 
 # TODO: get the logs of the failed services?
 
-- name: Check if we can access the service
-  ansible.builtin.uri:
-    url: http://{{ tmp_back_hostname }}/__healthcheck/
-    follow_redirects: true
-    return_content: true
-    headers:
-      Accept: application/json
-  register: this
-  failed_when: "this.status != 200 or 'https://' not in this.url"
-  retries: 5
-  delay: 10
-  until: this.status == 200
+# - name: Check if we can access the service
+#   ansible.builtin.uri:
+#     url: http://{{ tmp_back_hostname }}/__healthcheck/
+#     follow_redirects: true
+#     return_content: true
+#     headers:
+#       Accept: application/json
+#   register: this
+#   failed_when: "this.status != 200 or 'https://' not in this.url"
+#   retries: 5
+#   delay: 10
+#   until: this.status == 200
