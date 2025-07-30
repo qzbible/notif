@@ -56,17 +56,18 @@ def parse_date_to_730(date_str):
                 datetime(parsed_date.year, parsed_date.month, parsed_date.day, 7, 30, 0)
             )
         
+        return None
         # Vérifier si la date est dans le passé
-        now = timezone.now()
-        print(f"✅ Date actuelle: {now}")
-        if target_datetime <= now:
-            print(f"⚠️ Date dans le passé détectée: {target_datetime}")
-            print(f"   Heure actuelle: {now}")
-            print("   → Exécution immédiate programmée")
-            return None  # None = exécution immédiate pour Celery
+        # now = timezone.now()
+        # print(f"✅ Date actuelle: {now}")
+        # if target_datetime <= now:
+        #     print(f"⚠️ Date dans le passé détectée: {target_datetime}")
+        #     print(f"   Heure actuelle: {now}")
+        #     print("   → Exécution immédiate programmée")
+        #     return None  # None = exécution immédiate pour Celery
         
-        print(f"✅ Tâche programmée pour: {target_datetime}")
-        return target_datetime
+        # print(f"✅ Tâche programmée pour: {target_datetime}")
+        # return target_datetime
         
     except (ValueError, AttributeError) as e:
         raise ValueError(f"Format de date non supporté: {date_str}")
