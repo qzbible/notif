@@ -18,11 +18,11 @@ def mail_service(  name, dest_email, company, url, back_url=None, lang=None ):
     if lang == "fr-FR" :
         path = "notification/welcome/index-fr.html" 
         path_txt = "notification/welcome/index-fr.txt" 
-        object = "Bienvenue sur Klivar"
+        object = "Bienvenue dans votre espace Klivar – Accédez dès maintenant à vos ressources clés 🚀"
     elif lang == "en-US":
         path = "notification/welcome/index-en.html" 
         path_txt = "notification/welcome/index-en.txt" 
-        object = "Welcome to Klivar"
+        object = "Welcome to your Klivar space – Access your key resources now 🚀"
     else:
         path = "notification/welcome/index-fr.html"
         path_txt = "notification/welcome/index-fr.txt"  
