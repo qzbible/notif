@@ -27,7 +27,8 @@ def mail_service(  name, dest_email, company, url, back_url=None, lang=None ):
         path = "notification/welcome/index-fr.html"
         path_txt = "notification/welcome/index-fr.txt"  
         object = "Bienvenue sur Klivar"
-
+    
+    print("url", url)
     context = {
         "name":name,  
         "title": object, 
