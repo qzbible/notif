@@ -2,6 +2,7 @@ from django.shortcuts import render
 from alert_security.models import DeviseAuthMail, authCode
 from alert_security.serializers import AlertSecurityMailSerializer
 from alert_security.service import mail_new_devise_service
+from external_service.call_api import validate_device_on_main_back
 from rest_framework.permissions import AllowAny
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -12,6 +13,7 @@ from django.utils import timezone
 import random
 from datetime import datetime, timedelta
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
 from service.utils import send_mail_created
 # Create your views here.
@@ -92,7 +94,8 @@ class AlertSecurityMailView(APIView):
                 client_id = data.get('client_id', None),
                 lang = data.get('lang', None),
                 company = data.get('company', None),
-                surfix = data.get("surfix", None)
+                surfix = data.get("surfix", None),
+                device_id = data.get('device_id', 0) 
                 )
             
             mail_new_devise_service( 
@@ -100,7 +103,7 @@ class AlertSecurityMailView(APIView):
                 dest_email = data.get('email', None),
                 company = data.get('company', 'klivar'), 
                 os_name= data.get('device_name', None),
-                devise_type = data.get('devise_type', None),
+                device_type = data.get('device_type', None),
                 browser_name = data.get('browser_name', None),
                 url_verification=data.get('url_verification', None) + str(token), 
                 back_url=data.get('base_url', None),
@@ -302,12 +305,13 @@ class ValidateAuthCodeView(APIView):
             # Suppression du code d'authentification après utilisation
             auth_code_instance.delete()
             instance = DeviseAuthMail.objects.get(token=token) 
-
+            response = validate_device_on_main_back(instance.device_id, instance.token)
+            # validate device .. 
             return Response( 
                 {
                     "path":instance.url_connect, 
                 },
-                status=status.HTTP_200_OK
+                status=response.status_code
             )   
         except Exception as e:
             return Response(
@@ -320,3 +324,13 @@ class ValidateAuthCodeView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+
+
+@api_view(["PUT"])
+def validate_device(self, pk=None):
+    try:
+        response = validate_device_on_main_back(pk, "instance.token")
+        return Response(status=response.status_code)
+    except Exception as e:
+        return Response( {"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+

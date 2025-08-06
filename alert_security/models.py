@@ -22,6 +22,7 @@ class DeviseAuthMail(models.Model):
     # url_auth_code = models.CharField(max_length=255, blank=True, null=True)
     token = models.TextField(null=True, blank=True)
     client_id = models.CharField(max_length=255, null=True)
+    device_id = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     is_send = models.BooleanField(default=False)
     lang = models.CharField(max_length=10, blank=True, null=True)
