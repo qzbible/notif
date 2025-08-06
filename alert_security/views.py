@@ -274,45 +274,47 @@ class ValidateAuthCodeView(APIView):
         Valide un code d'authentification à 2 facteurs
         """
         try:  
-            auth_header = request.headers.get('Authorization')
-            token = None
-            if auth_header and auth_header.startswith('Bearer '):
-                token = auth_header[7:]  
-            data = request.data
-            try:
-                auth_code_instance = authCode.objects.get(token=token, code=data['code'])
-            except authCode.DoesNotExist:
-                return Response(
-                    {
-                        "message": "Code d'authentification invalide",
-                        "status": "error",
-                        "code": status.HTTP_404_NOT_FOUND,
-                    },
-                    status=status.HTTP_404_NOT_FOUND,
-                ) 
-            # Vérification de l'expiration
-            now = timezone.now() 
-            if auth_code_instance.expires_at < now:
-                auth_code_instance.delete()
-                return Response(
-                    {
-                        "message": "Le code d'authentification a expiré",
-                        "status": "error",
-                        "code": status.HTTP_408_REQUEST_TIMEOUT,
-                    },
-                    status=status.HTTP_408_REQUEST_TIMEOUT,
-                )
-            # Suppression du code d'authentification après utilisation
-            auth_code_instance.delete()
-            instance = DeviseAuthMail.objects.get(token=token) 
-            response = validate_device_on_main_back(instance.device_id, instance.token)
-            # validate device .. 
-            return Response( 
-                {
-                    "path":instance.url_connect, 
-                },
-                status=response.status_code
-            )   
+            # auth_header = request.headers.get('Authorization')
+            # token = None
+            # if auth_header and auth_header.startswith('Bearer '):
+            #     token = auth_header[7:]  
+            # data = request.data
+            # try:
+            #     auth_code_instance = authCode.objects.get(token=token, code=data['code'])
+            # except authCode.DoesNotExist:
+            #     return Response(
+            #         {
+            #             "message": "Code d'authentification invalide",
+            #             "status": "error",
+            #             "code": status.HTTP_404_NOT_FOUND,
+            #         },
+            #         status=status.HTTP_404_NOT_FOUND,
+            #     ) 
+            # # Vérification de l'expiration
+            # now = timezone.now() 
+            # if auth_code_instance.expires_at < now:
+            #     auth_code_instance.delete()
+            #     return Response(
+            #         {
+            #             "message": "Le code d'authentification a expiré",
+            #             "status": "error",
+            #             "code": status.HTTP_408_REQUEST_TIMEOUT,
+            #         },
+            #         status=status.HTTP_408_REQUEST_TIMEOUT,
+            #     )
+            # # Suppression du code d'authentification après utilisation
+            # auth_code_instance.delete()
+            # instance = DeviseAuthMail.objects.get(token=token) 
+            # response = validate_device_on_main_back(instance.device_id, instance.token)
+            # # validate device .. 
+            # return Response( 
+            #     {
+            #         "path":instance.url_connect, 
+            #     },
+            #     status=response.status_code
+            # )   
+            response = validate_device_on_main_back(2, "instance.token")
+            return Response(status=response.status_code)
         except Exception as e:
             return Response(
                 {
