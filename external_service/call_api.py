@@ -18,7 +18,7 @@ def validate_device_on_main_back(id, token):
         "Authorization": f"Bearer {token}",  # Add JWT token to Authorization header
     }
     print(f"token  {token}")
-    resp = requests.post(url, headers=headers) 
+    resp = requests.put(url, headers=headers) 
     logging.debug('Response: %s', resp.text)
     print("Response: ", resp.status_code)
     print("Response: ", resp.text)
