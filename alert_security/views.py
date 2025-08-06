@@ -96,10 +96,9 @@ class AlertSecurityMailView(APIView):
                 )
             
             mail_new_devise_service( 
-                name = data.get('device_name', 'Client'),
+                name = data.get('name', ''),
                 dest_email = data.get('email', None),
-                company = data.get('company', 'klivar'),
-               
+                company = data.get('company', 'klivar'), 
                 os_name= data.get('device_name', None),
                 devise_type = data.get('devise_type', None),
                 browser_name = data.get('browser_name', None),
@@ -303,6 +302,7 @@ class ValidateAuthCodeView(APIView):
             # Suppression du code d'authentification après utilisation
             auth_code_instance.delete()
             instance = DeviseAuthMail.objects.get(token=token) 
+
             return Response( 
                 {
                     "path":instance.url_connect, 
