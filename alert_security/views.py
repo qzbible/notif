@@ -326,7 +326,9 @@ class ValidateAuthCodeView(APIView):
         
 
 
+
 @api_view(["PUT"])
+@permission_classes([AllowAny])
 def validate_device(self, pk=None):
     try:
         response = validate_device_on_main_back(pk, "instance.token")

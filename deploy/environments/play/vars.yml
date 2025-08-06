@@ -3,3 +3,5 @@ backend_app_hostname: play-backend.app.klivar.com
 front_app_manager_hostname: play.app.klivar.com
 front_app_admin_hostname: play.admin.klivar.com
 front_app_staff_hostname: play.staff.klivar.com
+backend_main_hostname: play2-backend.app.klivar.com
+

@@ -3,3 +3,4 @@ backend_app_hostname: beta-notify.back.klivar.com
 front_app_manager_hostname: beta.app.klivar.com
 front_app_admin_hostname: beta.admin.klivar.com
 front_app_staff_hostname: beta.staff.klivar.com
+backend_main_hostname: beta-backend.app.klivar.com
