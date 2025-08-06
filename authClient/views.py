@@ -2,8 +2,8 @@ import random
  
 # from exigence.utils import send_mail_created
 from authClient.models import ClientAuthMail, EmailVerification, authCodeClient
-from authClient.serializers import ClientAuthMailSerializer, MailVerificationSendSerializer, frogetPwdSerializer
-from authClient.service import  mail_forgrt_service, mail_service
+from authClient.serializers import  ClientAuthMailSerializer, MailVerificationSendSerializer, frogetPwdSerializer
+from authClient.service import  mail_forgrt_service, mail_welcome_service
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
@@ -107,7 +107,7 @@ class welcomeMailView(APIView):
                 company = data.get('company', None),
                 surfix = data.get("surfix", None)
                 )
-            mail_service( 
+            mail_welcome_service( 
                 name = data.get('name', 'Client'),
                 dest_email = data.get('email', None),
                 company = data.get('company', 'klivar'),
@@ -538,7 +538,6 @@ class MailResetPassword(APIView):
             )
         
 
-
 # Vue API
 class changePwdMailView(APIView):
     permission_classes = [AllowAny]
@@ -632,91 +631,4 @@ class changePwdMailView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-
-
-
-    
-class AlertSecurityView(APIView):
-    permission_classes = [AllowAny]
-
-    @extend_schema(
-        request=ClientAuthMailSerializer,
-        responses={
-            201: ClientAuthMailSerializer,
-            400: ClientAuthMailSerializer,
-            401: OpenApiTypes.OBJECT,
-            500: OpenApiTypes.OBJECT,
-        },
-        examples=[
-                OpenApiExample(
-                    'Exemple de requête valide',
-                value={
-                    'email': 'client@example.com', 
-                    'is_send': False
-                },
-                    request_only=True,
-                ),
-                OpenApiExample(
-                    'Réponse de succès',
-                    value={
-                        'message': 'Mail créée avec succès',
-                        'status': 'success',
-                        'code': 201
-                    },
-                    response_only=True,
-                    status_codes=['201'],
-                ),
-            ],
-            description="",
-            summary="Créer une auth code auth",
-            tags=["Alert Security"],
-        )
-
-    def post(self, request):
-        """
-        Envoie un code d'authentification à 2 facteurs par email
-        """
-        try:  
-            data = request.data
-            # Générer le code de vérification
-              
-
-            path = "notification/alert_security/index.html"
-            path_txt = "notification/2fa_auth/2FA-auth.txt"
-            
-            context = {  
-                "user_name": '',
-                "code_auth": "verification_code",
-                "company": "klivar",
-                "name" : "",
-                "back_url" :  "https://dev-backend.app.klivar.com/"
-            } 
-            html_content = render_to_string(path, context)
-            text_content = render_to_string(path_txt, context)  
-            send_mail_created(
-                [data.get('email', None)], 
-                object, 
-                text_content, 
-                html_content,
-                "klivar"
-            )
-            # Inclure le token JWT dans la réponse si récupéré
-            response_data = {
-                "message": "your request was do successfully",
-                "status": "success", 
-                "code": status.HTTP_200_OK,
-            } 
-            return Response(response_data, status.HTTP_200_OK)
-                
-        except Exception as e:
-            return Response(
-                {
-                    "message": "Erreur lors de l'envoi du code d'authentification",
-                    "status": "error",
-                    "error": str(e),
-                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
-      
+ 

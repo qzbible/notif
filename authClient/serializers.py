@@ -115,13 +115,13 @@ class frogetPwdSerializer(serializers.Serializer):
         required=False,
         allow_blank=True,
         max_length=255,
-        help_text="Nom du client"
+        help_text="url du client"
     )
     lang = serializers.CharField(
         required=False,
         allow_blank=True,
         max_length=255,
-        help_text="Nom du client"
+        help_text="lang"
     )
     token = serializers.CharField(
         required=False,
@@ -130,3 +130,5 @@ class frogetPwdSerializer(serializers.Serializer):
         help_text="Adresse email du client"
     )
    
+ 
+     

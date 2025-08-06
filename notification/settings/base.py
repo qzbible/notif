@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     # 'drf_yasg',
     'authClient',
+    'alert_security',
     'mailing', 
     'exigence',
     'updateMaster',

@@ -13,7 +13,7 @@ from django.conf import settings
 
 from service.utils import send_mail_created
 
-def mail_service(  name, dest_email, company, url, back_url=None, lang=None ):
+def mail_welcome_service(  name, dest_email, company, url, back_url=None, lang=None ):
     # object and description
     if lang == "fr-FR" :
         path = "notification/welcome/index-fr.html" 
@@ -84,4 +84,7 @@ def mail_forgrt_service(  name, dest_email, company, url, back_url=None, lang=No
     x.start() 
     
     return True
+
+ 
+
 
