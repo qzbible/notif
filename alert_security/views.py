@@ -274,10 +274,10 @@ class ValidateAuthCodeView(APIView):
         Valide un code d'authentification à 2 facteurs
         """
         try:  
-            # auth_header = request.headers.get('Authorization')
-            # token = None
-            # if auth_header and auth_header.startswith('Bearer '):
-            #     token = auth_header[7:]  
+            auth_header = request.headers.get('Authorization')
+            token = None
+            if auth_header and auth_header.startswith('Bearer '):
+                token = auth_header[7:]  
             # data = request.data
             # try:
             #     auth_code_instance = authCode.objects.get(token=token, code=data['code'])
@@ -313,7 +313,7 @@ class ValidateAuthCodeView(APIView):
             #     },
             #     status=response.status_code
             # )   
-            response = validate_device_on_main_back(2, "instance.token")
+            response = validate_device_on_main_back(2, token)
             return Response(status=response.status_code)
         except Exception as e:
             return Response(
