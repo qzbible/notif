@@ -34,7 +34,16 @@ from django.utils import timezone
 from service.utils import send_mail_created
 from celery import current_app
 from dateutil.parser import parse as dateutil_parse
+import pytz
 
+def get_current_date_iso():
+    now_utc = datetime.now(pytz.UTC)
+    return now_utc.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+
+def add_days(date_str, days=30):
+    dt = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+    new_dt = dt + timedelta(days=days)
+    return new_dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
 def parse_date_to_730(date_str):
     """
@@ -128,127 +137,126 @@ class ExigenceResponsableView(APIView):
         tags=["Exigences"],
     )
     def post(self, request):
-        serializer = ExigenceSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(
-                {
-                    "message": "Erreur de validation des données",
-                    "errors": serializer.errors
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        # Récupération des données validées
-        validated_data = serializer.validated_data  
-        # 2025-04-03T22:23:52.900Z
+        # serializer = ExigenceSerializer(data=request.data)
+        data = request.data
+        # if not serializer.is_valid():
+        #     return Response(
+        #         {
+        #             "message": "Erreur de validation des données",
+        #             "errors": serializer.errors
+        #         },
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
+        # # Récupération des données validées
+        # validated_data = serializer.validated_data  
+        # 2025-04-03T22:23:52.900Z 
+         
         try:
 
-            if validated_data.get("type_task") == "EXIGENCE":
+            if data.get("type_task") == "EXIGENCE":
             # Envoi de l'email
-                if validated_data.get("lang") != "fr-FR":
+                if data.get("lang") != "fr-FR":
                     type_task="Requirement"
                 else :
                     type_task="Exigence"
-            elif validated_data.get("type_task") == "ACTION":
+            elif data.get("type_task") == "ACTION":
                 type_task = "Action corrective"
-                if validated_data.get("lang") != "fr-FR":
+                if data.get("lang") != "fr-FR":
                     type_task="Corrective action"
 
             
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
-                object=validated_data.get("object"),
-                description=validated_data.get("description"),
-                company=validated_data.get("company"),
-                dest_email=validated_data.get("dest_email"),
-                sender_name=validated_data.get("sender_name"),
-                dest_name=validated_data.get("dest_name"),
-                url=validated_data.get("url"),
-                method=validated_data.get("method"),
-                base_url=validated_data.get("base_url"),
-                jwt_token=validated_data.get("jwt_token"),
-                id_action = validated_data.get("id_action"),
-                id_analysis = validated_data.get("id_analysis"),
-                id_reporting = validated_data.get("id_reporting"),
-                id_indicateur = validated_data.get("id_indicateur"),
-                dealine = validated_data.get("dealine"),
-                start_date = validated_data.get("start_date"),
-                time = validated_data.get("time"),
-                type_task = validated_data.get("type_task"),
-                lang = validated_data.get("lang", "fr-FR"),
+                object=data.get("object"),
+                description=data.get("description"),
+                company=data.get("company"),
+                dest_email=data.get("dest_email"),
+                sender_name=data.get("sender_name"),
+                dest_name=data.get("dest_name"),
+                url=data.get("url"),
+                method=data.get("method", 'sondage'),
+                base_url=data.get("base_url"),
+                jwt_token=data.get("jwt_token"),
+                id_action = data.get("id_action"),
+                id_analysis = data.get("id_analysis"),
+                id_reporting = data.get("id_reporting"),
+                id_indicateur = data.get("id_indicateur"),
+                dealine = data.get("dealine", add_days(get_current_date_iso())),
+                start_date = data.get("start_date", get_current_date_iso()),
+                time = data.get("time"),
+                type_task = data.get("type_task"),
+                lang = data.get("lang", "fr-FR"),
             )
             
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
-            if "scope" in validated_data and validated_data.get("scope"):
-                exigence.scope = validated_data.get("scope")
+            if "scope" in data and data.get("scope"):
+                exigence.scope = data.get("scope")
                 exigence.save()
              
-            if validated_data.get("type_task") == "EXIGENCE":
-                print('Exigence data start', parse_date_to_730(validated_data.get("start_date")))
-                target_time = timezone.now() + timedelta(minutes=2)
-                print('Exigence data start 2',  target_time)
-                print('Exigence data start 3',  timezone.now() )
-
-                eta_datetime = parse_date_to_730(validated_data.get("start_date"))
+            if data.get("type_task") == "EXIGENCE":
+                # print('Exigence data start', parse_date_to_730(data.get("start_date")))
+                # target_time = timezone.now() + timedelta(minutes=2) 
+                eta_datetime = parse_date_to_730(data.get("start_date", get_current_date_iso()))
                 if eta_datetime is None:
                     task = exigence_responsable.apply_async(
                         args=[
-                            validated_data.get("object"),
+                            data.get("object"),
                             type_task,
-                            validated_data.get("description"),
-                            validated_data.get("dest_email"),
-                            validated_data.get("sender_name"),
-                            validated_data.get("dest_name"),
-                            validated_data.get("company"), 
-                            validated_data.get("url"),
-                            validated_data.get("scope", []),
-                            validated_data.get("time"),
-                            validated_data.get("dealine"),
-                            validated_data.get("start_date"),
+                            data.get("description"),
+                            data.get("dest_email"),
+                            data.get("sender_name"),
+                            data.get("dest_name"),
+                            data.get("company"), 
+                            data.get("url"),
+                            data.get("scope", []),
+                            data.get("time"),
+                            data.get("dealine", add_days(get_current_date_iso())),
+                            data.get("start_date", get_current_date_iso()),
                             None,
-                            validated_data.get("lang")
+                            data.get("lang")
                         ],
                         # eta=parse_date_to_730(validated_data.get("start_date"))
                     )
                 else:
                     task = exigence_responsable.apply_async(
                         args=[
-                            validated_data.get("object"),
+                            data.get("object"),
                             type_task,
-                            validated_data.get("description"),
-                            validated_data.get("dest_email"),
-                            validated_data.get("sender_name"),
-                            validated_data.get("dest_name"),
-                            validated_data.get("company"), 
-                            validated_data.get("url"),
-                            validated_data.get("scope", []),
-                            validated_data.get("time"),
-                            validated_data.get("dealine"),
-                            validated_data.get("start_date"),
+                            data.get("description"),
+                            data.get("dest_email"),
+                            data.get("sender_name"),
+                            data.get("dest_name"),
+                            data.get("company"), 
+                            data.get("url"),
+                            data.get("scope", []),
+                            data.get("time"),
+                            data.get("dealine", add_days(get_current_date_iso())),
+                            data.get("start_date", get_current_date_iso()),
                             None,
-                            validated_data.get("lang")
+                            data.get("lang")
                         ],
-                        eta=parse_date_to_730(validated_data.get("start_date"))
+                        eta=parse_date_to_730(data.get("start_date", get_current_date_iso()))
                     )
                 # Sauvegarder l'ID de la tâche
                 exigence.task_id = task.id
                 exigence.save()
-            elif validated_data.get("type_task") == "ACTION":
+            elif data.get("type_task") == "ACTION":
                 type_task = "Action corrective"
-                if validated_data.get("lang") != "fr-FR":
+                if data.get("lang") != "fr-FR":
                     type_task="Corrective action"
                 mail = task_responsable(
-                    object= validated_data.get("object"),
+                    object= data.get("object"),
                     type_task = type_task,
-                    description= validated_data.get("description"),
-                    dest_email=validated_data.get("dest_email"),
-                    sender_name=validated_data.get("sender_name"),
-                    dest_name= validated_data.get("dest_name"),
-                    company= validated_data.get("company"), 
-                    url= validated_data.get("url"),
-                    during= validated_data.get("time"), 
-                    start_date= validated_data.get("start_date"),
-                    scope= validated_data.get("scope", []),
-                    lang=validated_data.get("lang")
+                    description= data.get("description"),
+                    dest_email=data.get("dest_email"),
+                    sender_name=data.get("sender_name"),
+                    dest_name= data.get("dest_name"),
+                    company= data.get("company"), 
+                    url= data.get("url"),
+                    during= data.get("time"), 
+                    start_date= data.get("start_date", get_current_date_iso()),
+                    scope= data.get("scope", []),
+                    lang=data.get("lang")
                 )
             # Envoi de l'email 
             return Response(

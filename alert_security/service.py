@@ -18,7 +18,7 @@ def mail_new_devise_service(  name, dest_email, company,  os_name, device_type, 
     if lang == "fr-FR" :
         path = "notification/alert_security/index-fr.html" 
         path_txt = "notification/alert_security/index-fr.txt" 
-        object = "🔒 [Alert sécurité] Nouvelle connexion détectée sur votre compte Klivar"
+        object = "🔒 [Alerte sécurité] Nouvelle connexion détectée sur votre compte Klivar"
     elif lang == "en-US":
         path = "notification/alert_security/index-en.html" 
         path_txt = "notification/alert_security/index-en.txt" 
@@ -26,7 +26,7 @@ def mail_new_devise_service(  name, dest_email, company,  os_name, device_type, 
     else:
         path = "notification/alert_security/index-fr.html"
         path_txt = "notification/alert_security/index-fr.txt"  
-        object = "🔒 [Alert sécurité] Nouvelle connexion détectée sur votre compte Klivar"
+        object = "🔒 [Alerte sécurité] Nouvelle connexion détectée sur votre compte Klivar"
     
    
     context = {

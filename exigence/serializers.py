@@ -43,7 +43,7 @@ class ExigenceSerializer(serializers.Serializer):
         help_text="Methode  de l'exigence"
     )
     base_url = serializers.URLField(
-        required=True,
+        required=False,
         help_text="Url pour les image de référence de l'exigence"
     )
     jwt_token = serializers.CharField(

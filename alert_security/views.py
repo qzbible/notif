@@ -227,7 +227,7 @@ class sendAuthCodeView(APIView):
                     "user_name": "",
                     "code_auth": verification_code,
                     "company": custom_ins.company,
-                    "name" : custom_ins.device_name,
+                    "name" : '',
                     "back_url" :  "https://dev-backend.app.klivar.com/"
                 } 
                 
