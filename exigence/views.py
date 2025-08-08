@@ -194,10 +194,10 @@ class ExigenceResponsableView(APIView):
                 exigence.save()
              
             if validated_data.get("type_task") == "EXIGENCE":
-                print("str(get_current_date_iso())", str(get_current_date_iso()))
-                print("str(get_current_date_iso()) valid", validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso())
-                print('Exigence data start', parse_date_to_730(validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso()))
-                target_time = timezone.now() + timedelta(minutes=2)
+                # print("str(get_current_date_iso())", str(get_current_date_iso()))
+                # print("str(get_current_date_iso()) valid", validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso())
+                # print('Exigence data start', parse_date_to_730(validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso()))
+                # target_time = timezone.now() + timedelta(minutes=2)
                 
 
                 eta_datetime = parse_date_to_730(validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso())
