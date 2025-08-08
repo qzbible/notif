@@ -36,18 +36,22 @@ class ExigenceSerializer(serializers.Serializer):
     )
     url = serializers.URLField(
         required=True,
+        allow_null=True, 
         help_text="URL pour le lien front end de l'exigence"
     )
     method = serializers.CharField(
         required=False,
+        allow_null=True, 
         help_text="Methode  de l'exigence"
     )
     base_url = serializers.URLField(
         required=False,
+        allow_null=True, 
         help_text="Url pour les image de référence de l'exigence"
     )
     jwt_token = serializers.CharField(
         required=True,
+        allow_null=True, 
         help_text="Token user config exigence"
     )
     scope = serializers.ListField(
@@ -57,22 +61,27 @@ class ExigenceSerializer(serializers.Serializer):
     )
     id_action =  serializers.CharField(
         required=False,
+        allow_null=True, 
         help_text="Id de l'action"
     )
     id_analysis =  serializers.CharField(
         required=False,
+        allow_null=True, 
         help_text="Id de l'analysis"
     )
     id_reporting =  serializers.CharField(
         required=False,
+        allow_null=True, 
         help_text="Id de l'reporting"
     )
     id_indicateur =  serializers.CharField(
         required=False,
+        allow_null=True, 
         help_text="Id de l'indicateur"
     )
     dealine = serializers.CharField(
         required=False,
+        allow_null=True, 
         help_text="Deadline de l'exigence"
     )
     time = serializers.CharField(
@@ -81,6 +90,7 @@ class ExigenceSerializer(serializers.Serializer):
     )
     start_date = serializers.CharField(
         required=False,
+        allow_null=True, 
         help_text="time de l'exigence"
     )
 
