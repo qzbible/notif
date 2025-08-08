@@ -42,6 +42,7 @@ class ExigenceSerializer(serializers.Serializer):
     method = serializers.CharField(
         required=False,
         allow_null=True, 
+        allow_blank=True,
         help_text="Methode  de l'exigence"
     )
     base_url = serializers.URLField(
