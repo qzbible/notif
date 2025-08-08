@@ -192,7 +192,7 @@ class sendAuthCodeView(APIView):
                     "user_name": '',
                     "code_auth": auth_code_instance.code,
                     "company": custom_ins.company,
-                    "name" : custom_ins.name,
+                    "name" : custom_ins.device_name,
                     "back_url" :  "https://dev-backend.app.klivar.com/"
                 } 
                 html_content = render_to_string(path, context)
@@ -227,7 +227,7 @@ class sendAuthCodeView(APIView):
                     "user_name": "",
                     "code_auth": verification_code,
                     "company": custom_ins.company,
-                    "name" : custom_ins.name,
+                    "name" : custom_ins.device_name,
                     "back_url" :  "https://dev-backend.app.klivar.com/"
                 } 
                 
@@ -271,13 +271,13 @@ class ValidateAuthCodeView(APIView):
     )
     def post(self, request):
         """
-        Valide un code d'authentification à 2 facteurs
+         Valide un code d'authentification à 2 facteurs
         """
         try:  
             auth_header = request.headers.get('Authorization')
             token = None
             if auth_header and auth_header.startswith('Bearer '):
-                token = auth_header[7:]  
+                token = auth_header[7:]
             data = request.data
             try:
                 auth_code_instance = authCode.objects.get(token=token, code=data['code'])
