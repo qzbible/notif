@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>alert to the Klivar</title>
+    <style>
+      /* Reset */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f8f8fc;
+        width: 100% !important;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+
+      table {
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+
+      img {
+        border: 0;
+        height: auto;
+        line-height: 100%;
+        outline: none;
+        text-decoration: none;
+        -ms-interpolation-mode: bicubic;
+        max-width: 100%;
+      }
+
+      .hero-bg {
+        background: linear-gradient(135deg, #7a1cac, #4f0a84);
+      }
+
+      .cta-button {
+        background: linear-gradient(135deg, #7a1cac, #4f0a84);
+        color: white !important;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+        margin: 8px 4px;
+      }
+
+      .icon-placeholder {
+        width: 15px;
+        height: 15px;
+        background-color: #7a1cac;
+        border-radius: 2px;
+        display: inline-block;
+      }
+
+      a[x-apple-data-detectors] {
+        color: inherit !important;
+        text-decoration: inherit !important;
+      }
+
+      #MessageViewBody a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      p {
+        line-height: inherit;
+      }
+
+      .desktop_hide,
+      .desktop_hide table {
+        mso-hide: all;
+        display: none;
+        max-height: 0px;
+        overflow: hidden;
+      }
+
+      .image_block img + div {
+        display: none;
+      }
+
+      sup,
+      sub {
+        font-size: 75%;
+        line-height: 0;
+      }
+
+      .protected-image {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-user-drag: none;
+        -webkit-touch-callout: none;
+        -webkit-context-menu: none;
+        pointer-events: none;
+        position: relative;
+      }
+
+      .image-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        z-index: 10;
+      }
+      
+      /* Nouvelles classes pour le tableau des détails */
+      .details-table {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        width: 100%;
+        background-color: white;
+        overflow: hidden;
+      }
+      
+      .details-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 15px 20px;
+      }
+      
+      .details-header-text {
+        color: #4c0c84;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      .details-content {
+        padding: 20px;
+      }
+      
+      .details-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 8px 0;
+      }
+      
+      .details-description {
+        font-size: 12px;
+        color: #666;
+        margin: 0 0 15px 0;
+        line-height: 1.5;
+      }
+      
+      .date-row {
+        border-top: 1px solid #f0f0f0;
+        padding-top: 15px;
+      }
+      
+      .date-table {
+        width: 100%;
+      }
+      
+      .date-cell {
+        padding: 8px 0;
+        font-size: 12px;
+        color: #555;
+        vertical-align: top;
+      }
+      
+      .date-label {
+        font-weight: 600;
+        width: 80px;
+      }
+      
+      .date-value {
+        color: #333;
+      }
+
+      /* Responsive Styles */
+      @media screen and (max-width: 700px) {
+        .main-table {
+          width: 100% !important;
+          min-width: 320px !important;
+        }
+
+        .mobile_hide {
+          display: none !important;
+          min-height: 0 !important;
+          max-height: 0 !important;
+          max-width: 0 !important;
+          overflow: hidden !important;
+          font-size: 0px !important;
+        }
+
+        .desktop_hide,
+        .desktop_hide table {
+          display: table !important;
+          max-height: none !important;
+        }
+
+        .hero-bg {
+          padding: 30px 20px !important;
+        }
+
+        .hero-title {
+          font-size: 32px !important;
+          text-align: center !important;
+        }
+
+        .content-padding {
+          padding: 30px 20px !important;
+        }
+
+        .logo-container {
+          width: 120px !important;
+          height: 48px !important;
+        }
+
+        .logo-text {
+          font-size: 16px !important;
+        }
+
+        .feature-table {
+          width: 100% !important;
+        }
+
+        .feature-icon {
+          width: 20px !important;
+          padding-right: 12px !important;
+        }
+
+        .feature-text {
+          width: calc(100% - 32px) !important;
+        }
+
+        .checklist-table {
+          width: 100% !important;
+        }
+
+        .check-icon {
+          width: 20px !important;
+          padding-right: 10px !important;
+        }
+
+        .check-text {
+          width: calc(100% - 30px) !important;
+        }
+
+        body {
+          padding: 10px !important;
+        }
+
+        .main-container {
+          margin: 0 !important;
+          border-radius: 4px !important;
+        }
+
+        .footer-padding {
+          padding: 15px 10px !important;
+        }
+        
+        .details-content {
+          padding: 15px !important;
+        }
+        
+        .details-header {
+          padding: 12px 15px !important;
+        }
+      }
+
+      @media screen and (max-width: 480px) {
+        .hero-bg {
+          padding: 25px 15px !important;
+        }
+
+        .hero-title {
+          font-size: 28px !important;
+        }
+
+        .content-padding {
+          padding: 25px 15px !important;
+        }
+
+        .alert-text {
+          font-size: 16px !important;
+          text-align: center;
+        }
+
+        .body-text {
+          font-size: 11px !important;
+          line-height: 1.6 !important;
+        }
+
+        .feature-text-content {
+          font-size: 11px !important;
+          line-height: 1.6 !important;
+        }
+
+        .logo-container {
+          width: 100px !important;
+          height: 40px !important;
+        }
+
+        .logo-text {
+          font-size: 14px !important;
+        }
+        
+        .details-header-text {
+          font-size: 14px !important;
+        }
+        
+        .details-title {
+          font-size: 13px !important;
+        }
+        
+        .details-description {
+          font-size: 11px !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body style="background-color: #f8f8fc; margin: 0; padding: 20px">
+    <!-- Container principal -->
+    <table
+      class="main-table main-container"
+      width="640"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      align="center"
+      style="background-color: #f8f8fc; max-width: 640px"
+    >
+      <!-- Header avec logo -->
+      <tr>
+        <td align="center" style="padding: 20px 0">
+          <table
+            class="logo-container"
+            width="144"
+            height="56"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="border-radius: 4px"
+          >
+            <tr>
+              <td
+                align="center"
+                valign="middle"
+                class="logo-text"
+                style="color: white; font-weight: bold; font-size: 18px"
+              >
+                <img
+                  src="{{back_url}}media/icons_mail/cropped-Logo-Klivar-1.png"
+                  class="protected-image"
+                  oncontextmenu="return false;"
+                  ondragstart="return false;"
+                  onselectstart="return false;"
+                  alt="Klivar Logo"
+                />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Contenu principal -->
+      <tr>
+        <td
+          class="content-padding"
+          style="
+            background-color: white;
+            border-radius: 8px;
+            padding: 40px;
+          "
+        >
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <!-- Titre -->
+            <tr>
+                <td
+                  align="center"
+                  valign="middle"
+                  class="logo-text"
+                  style="color: white;"
+                >
+                  <img
+                    src="{{back_url}}media/icons_mail/projet-lance.png"
+                    class="protected-image"
+                    oncontextmenu="return false;"
+                    ondragstart="return false;"
+                    onselectstart="return false;"
+                    alt="projet-lance"
+                  />
+                </td>
+              </tr>
+            <tr>
+              <td style="padding-bottom: 10px">
+                <h1
+                  class="alert-text"
+                  style="
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #000;
+                    margin: 0;
+                    line-height: 1.8;
+                    text-align: center;
+                  "
+                >
+                Audit Project Launched
+                </h1>
+              </td>
+            </tr>
+            
+            <!-- Message d'accueil -->
+            <tr>
+              <td style="padding-bottom: 10px">
+                <p
+                  class="body-text"
+                  style="
+                    font-size: 12px;
+                    color: #353739;
+                    margin: 0;
+                    line-height: 1.5;
+                    letter-spacing: 0.2px;
+                  "
+                >
+                Dear <strong>{{name}}</strong>,<br /><br />
+                Your audit campaign for {{start_date}} at {{end_date}} has been launched.Go to the Deploy module to manage tasks and collect evidence.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Tableau des détails corrigé -->
+            <tr>
+              <td style="padding-bottom: 10px">
+                <table 
+                  class="details-table" 
+                  width="100%" 
+                  cellpadding="0" 
+                  cellspacing="0" 
+                  border="0"
+                >
+                  <!-- En-tête -->
+                  <tr>
+                    <td class="details-header">
+                      <h3 class="details-header-text">
+                        Audit project details:
+                      </h3>
+                    </td>
+                  </tr>
+                  
+                  <!-- Contenu -->
+                  <tr>
+                    <td class="details-content">
+                      <!-- Titre du projet -->
+                      <p class="details-title">{{title}}</p>
+                      
+                      <!-- Description -->
+                      <div class="details-description">
+                        {{description|safe}}
+                      </div>
+                      
+                      
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <!-- Bouton d'action (optionnel) -->
+            <tr>
+              <td align="center" style="padding-bottom: 10px">
+                <a href="{{url}}" class="cta-button">
+                  Access the Deploy module
+                </a>
+              </td>
+            </tr>
+
+            <!-- Signature -->
+            <tr>
+              <td style="padding-top: 10px">
+                <p
+                  class="body-text"
+                  style="
+                    font-size: 12px;
+                    color: #353739;
+                    margin: 0;
+                    line-height: 1.8;
+                    letter-spacing: 0.2px;
+                  "
+                >
+                  <strong> Your {{company}} team  </strong>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td align="center" class="footer-padding" style="padding: 20px">
+          <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td align="center" style="padding-bottom: 4px">
+                <p style="font-size: 12px; color: #9d9d9d; margin: 0">
+                  https://www.klivar.fr/
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center">
+                <p style="font-size: 14px; color: #9d9d9d; margin: 0">
+                  📩 avotreecoute@klivar.com
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

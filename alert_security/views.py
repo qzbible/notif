@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from alert_security.models import DeviseAuthMail, authCode
 from alert_security.serializers import AlertSecurityMailSerializer
-from alert_security.service import mail_new_devise_service
+from alert_security.service import mail_new_devise_service, mail_new_network_service
 from external_service.call_api import validate_device_on_main_back
 from rest_framework.permissions import AllowAny
 from drf_spectacular.types import OpenApiTypes
@@ -192,7 +192,7 @@ class sendAuthCodeView(APIView):
                     "user_name": '',
                     "code_auth": auth_code_instance.code,
                     "company": custom_ins.company,
-                    "name" : custom_ins.device_name,
+                    "name" : '',
                     "back_url" :  "https://dev-backend.app.klivar.com/"
                 } 
                 html_content = render_to_string(path, context)
@@ -322,12 +322,86 @@ class ValidateAuthCodeView(APIView):
 
 
 
-@api_view(["PUT"])
-@permission_classes([AllowAny])
-def validate_device(self, pk=None):
-    try:
-        response = validate_device_on_main_back(pk, "instance.token")
-        return Response(status=response.status_code)
-    except Exception as e:
-        return Response( {"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+# Vue API
+class NotificationNetworkView(APIView):
+    permission_classes = [AllowAny]
 
+    @extend_schema(
+        request=AlertSecurityMailSerializer,
+        responses={
+            201: AlertSecurityMailSerializer,
+            400: AlertSecurityMailSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+                OpenApiExample(
+                    'Exemple de requête valide',
+                value={
+                    'name': 'samuel',
+                    'email': 'client@example.com',
+                    'device_name': 'Jean Dupont',
+                    'os_name': 'Ziyouma',
+                    'devise_type': 'Ziyouma',
+                    'browser_name': 'Ziyouma',
+                    'ip_address': '',
+                    'connection_time': '', 
+                    'base_url': 'https://api.example.com',
+                    'lang' :"Fr-fr" 
+                },
+                    request_only=True,
+                ),
+                OpenApiExample(
+                    'Réponse de succès',
+                    value={
+                        'message': 'Mail créée avec succès',
+                        'status': 'success',
+                        'code': 201
+                    },
+                    response_only=True,
+                    status_codes=['201'],
+                ),
+            ],
+            description="",
+            summary="Créer une auth code auth",
+            tags=["Alert sécurity"],
+        )
+    
+    
+    def post(self, request):
+        """
+            Envoie un code d'authentification à 2 facteurs par email
+        """
+        try:   
+            data = request.data 
+            mail_new_network_service( 
+                name = data.get('name', ''),
+                dest_email = data.get('email', None),
+                company = data.get('company', 'klivar'), 
+                os_name= data.get('os_name', None),
+                device_name = data.get('device_name', None),
+                browser_name = data.get('browser_name', None),
+                ip_address = data.get('ip_address', None), 
+                connection_time = data.get('connection_time', None), 
+                back_url=data.get('base_url', None),
+                lang=data.get('lang', None)
+            )
+            # Inclure le token JWT dans la réponse si récupéré
+            response_data = {
+                "message": "your request was do successfully",
+                "status": "success", 
+                "code": status.HTTP_200_OK,
+            } 
+            return Response(response_data, status.HTTP_200_OK)
+                
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Erreur lors de l'envoi du code d'authentification",
+                    "status": "error",
+                    "error": str(e),
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        

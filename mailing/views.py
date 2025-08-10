@@ -1,122 +1,105 @@
-from mailing.serializers import ExigenceSerializer
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-from django.shortcuts import get_object_or_404
-
-from rest_framework.viewsets import ViewSet
+from django.shortcuts import render
+ 
+from mailing.serializers import StartProjectMailSerializer  
+from mailing.service import mail_notification_end_projet_service, mail_notification_start_projet_service
+from rest_framework.permissions import AllowAny
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from rest_framework.response import Response
 from rest_framework import status
- 
-from rest_framework.permissions import IsAuthenticated
-from collections import OrderedDict
- 
-import json
- 
+from django.template.loader import render_to_string
+from django.utils import timezone
+import random
+from datetime import datetime, timedelta
 from rest_framework.views import APIView
-import uuid
-from datetime import datetime
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
-from .utils import *
-import shutil
- 
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from service.utils import send_mail_created
+# Create your views here.
+
+
+
 
 # Vue API
-class ExigenceResponsableView(APIView):
-    permission_classes = [IsAuthenticated]
 
-    # Schémas pour la documentation Swagger
-    success_schema = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Votre requête a été traitée avec succès")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        ))
-    )
+# Vue API
+class NotificationStartProjetView(APIView):
+    permission_classes = [AllowAny]
 
-    request_body_schema = openapi.Schema(
-        description="Description du corps de la requête",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Demande de permission")),
-            ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="John Doe")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
-                items=openapi.Items(type=openapi.TYPE_STRING),
-             example=["email1@example.com", "email2@example.com"])), 
-            ("company", openapi.Schema(type=openapi.TYPE_STRING, 
-            example="Ziyouma")),
-            ("url", openapi.Schema(type=openapi.TYPE_STRING, 
-            example="https://example.com")),
-        ))
-    )
-
-    bad_token_schema = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Token invalide ou expiré")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        ))
-    )
-
-    @swagger_auto_schema(
-        operation_description="Cette API crée une tâche Celery pour l'envoi d'emails",
-        request_body=request_body_schema,
-        responses={ 
-            status.HTTP_201_CREATED: success_schema,
-            status.HTTP_401_UNAUTHORIZED: bad_token_schema,
-            status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-            status.HTTP_404_NOT_FOUND: 'Ressource non trouvée',
-        }
-    )
+    @extend_schema(
+        request=StartProjectMailSerializer,
+        responses={
+            201: StartProjectMailSerializer,
+            400: StartProjectMailSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+                OpenApiExample(
+                    'Exemple de requête valide',
+                value={
+                    'name': 'samuel',
+                    'email': 'client@example.com',
+                    'title': 'Ziyouma',
+                    'end_date': 'Jean Dupont',
+                    'start_date':  'Ziyouma',
+                    'company': 'Ziyouma',
+                    'description': 'Ziyouma',
+                    'url': '', 
+                    'base_url': 'https://api.example.com',
+                    'lang' :"Fr-fr" 
+                },
+                    request_only=True,
+                ),
+                OpenApiExample(
+                    'Réponse de succès',
+                    value={
+                        'message': 'Mail créée avec succès',
+                        'status': 'success',
+                        'code': 201
+                    },
+                    response_only=True,
+                    status_codes=['201'],
+                ),
+            ],
+            description="",
+            summary="Créer une auth code auth",
+            tags=["Projet audit"],
+        )
+    
+    
     def post(self, request):
-        serializer = ExigenceSerializer(data=request.data)
-        
-        if not serializer.is_valid():
-            return Response(
-                {
-                    "message": "Erreur de validation des données",
-                    "errors": serializer.errors
-                },
-                status=status.HTTP_400_BAD_REQUEST
+        """
+            Envoie un code d'authentification à 2 facteurs par email
+        """
+        try:   
+            data = request.data 
+            mail_notification_start_projet_service( 
+                name = data.get('name', ''),
+                dest_email = data.get('email', None),
+                company = data.get('company', 'klivar'), 
+                title= data.get('title', None),
+                end_date = data.get('end_date', None),
+                start_date= data.get('start_date', None),
+                description = data.get('description', None),
+                url = data.get('url', None),  
+                lang=data.get('lang', None)
             )
-        
-        # Récupération des données validées
-        object_text = serializer.validated_data.get("object")
-        user_name = serializer.validated_data.get("user_name")
-        destinator = serializer.validated_data.get("destinator")
-        company = serializer.validated_data.get("company")
-        url = serializer.validated_data.get("url")
-        
-        # Création de la tâche Celery
-        try:
-            # task = send_email_task.delay(
-            #     object_text=object_text,
-            #     user_name=user_name,
-            #     destinator=destinator,
-            #     company=company,
-            #     url=url
-            # )
-
-            return Response(
-                {
-                    "message": "Tâche d'envoi d'email créée avec succès",
-                    "status": "success",
-                    "code": status.HTTP_201_CREATED,
-                    # "task_id": task.id
-                },
-                status=status.HTTP_201_CREATED
-            )
+            # Inclure le token JWT dans la réponse si récupéré
+            response_data = {
+                "message": "your request was do successfully",
+                "status": "success", 
+                "code": status.HTTP_200_OK,
+            } 
+            return Response(response_data, status.HTTP_200_OK)
+                
         except Exception as e:
             return Response(
                 {
-                    "message": f"Erreur lors de la création de la tâche: {str(e)}",
-                    "status": "error"
+                    "message": "Erreur lors de l'envoi du code d'authentification",
+                    "status": "error",
+                    "error": str(e),
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
@@ -124,202 +107,79 @@ class ExigenceResponsableView(APIView):
 
 
 # Vue API
-class ExigenceApprobatorView(APIView):
-    permission_classes = [IsAuthenticated]
+class NotificationEndProjetView(APIView):
+    permission_classes = [AllowAny]
 
-    # Schémas pour la documentation Swagger
-    success_schema = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Votre requête a été traitée avec succès")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        ))
-    )
-
-    request_body_schema = openapi.Schema(
-        description="Description du corps de la requête",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Demande de permission")),
-            ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="John Doe")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
-                items=openapi.Items(type=openapi.TYPE_STRING),
-             example=["email1@example.com", "email2@example.com"])), 
-            ("company", openapi.Schema(type=openapi.TYPE_STRING, 
-            example="Ziyouma")),
-            ("url", openapi.Schema(type=openapi.TYPE_STRING, 
-            example="https://example.com")),
-        ))
-    )
-
-    bad_token_schema = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Token invalide ou expiré")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        ))
-    )
-
-    @swagger_auto_schema(
-        operation_description="Cette API crée une tâche Celery pour l'envoi d'emails",
-        request_body=request_body_schema,
-        responses={ 
-            status.HTTP_201_CREATED: success_schema,
-            status.HTTP_401_UNAUTHORIZED: bad_token_schema,
-            status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-            status.HTTP_404_NOT_FOUND: 'Ressource non trouvée',
-        }
-    )
+    @extend_schema(
+        request=StartProjectMailSerializer,
+        responses={
+            201: StartProjectMailSerializer,
+            400: StartProjectMailSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+                OpenApiExample(
+                    'Exemple de requête valide',
+                value={
+                    'name': 'samuel',
+                    'email': 'client@example.com',
+                    'title': 'Ziyouma', 
+                    'company': 'Ziyouma',
+                    'description': 'Ziyouma',
+                    'url': '', 
+                    'base_url': 'https://api.example.com',
+                    'lang' :"Fr-fr" 
+                },
+                    request_only=True,
+                ),
+                OpenApiExample(
+                    'Réponse de succès',
+                    value={
+                        'message': 'Mail créée avec succès',
+                        'status': 'success',
+                        'code': 201
+                    },
+                    response_only=True,
+                    status_codes=['201'],
+                ),
+            ],
+            description="",
+            summary="Créer une auth code auth",
+            tags=["Projet audit"],
+        )
+    
+    
     def post(self, request):
-        serializer = ExigenceSerializer(data=request.data)
-        
-        if not serializer.is_valid():
-            return Response(
-                {
-                    "message": "Erreur de validation des données",
-                    "errors": serializer.errors
-                },
-                status=status.HTTP_400_BAD_REQUEST
+        """
+            Envoie un code d'authentification à 2 facteurs par email
+        """
+        try:   
+            data = request.data 
+            mail_notification_end_projet_service( 
+                name = data.get('name', ''),
+                dest_email = data.get('email', None),
+                company = data.get('company', 'klivar'), 
+                title= data.get('title', None), 
+                description = data.get('description', None),
+                url = data.get('url', None),  
+                lang=data.get('lang', None)
             )
-        
-        # Récupération des données validées
-        object_text = serializer.validated_data.get("object")
-        user_name = serializer.validated_data.get("user_name")
-        destinator = serializer.validated_data.get("destinator")
-        company = serializer.validated_data.get("company")
-        url = serializer.validated_data.get("url")
-        
-        # Création de la tâche Celery
-        try:
-            # task = send_email_task.delay(
-            #     object_text=object_text,
-            #     user_name=user_name,
-            #     destinator=destinator,
-            #     company=company,
-            #     url=url
-            # )
-
-            return Response(
-                {
-                    "message": "Tâche d'envoi d'email créée avec succès",
-                    "status": "success",
-                    "code": status.HTTP_201_CREATED,
-                    # "task_id": task.id
-                },
-                status=status.HTTP_201_CREATED
-            )
+            # Inclure le token JWT dans la réponse si récupéré
+            response_data = {
+                "message": "your request was do successfully",
+                "status": "success", 
+                "code": status.HTTP_200_OK,
+            } 
+            return Response(response_data, status.HTTP_200_OK)
+                
         except Exception as e:
             return Response(
                 {
-                    "message": f"Erreur lors de la création de la tâche: {str(e)}",
-                    "status": "error"
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-# Vue API
-class ExigenceInformateurView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    # Schémas pour la documentation Swagger
-    success_schema = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Votre requête a été traitée avec succès")),
-            ("status", openapi.Schema(type=openapi.TYPE_STRING, example="success")),
-            ("code", openapi.Schema(type=openapi.TYPE_INTEGER,
-             example=status.HTTP_201_CREATED)),
-        ))
-    )
-
-    request_body_schema = openapi.Schema(
-        description="Description du corps de la requête",
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("object", openapi.Schema(type=openapi.TYPE_STRING,
-             example="Demande de permission")),
-            ("user_name", openapi.Schema(type=openapi.TYPE_STRING,
-             example="John Doe")),
-            ("destinator", openapi.Schema(type=openapi.TYPE_ARRAY, 
-                items=openapi.Items(type=openapi.TYPE_STRING),
-             example=["email1@example.com", "email2@example.com"])), 
-            ("company", openapi.Schema(type=openapi.TYPE_STRING, 
-            example="Ziyouma")),
-            ("url", openapi.Schema(type=openapi.TYPE_STRING, 
-            example="https://example.com")),
-        ))
-    )
-
-    bad_token_schema = openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties=OrderedDict((
-            ("message", openapi.Schema(
-                type=openapi.TYPE_STRING, example="Token invalide ou expiré")),
-            ("Gateway_code", openapi.Schema(type=openapi.TYPE_INTEGER, example=401)),
-        ))
-    )
-
-    @swagger_auto_schema(
-        operation_description="Cette API crée une tâche Celery pour l'envoi d'emails",
-        request_body=request_body_schema,
-        responses={ 
-            status.HTTP_201_CREATED: success_schema,
-            status.HTTP_401_UNAUTHORIZED: bad_token_schema,
-            status.HTTP_400_BAD_REQUEST: "Erreur de paramètres.",
-            status.HTTP_404_NOT_FOUND: 'Ressource non trouvée',
-        }
-    )
-    def post(self, request):
-        serializer = ExigenceSerializer(data=request.data)
-        
-        if not serializer.is_valid():
-            return Response(
-                {
-                    "message": "Erreur de validation des données",
-                    "errors": serializer.errors
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Récupération des données validées
-        object_text = serializer.validated_data.get("object")
-        user_name = serializer.validated_data.get("user_name")
-        destinator = serializer.validated_data.get("destinator")
-        company = serializer.validated_data.get("company")
-        url = serializer.validated_data.get("url")
-        
-        # Création de la tâche Celery
-        try:
-            # task = send_email_task.delay(
-            #     object_text=object_text,
-            #     user_name=user_name,
-            #     destinator=destinator,
-            #     company=company,
-            #     url=url
-            # )
-
-            return Response(
-                {
-                    "message": "Tâche d'envoi d'email créée avec succès",
-                    "status": "success",
-                    "code": status.HTTP_201_CREATED,
-                    # "task_id": task.id
-                },
-                status=status.HTTP_201_CREATED
-            )
-        except Exception as e:
-            return Response(
-                {
-                    "message": f"Erreur lors de la création de la tâche: {str(e)}",
-                    "status": "error"
+                    "message": "Erreur lors de l'envoi du code d'authentification",
+                    "status": "error",
+                    "error": str(e),
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

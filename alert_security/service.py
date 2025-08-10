@@ -53,3 +53,46 @@ def mail_new_devise_service(  name, dest_email, company,  os_name, device_type, 
     return True
 
 
+
+def mail_new_network_service(  name, dest_email, company,  os_name, device_name, browser_name, ip_address, connection_time, back_url=None, lang=None ):
+    # object and description
+    if lang == "fr-FR" :
+        path = "notification/alert_security/notif-network-fr.html" 
+        path_txt = "notification/alert_security/index-fr.txt" 
+        object = "Notification de sécurité – Nouvelle localisation/réseau détecté"
+    elif lang == "en-US":
+        path = "notification/alert_security/notif-network-en.html" 
+        path_txt = "notification/alert_security/index-en.txt" 
+        object = "Security Notification – New Location/Network Detected"
+    else:
+        path = "notification/alert_security/notif-network-fr.html"
+        path_txt = "notification/alert_security/index-fr.txt"  
+        object = "Notification de sécurité – Nouvelle localisation/réseau détecté"
+    
+   
+    context = {
+        "name":name,  
+        "device_name":device_name,  
+        "os_name": os_name, 
+        "browser_name":browser_name,
+        "ip_address":ip_address,
+        "connection_time":connection_time,
+       
+        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+    }
+ 
+    body_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+    x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+    x.start() 
+    
+    return True
+
+
+
