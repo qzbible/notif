@@ -1027,4 +1027,83 @@ def send_mail_with_files(to_emails, title, files, html_content, company, text_co
 
 
 
+
+from datetime import datetime
+
+# ===== MÉTHODE SIMPLE (recommandée) =====
+def get_formatted_date(language='fr'):
+    now = datetime.now()
+    
+    if 'fr' in language:
+        # Français : "lundi 11 août 2025 à 14:30"
+        days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']
+        months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+        
+        day_name = days[now.weekday()]
+        month_name = months[now.month - 1]
+        return f"{day_name} {now.day} {month_name} {now.year} à {now.hour:02d}:{now.minute:02d}"
+    
+    else:
+        # Anglais : "Monday, August 11, 2025 at 2:30 PM"
+        days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        months = ['January', 'February', 'March', 'April', 'May', 'June',
+                 'July', 'August', 'September', 'October', 'November', 'December']
+        
+        day_name = days[now.weekday()]
+        month_name = months[now.month - 1]
+        hour_12 = now.hour if now.hour <= 12 else now.hour - 12
+        hour_12 = 12 if hour_12 == 0 else hour_12
+        am_pm = 'AM' if now.hour < 12 else 'PM'
+        return f"{day_name}, {month_name} {now.day}, {now.year} at {hour_12}:{now.minute:02d} {am_pm}"
+    
+
+
+
+def format_date_string_short(date_string, language='fr'):
+    """
+    Version courte sans le jour de la semaine
+    
+    Returns:
+        str: Date formatée courte
+            - FR: "11 août 2025"
+            - EN: "August 11, 2025"
+    """
+    
+    try:
+        if 'fr' in language.lower():
+            # Format français DD-MM-YYYY
+            if '-' in date_string:
+                dt = datetime.strptime(date_string, '%d-%m-%Y')
+            elif '/' in date_string:
+                dt = datetime.strptime(date_string, '%d/%m/%Y')
+            else:
+                raise ValueError("Format de date français non reconnu")
+            
+            months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+            
+            month_name = months[dt.month - 1]
+            return f"{dt.day} {month_name} {dt.year}"
+        
+        else:
+            # Format anglais YYYY-MM-DD
+            if '-' in date_string:
+                dt = datetime.strptime(date_string, '%Y-%m-%d')
+            elif '/' in date_string:
+                dt = datetime.strptime(date_string, '%Y/%m/%d')
+            else:
+                raise ValueError("Format de date anglais non reconnu")
+            
+            months = ['January', 'February', 'March', 'April', 'May', 'June',
+                     'July', 'August', 'September', 'October', 'November', 'December']
+            
+            month_name = months[dt.month - 1]
+            return f"{month_name} {dt.day}, {dt.year}"
+    
+    except ValueError:
+        return date_string
+
+
+
  

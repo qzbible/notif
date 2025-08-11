@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
-from service.utils import send_mail_created
+from service.utils import get_formatted_date, send_mail_created
 # Create your views here.
 
 
@@ -178,13 +178,13 @@ class sendAuthCodeView(APIView):
                 )
                 if custom_ins !=None and custom_ins.lang == "fr-FR":
                     path = "notification/2fa_auth/2FA-auth-fr.html"
-                    object = "Code d'authentification" + "[" + current_datetime_string  + "]"
+                    object = "Code d'authentification "+  get_formatted_date(custom_ins.lang)
                 elif custom_ins !=None and custom_ins.lang == "en-US":
                     path = "notification/2fa_auth/2FA-auth-en.html"
-                    object = "Authentication code" + "[" + current_datetime_string  + "]"
+                    object = "Authentication code "+  get_formatted_date(custom_ins.lang)
                 else:
                     path = "notification/2fa_auth/2FA-auth-fr.html"
-                    object = "Code d'authentification" + "[" + current_datetime_string  + "]"
+                    object = "Code d'authentification "+  get_formatted_date(custom_ins.lang)
 
                 path_txt = "notification/2fa_auth/2FA-auth.txt"
                 
@@ -212,14 +212,14 @@ class sendAuthCodeView(APIView):
                 
                 if custom_ins !=None and custom_ins.lang == "fr-FR":
                     path = "notification/2fa_auth/2FA-auth-fr.html"
-                    object = "Code d'authentification" + "[" + current_datetime_string  + "]"
+                    object = "Code d'authentification " +  get_formatted_date(custom_ins.lang)
                 elif custom_ins !=None and custom_ins.lang == "en-US":
                     path = "notification/2fa_auth/2FA-auth-en.html"
-                    object = "Authentication code" + "[" + current_datetime_string  + "]"
+                    object = "Authentication code " +  get_formatted_date(custom_ins.lang)
 
                 else:
                     path = "notification/2fa_auth/2FA-auth-fr.html"
-                    object = "Code d'authentification" + "[" + current_datetime_string  + "]"
+                    object = "Code d'authentification "+  get_formatted_date(custom_ins.lang)
 
                 path_txt = "notification/2fa_auth/2FA-auth.txt" 
 

@@ -11,28 +11,28 @@ import uuid
 import secrets
 from django.conf import settings
 
-from service.utils import send_mail_created
+from service.utils import format_date_string_short, send_mail_created
  
 def mail_notification_start_projet_service(  name, dest_email, title, start_date, end_date, company,  description, url, back_url=None, lang=None ):
     # object and description
     if lang == "fr-FR" :
         path = "notification/audit_project/index-start-project-fr.html" 
         path_txt = "notification/audit_project/index-start-project-fr.txt" 
-        object = f"✅ Audit lancé : {title} ({start_date} - {end_date})"
+        object = f"✅ Audit lancé : {title} ({format_date_string_short(start_date, lang) } au {format_date_string_short(end_date, lang)})"
     elif lang == "en-US":
         path = "notification/audit_project/index-start-project-en.html" 
         path_txt = "notification/audit_project/index-start-project-en.txt" 
-        object = f"Audit launched: {title} ({start_date} - {end_date})"
+        object = f"Audit launched: {title} ✅ Audit lancé : {title} ({format_date_string_short(start_date, lang)} at {format_date_string_short(end_date, lang)})"
     else:
         path = "notification/audit_project/index-start-project-fr.html"
         path_txt = "notification/audit_project/index-start-project-fr.txt"  
-        object = f"✅ Audit lancé : {title} ({start_date} - {end_date})"
+        object = f"✅ Audit lancé : {title} ({format_date_string_short(start_date) } au {format_date_string_short(end_date)})"
     
    
     context = {
         "name":name,  
-        "start_date": start_date, 
-        "end_date":end_date,
+        "start_date": format_date_string_short(start_date, lang),
+        "end_date": format_date_string_short(end_date, lang),
         "title":title,
         "description":description,
         "company":company,
