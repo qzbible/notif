@@ -81,6 +81,7 @@ def mail_new_network_service(  name, dest_email, company,  os_name, device_name,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
     }
  
+    print('data context', context)
     body_content = render_to_string(
         path,
         context

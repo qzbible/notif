@@ -321,7 +321,6 @@ class ValidateAuthCodeView(APIView):
         
 
 
-
 # Vue API
 class NotificationNetworkView(APIView):
     permission_classes = [AllowAny]
