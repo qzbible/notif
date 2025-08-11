@@ -98,7 +98,7 @@ jobs:
 
     environment:
       name: beta
-      url: https://beta-notify.back.klivar.com/__healthcheck/ 
+      url: https://beta-notify.back.klivar.com/ 
 
     env:
       IMAGE_TAG: ${{needs.build-images.outputs.api-image-tags}}
@@ -132,7 +132,7 @@ jobs:
       cancel-in-progress: false
     environment:
       name: play
-      url: https://play-backend.app.klivar.com/__healthcheck/
+      url: https://play-tmp.back.klivar.com/
     env:
       IMAGE_TAG: ${{needs.build-images.outputs.api-image-tags}}
     steps:
@@ -140,7 +140,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup ansible
-        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v1.0.0
+        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v2.1.1
         with:
           ssh_private_key: ${{ secrets.OVH_MANAGER_SSH_PRIVATE_KEY }}
           ansible_vault_pass: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
@@ -154,34 +154,4 @@ jobs:
         run: |
           ansible-playbook -e env=play -e tmp_back_image=${IMAGE_TAG} deploy.yml
 
-  prod:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
-    needs:
-      - build-images
-    concurrency:
-      group: prod
-      cancel-in-progress: false
-    environment:
-      name: prod
-      url: https://backend.klivar.com/__healthcheck/
-    env:
-      IMAGE_TAG: ${{needs.build-images.outputs.api-image-tags}}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup ansible
-        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v1.0.0
-        with:
-          ssh_private_key: ${{ secrets.OVH_MANAGER_SSH_PRIVATE_KEY }}
-          ansible_vault_pass: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-          working_directory: deploy
-
-      - name: Display the image being deployed
-        run: echo "Deploying the image ${IMAGE_TAG}"
-
-      - name: Running ansible
-        working-directory: deploy
-        run: |
-          ansible-playbook -e env=prod -e tmp_back_image=${IMAGE_TAG} deploy.yml
+ 
