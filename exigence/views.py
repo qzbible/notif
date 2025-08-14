@@ -361,8 +361,7 @@ class ExigenceApprobatorView(APIView):
                 id_answer = data.get("id_answer", None),
                 lang = data.get("lang", "fr-FR"),
                 is_notification=False,
-                is_approver=True,
-
+                is_approver=True, 
             )
             print("langue ---------->", data.get("lang"))
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
@@ -409,7 +408,7 @@ class ExigenceApprobatorView(APIView):
             
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:
-            return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
+            return Response( {'error':str(e)}, status=status.HTTP_400_BAD_REQUEST )
         
 # Vue API
 class ExigenceNotificationView(APIView):
