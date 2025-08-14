@@ -3,7 +3,8 @@ from django.shortcuts import render
 # from mailing.serializers import StartProjectMailSerializer  
 # from mailing.service import mail_notification_end_projet_service, mail_notification_start_projet_service
 from projet.models import ProjetMail
-from projet.service import mail_notification_start_projet_service
+from projet.serializers import StartProjectMailSerializer
+from projet.service import mail_notification_end_projet_service, mail_notification_start_projet_service
 from rest_framework.permissions import AllowAny
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
