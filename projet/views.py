@@ -1,7 +1,9 @@
 from django.shortcuts import render
  
-from mailing.serializers import StartProjectMailSerializer  
-from mailing.service import mail_notification_end_projet_service, mail_notification_start_projet_service
+# from mailing.serializers import StartProjectMailSerializer  
+# from mailing.service import mail_notification_end_projet_service, mail_notification_start_projet_service
+from projet.models import ProjetMail
+from projet.service import mail_notification_start_projet_service
 from rest_framework.permissions import AllowAny
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
@@ -75,6 +77,12 @@ class NotificationStartProjetView(APIView):
         """
         try:   
             data = request.data 
+            
+    # task_id = models.CharField(max_length=255, null=True, blank=True)
+            project_ins = ProjetMail.objects.create(
+                projet_id = data.get('projet_id', None),
+                user_email = data.get('email', None)
+            )
             mail_notification_start_projet_service( 
                 name = data.get('name', ''),
                 dest_email = data.get('email', None),

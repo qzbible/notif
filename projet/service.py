@@ -14,7 +14,7 @@ from django.conf import settings
 from service.utils import format_date_string_short, send_mail_created
 from celery import shared_task
 
- 
+@shared_task
 def mail_notification_start_projet_service(name, dest_email, title, start_date, end_date, company,  description, url, back_url=None, lang=None ):
     # object and description
     if lang == "fr-FR" :

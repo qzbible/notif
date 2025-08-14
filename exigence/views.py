@@ -408,6 +408,7 @@ class ExigenceApprobatorView(APIView):
             
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:
+            print('error', str(e))
             return Response( {'error':str(e)}, status=status.HTTP_400_BAD_REQUEST )
         
 # Vue API
