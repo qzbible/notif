@@ -31,7 +31,7 @@ from django.template.loader import render_to_string
 
 from django.utils import timezone
 
-from service.utils import get_formatted_date, send_mail_created
+from service.utils import get_formatted_date, get_lang_request, send_mail_created
 from celery import current_app
 from dateutil.parser import parse as dateutil_parse
 import pytz
@@ -164,7 +164,7 @@ class ExigenceResponsableView(APIView):
                 if validated_data.get("lang") != "fr-FR":
                     type_task="Corrective action"
 
-            
+            lang = get_lang_request(request)
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
                 object=validated_data.get("object"),
@@ -185,7 +185,7 @@ class ExigenceResponsableView(APIView):
                 start_date = validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
                 time = validated_data.get("time"),
                 type_task = validated_data.get("type_task"),
-                lang = validated_data.get("lang", "fr-FR"),
+                lang = lang,
             )
             
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
@@ -217,7 +217,7 @@ class ExigenceResponsableView(APIView):
                             validated_data.get("dealine") if validated_data.get("dealine") else add_days(get_current_date_iso()),
                             validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
                             None,
-                            validated_data.get("lang")
+                            lang
                         ],
                         # eta=parse_date_to_730(validated_data.get("start_date"))
                     )
@@ -237,7 +237,7 @@ class ExigenceResponsableView(APIView):
                             validated_data.get("dealine") if validated_data.get("dealine") else add_days(get_current_date_iso()),
                             validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
                             None,
-                            validated_data.get("lang")
+                            lang
                         ],
                         eta=parse_date_to_730(validated_data.get("start_date"))
                     )
@@ -260,7 +260,7 @@ class ExigenceResponsableView(APIView):
                     during= validated_data.get("time"), 
                     start_date= validated_data.get("start_date"),
                     scope= validated_data.get("scope", []),
-                    lang=validated_data.get("lang")
+                    lang=lang
                 )
             # Envoi de l'email 
             return Response(
@@ -341,6 +341,7 @@ class ExigenceApprobatorView(APIView):
        
         # Création de la tâche Celery
         try:
+            lang = get_lang_request(request)
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
                 object=data.get("object"),
@@ -359,11 +360,12 @@ class ExigenceApprobatorView(APIView):
                 time = data.get("time", None),
                 type_task = data.get("type_task", None),
                 id_answer = data.get("id_answer", None),
-                lang = data.get("lang", "fr-FR"),
+                lang = lang,
                 is_notification=False,
                 is_approver=True, 
             )
             print("langue ---------->", data.get("lang"))
+         
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in data and data.get("scope"):
                 exigence.scope = data.get("scope")
@@ -388,7 +390,7 @@ class ExigenceApprobatorView(APIView):
                     deadline= data.get("dealine"),
                     start_date= data.get("start_date"),
                     scope= data.get("scope", []),
-                    lang=data.get("lang")
+                    lang=lang
                 )
             elif data.get("type_task") == "CORRECT_ACTION":
                 type_task = "Action corrective"
@@ -465,7 +467,7 @@ class ExigenceNotificationView(APIView):
     def post(self, request):
         
         data = request.data
- 
+        lang = get_lang_request(request)
         # Création de la tâche Celery
         try:
             # Sauvegarde des données dans le modèle
@@ -486,7 +488,7 @@ class ExigenceNotificationView(APIView):
                 start_date = data.get("start_date"),
                 time = data.get("time"),
                 type_task = data.get("type_task"),
-                lang = data.get("lang", "fr-FR"),
+                lang = lang,
             )
             
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
@@ -512,7 +514,7 @@ class ExigenceNotificationView(APIView):
                     deadline= data.get("dealine"),
                     start_date= data.get("start_date"),
                     scope= data.get("scope", []),
-                    lang=data.get("lang")
+                    lang=lang
                 )
             elif data.get("type_task") == "CORRECT_ACTION":
                 type_task = "Action"
@@ -936,7 +938,7 @@ class UpdateExigeneTaskView(APIView):
     
         if not reporting_id:
             return Response({'error': 'id requis'}, status=400)
-        
+       
         task_exigences = ExigenceMail.objects.filter(id_reporting=str(reporting_id))
         for task in task_exigences:
             try:
@@ -966,7 +968,7 @@ class UpdateExigeneTaskView(APIView):
                         task.dealine,
                         task.start_date,
                         None,
-                        task.lang
+                        get_lang_request(request)
                     ],
                     # eta=parse_date_to_730(validated_data.get("start_date"))
                 )
@@ -986,7 +988,7 @@ class UpdateExigeneTaskView(APIView):
                         task.dealine,
                         task.start_date,
                         None,
-                        task.lang
+                        get_lang_request(request)
                     ],
                     eta=eta_datetime
                 )
@@ -1063,7 +1065,7 @@ class AcceptExigenceView(APIView):
                 data.get("dest_name", ""),
                 data.get("company", ""),
                 data.get("back_url", None),
-                data.get("lang", "")
+                get_lang_request(request)
             ) 
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:
@@ -1131,7 +1133,7 @@ class RejetExigenceView(APIView):
                 data.get("dest_name", ""),
                 data.get("company", ""),
                 data.get("back_url", None),
-                data.get("lang", "")
+                get_lang_request(request)
             ) 
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:

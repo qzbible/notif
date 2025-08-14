@@ -250,7 +250,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
 
     deadline_text = "non défini" 
 
-
+   
     if verifier_presence_t(deadline):
         new_deadline = deadline 
     else: 
@@ -283,7 +283,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
             filename = add_calendar(
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         
-    
+   
     if lang == "fr-FR" :
         path = "notification/evaluation/exigence-approbation-fr.html" 
     elif lang == "en-US":
@@ -293,6 +293,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
 
     # path = "notification/evaluation/exigence-approbation.html" 
     path_txt = "notification/evaluation/exigence-approbation.txt" 
+    # print("execution")
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
@@ -316,6 +317,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
             path_txt,
             context
     )
+ 
     # send_mail_created([dest_email], object, text_content, html_content, company)
     if filename != None:
         print("filename", filename)

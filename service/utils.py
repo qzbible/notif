@@ -1107,3 +1107,14 @@ def format_date_string_short(date_string, language='fr'):
 
 
  
+def get_lang_request(request):
+    accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
+    # Déterminer la langue à utiliser
+    if 'fr' in accept_language:
+        selected_lang = 'fr-FR'
+    elif 'en' in accept_language:
+        selected_lang = 'en-US'
+    else:
+        # Langue par défaut
+        selected_lang = 'fr-FR'
+    return selected_lang
