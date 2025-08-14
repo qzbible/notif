@@ -364,7 +364,7 @@ class ExigenceApprobatorView(APIView):
                 is_approver=True,
 
             )
-            
+            print("langue ---------->", data.get("lang"))
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in data and data.get("scope"):
                 exigence.scope = data.get("scope")

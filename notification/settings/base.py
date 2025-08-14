@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'mailing', 
     'exigence',
     'updateMaster',
+    'projet', 
     # Healthchecks
     'health_check',  # required
     'health_check.db',  

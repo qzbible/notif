@@ -12,7 +12,7 @@ import uuid
 import secrets
 from django.conf import settings
 
-from service.utils import send_mail_created, send_mail_with_ics 
+from service.utils import format_date_string_short, send_mail_created, send_mail_with_ics 
 from celery import shared_task
  
 #  Exigence data start 2025-06-16
@@ -154,7 +154,7 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
         "description":description,
         "time": time,
         "scope": scope,
-        "deadline": deadline_text,
+        "deadline": format_date_string_short(deadline_text,lang ),
         "company": company,
         "type_task": type_task,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
@@ -220,7 +220,7 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
         "description":description,
         "time": during,
         "scope":scope,
-        "deadline": deadline_text,
+        "deadline": format_date_string_short(deadline_text,lang ),
         "company": company,
         "type_task": type_task,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
@@ -301,7 +301,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
         "description":description,
         "time": time,
         "scope":scope,
-        "deadline": deadline_text,
+        "deadline": format_date_string_short(deadline_text,lang ),
         "company": company,
         "type_task": type_task,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
@@ -385,7 +385,7 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
         "description":description,
         "time": time,
         "scope":scope,
-        "deadline": deadline_text,
+        "deadline": format_date_string_short(deadline_text,lang ),
         "company": company,
         "type_task": type_task,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url

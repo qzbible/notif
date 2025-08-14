@@ -38,6 +38,7 @@ urlpatterns = [
     path('auth-client/', include('authClient.urls')),
     path('security/', include('alert_security.urls')),
     path('notif/', include('mailing.urls')),
+    path('projet/', include('projet.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),  # Endpoint pour le schéma JSON/YAML
     
     # Interface Swagger UI
