@@ -287,7 +287,11 @@
                         <td style="padding-bottom: 10px;">
                             <p class="body-text" style="font-size: 12px; color: #353739; margin: 0; line-height: 1.5; letter-spacing: 0.2px;">
                                 Dear <strong>{{name}}</strong>,<br><br> 
-                                We have detected a new login to your Klivar account from a <b> {{ device_type }} </b>  using the <b> {{ browser_name}} </b> . browser. If this was you, please confirm this activity. If it was not you, report it immediately so we can help secure your account.
+                                We have detected a new login to your Klivar account from a <b>{{ device_type }}</b>  using the <b> {{ browser_name }}</b>  browser.
+                                <br><br> 
+                                If this was you, please confirm this activity.
+                                <br></br>
+                                If this was not you, please ignore this message.
                             </p>
                         </td>
                     </tr> 
@@ -296,13 +300,11 @@
                                 <a href="{{url_verification}}" class="btn" style="display: inline-block; background-color: #7A1CAC; color: #ffffff; font-size: 14px; font-weight: 400; text-align: center; padding: 8px 16px; border-radius: 10px; margin: 8px 0 16px; text-decoration: none; border: 1px solid transparent;">
                                     Confirm
                                 </a>
-                                <a href="{{url}}" class="btn" style="display: inline-block; background-color: #f43711; color: #ffffff; font-size: 14px; font-weight: 400; text-align: center; padding: 8px 16px; border-radius: 10px; margin: 8px 0 16px; text-decoration: none; border: 1px solid transparent;">
+                                <!-- <a href="{{url}}" class="btn" style="display: inline-block; background-color: #f43711; color: #ffffff; font-size: 14px; font-weight: 400; text-align: center; padding: 8px 16px; border-radius: 10px; margin: 8px 0 16px; text-decoration: none; border: 1px solid transparent;">
                                     Report
-                                </a>
-                            </td>
-                            
-                        </tr>
-                   
+                                </a> -->
+                            </td> 
+                        </tr> 
                     <!-- Signature -->
                     <tr>
                         <td style="padding-top: 20px;">
