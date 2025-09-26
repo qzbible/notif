@@ -476,13 +476,23 @@
               </td>
             </tr>
             <!-- Bouton d'action (optionnel) -->
+
+            {% if url %}
             <tr>
+              <td align="center" style="padding-bottom: 10px">
+                <a href="{{url}}" class="cta-button">
+                  Access the Reporting module
+                </a>
+              </td>
+            </tr>
+            {% endif %}
+            <!-- <tr>
               <td align="center" style="padding-bottom: 10px">
                 <a href="{{url}}" class="cta-button">
                   Access the Deploy module
                 </a>
               </td>
-            </tr>
+            </tr> -->
 
             <!-- Signature -->
             <tr>
