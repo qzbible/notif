@@ -476,6 +476,8 @@
               </td>
             </tr>
             <!-- Bouton d'action (optionnel) -->
+
+            {% if url %}
             <tr>
               <td align="center" style="padding-bottom: 10px">
                 <a href="{{url}}" class="cta-button">
@@ -483,6 +485,14 @@
                 </a>
               </td>
             </tr>
+            {% endif %}
+            <!-- <tr>
+              <td align="center" style="padding-bottom: 10px">
+                <a href="{{url}}" class="cta-button">
+                  Access the Deploy module
+                </a>
+              </td>
+            </tr> -->
 
             <!-- Signature -->
             <tr>
