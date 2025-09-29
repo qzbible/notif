@@ -1,6 +1,6 @@
 {
   "name": "tmp-back",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Service de notification de  okkk",
   "main": "index.js",
   "config": {
