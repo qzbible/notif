@@ -31,6 +31,7 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # Application definition
 
 INSTALLED_APPS = [
+     "daphne",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,9 +54,20 @@ INSTALLED_APPS = [
 
     'django_celery_results',
     'django_celery_beat',
-    'drf_spectacular'
+    'drf_spectacular',
+   
 ]
 
+ASGI_APPLICATION = 'notification.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', 

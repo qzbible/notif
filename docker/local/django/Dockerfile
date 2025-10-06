@@ -41,6 +41,10 @@ COPY ./docker/local/django/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
+COPY ./docker/local/django/start-daphne /start-daphne
+RUN sed -i 's/\r$//g' /start-daphne
+RUN chmod +x /start-daphne
+
 
 COPY ./docker/local/django/celery/worker/start /start-celeryworker
 RUN sed -i 's/\r$//g' /start-celeryworker
@@ -53,6 +57,8 @@ RUN chmod +x /start-flower
 COPY ./docker/local/django/celery/beat/start /start-beat
 RUN sed -i 's/\r$//g' /start-beat
 RUN chmod +x /start-beat
+
+
 # COPY --chown=django:django . ${APP_HOME}
 COPY  . ${APP_HOME}
 

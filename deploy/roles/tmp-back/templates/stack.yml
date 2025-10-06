@@ -112,6 +112,39 @@ services:
       test: []
       disable: true
 
+
+ # Ajoutez simplement ce bloc dans votre fichier docker-stack.yml existant
+# après le service "api" et avant "redis"
+
+  # Service Daphne pour WebSockets
+  daphne:
+    <<: *api
+    image: "{{ tmp_back_image }}"
+    command: /start-daphne
+    networks:
+      - klivar
+    env_file:
+      - ./.django.env
+      - ./.postgres.env
+    deploy:
+      mode: replicated
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        failure_action: rollback
+      rollback_config:
+        order: start-first
+        parallelism: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.enable=false
+      placement:
+        constraints:
+          - node.role == manager
+
+
 volumes:
   static_volume:
   media_volume:

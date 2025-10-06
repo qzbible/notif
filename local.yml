@@ -6,20 +6,17 @@ services:
     image: redis:6-alpine
     networks:
       - klivar-api-local-live-nw
-
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 3s
       retries: 5
 
-
-  api: &api #container_name: api
+  api: &api
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
     command: /start
-    # restart: always
     volumes:
       - .:/app
       - static_volume:/app/static
@@ -32,14 +29,30 @@ services:
       - ./.envs/.local/.postgres
       - ./.envs/.local/.django
     depends_on:
-        - redis
+      - redis
 
+  # Nouveau service Daphne pour WebSockets
+  daphne:
+    <<: *api
+    image: klivar-backend-daphne
+    command: /start-daphne
+    expose:
+      - "9082"
+    networks:
+      - klivar-api-local-live-nw
+    env_file:
+      - ./.envs/.local/.postgres
+      - ./.envs/.local/.django
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
 
   celery_worker:
     <<: *api
     image: klivar-backend-celeryworker
     command: /start-celeryworker
-    healthcheck: # TODO: needs to be implemented
+    healthcheck:
       test: []
       disable: true
     networks:
@@ -48,17 +61,16 @@ services:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
     volumes:
-      - .:/app # cablage au source de travail
+      - .:/app
     depends_on:
       redis:
         condition: service_healthy
-
 
   celery_beat:
     <<: *api
     image: klivar-backend-celerybeat
     command: /start-beat
-    healthcheck: # TODO: needs to be implemented
+    healthcheck:
       test: []
       disable: true
     env_file:
@@ -67,16 +79,15 @@ services:
     networks:
       - klivar-api-local-live-nw
     volumes:
-      - .:/app # cablage au source de travail
+      - .:/app
     depends_on:
       - redis
-
 
   flower:
     <<: *api
     image: klivar-backend-flower
     command: /start-flower
-    healthcheck: # TODO: needs to be implemented
+    healthcheck:
       test: []
       disable: true
     env_file:
@@ -85,7 +96,7 @@ services:
     networks:
       - klivar-api-local-live-nw
     volumes:
-      - .:/app # cablage au source de travail
+      - .:/app
     depends_on:
       - redis
 
@@ -93,6 +104,7 @@ services:
     restart: always
     depends_on:
       - api
+      - daphne
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/mediafiles
@@ -104,13 +116,10 @@ services:
     networks:
       - klivar-api-local-live-nw
 
-
 networks:
   klivar-api-local-live-nw:
     external: true
 
-
 volumes:
   static_volume:
   media_volume:
- 

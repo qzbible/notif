@@ -8,7 +8,7 @@ constantly==15.1.0
 coreapi==2.3.3
 # coreschema==0.0.4
 cryptography==37.0.4
-daphne==3.0.2
+# daphne==3.0.2
 django-cors-headers==4.3.1
 django-filter==23.5
 django-rest-passwordreset==1.3.0
@@ -54,7 +54,7 @@ crypto
 # django-elasticsearch-dsl-drf==0.22.5
 factory-boy
 pyclamd
-redis==4.1.0
+# redis==4.1.0
 
 celery>=5.3.5
 flower==1.0.0
@@ -84,5 +84,10 @@ django-extensions==3.1.3
 
 confluent-kafka==2.3.0
 
+
+# WebSockets et Channels
+channels==4.0.0
+channels-redis==4.1.0
+daphne==4.0.0
  
 

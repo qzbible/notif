@@ -1,0 +1,16 @@
+#!/bin/bash
+# Fichier: /docker/local/django/start-daphne
+
+set -o errexit
+set -o nounset
+
+python manage.py migrate
+python manage.py collectstatic --noinput
+
+
+PROJECT_NAME="${DJANGO_PROJECT_NAME:-notification}"
+echo "Starting Daphne for project: ${PROJECT_NAME}"
+
+exec daphne -b 0.0.0.0 -p 9082 notification.asgi:application
+
+# exec daphne -b 0.0.0.0 -p 9082 ${PROJECT_NAME}.asgi:application
