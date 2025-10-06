@@ -121,6 +121,8 @@ services:
     <<: *api
     image: "{{ tmp_back_image }}"
     command: /start-daphne
+    expose:
+      - "9082"
     networks:
       - klivar
     env_file:
