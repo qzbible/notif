@@ -8,14 +8,14 @@ def send_bug_mail( to_emails, object, fichiers_urls, description, name, module, 
     # object and description
 
     if lang == "fr-FR" :
-        path = "notification/update_master/bug_assign/assign_fr.html" 
-        path_txt = "notification/update_master/bug_assign/assign_fr.txt" 
+        path = "client/update_master/bug_assign/assign_fr.html" 
+        path_txt = "client/update_master/bug_assign/assign_fr.txt" 
     elif lang == "en-US":
-        path = "notification/update_master/bug_assign/assign_en.html"
-        path_txt = "notification/update_master/bug_assign/assign_en.txt"
+        path = "client/update_master/bug_assign/assign_en.html"
+        path_txt = "client/update_master/bug_assign/assign_en.txt"
     else:
-        path = "notification/update_master/bug_assign/assign_fr.html" 
-        path_txt = "notification/update_master/bug_assign/assign_fr.txt"  
+        path = "client/update_master/bug_assign/assign_fr.html" 
+        path_txt = "client/update_master/bug_assign/assign_fr.txt"  
     context = {
         "name":name, 
         "description": description,
@@ -50,14 +50,14 @@ def send_bug_mail( to_emails, object, fichiers_urls, description, name, module, 
 def send_resolve_mail( to_emails, object, old_date, module, company=None, back_url=None, lang=None ):
     # object and description
     if lang == "fr-FR" :
-        path = "notification/update_master/bug_resolve/resolve_fr.html" 
-        path_txt = "notification/update_master/bug_resolve/resolve_fr.txt" 
+        path = "client/update_master/bug_resolve/resolve_fr.html" 
+        path_txt = "client/update_master/bug_resolve/resolve_fr.txt" 
     elif lang == "en-US":
-        path = "notification/update_master/bug_resolve/resolve_en.html"
-        path_txt = "notification/update_master/bug_resolve/resolve_en.txt"
+        path = "client/update_master/bug_resolve/resolve_en.html"
+        path_txt = "client/update_master/bug_resolve/resolve_en.txt"
     else:
-        path = "notification/update_master/bug_resolve/resolve_fr.html" 
-        path_txt = "notification/update_master/bug_resolve/resolve_fr.txt" 
+        path = "client/update_master/bug_resolve/resolve_fr.html" 
+        path_txt = "client/update_master/bug_resolve/resolve_fr.txt" 
     context = {
         "module":module, 
         "old_date": old_date, 

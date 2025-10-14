@@ -182,16 +182,16 @@ class sendAuthClientCodeView(APIView):
                     expires_at=expires_at
                 )
                 if custom_ins !=None and custom_ins.lang == "fr-FR":
-                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    path = "user-management/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification" + "[" + get_formatted_date(custom_ins.lang)  + "]"
                 elif custom_ins !=None and custom_ins.lang == "en-US":
-                    path = "notification/2fa_auth/2FA-auth-en.html"
+                    path = "user-management/2fa_auth/2FA-auth-en.html"
                     object = "Authentication code" + "[" + get_formatted_date(custom_ins.lang)   + "]"
                 else:
-                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    path = "user-management/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification" + "[" + get_formatted_date(custom_ins.lang)   + "]"
 
-                path_txt = "notification/2fa_auth/2FA-auth.txt"
+                path_txt = "user-management/2fa_auth/2FA-auth.txt"
                 
                 context = {  
                     "user_name": '',
@@ -216,17 +216,17 @@ class sendAuthClientCodeView(APIView):
                 auth_code_instance.save() 
                 
                 if custom_ins !=None and custom_ins.lang == "fr-FR":
-                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    path = "user-management/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification" + "[" + get_formatted_date(custom_ins.lang)   + "]"
                 elif custom_ins !=None and custom_ins.lang == "en-US":
-                    path = "notification/2fa_auth/2FA-auth-en.html"
+                    path = "user-management/2fa_auth/2FA-auth-en.html"
                     object = "Authentication code" + "[" + get_formatted_date(custom_ins.lang)   + "]"
 
                 else:
-                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    path = "user-management/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification" + "[" + get_formatted_date(custom_ins.lang)   + "]"
 
-                path_txt = "notification/2fa_auth/2FA-auth.txt" 
+                path_txt = "user-management/2fa_auth/2FA-auth.txt" 
 
                 context = {  
                     "user_name": "",
@@ -352,16 +352,16 @@ class MailVerificationView(APIView):
             current_datetime_string = current_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
             if lang !=None and  lang == "fr-FR":
-                path = "notification/2fa_auth/2FA-auth-fr.html"
+                path = "user-management/2fa_auth/2FA-auth-fr.html"
                 object = "Code d'authentification" + "[" + get_formatted_date(lang)   + "]"
             elif lang !=None and  lang == "en-US":
-                path = "notification/2fa_auth/2FA-auth-en.html"
+                path = "user-management/2fa_auth/2FA-auth-en.html"
                 object = "Authentication code" + "[" + get_formatted_date(lang)   + "]"
             else:
-                path = "notification/2fa_auth/2FA-auth-fr.html"
+                path = "user-management/2fa_auth/2FA-auth-fr.html"
                 object = "Code d'authentification" + "[" + get_formatted_date(lang)   + "]"
 
-            path_txt = "notification/2fa_auth/2FA-auth.txt"
+            path_txt = "user-management/2fa_auth/2FA-auth.txt"
             
             context = {  
                 "user_name": '',

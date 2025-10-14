@@ -16,16 +16,16 @@ from service.utils import send_mail_created
 def mail_new_devise_service(  name, dest_email, company,  os_name, device_type, browser_name, url_verification, back_url=None, lang=None ):
     # object and description
     if lang == "fr-FR" :
-        path = "notification/alert_security/index-fr.html" 
-        path_txt = "notification/alert_security/index-fr.txt" 
+        path = "user-management/alert_security/index-fr.html" 
+        path_txt = "user-management/alert_security/index-fr.txt" 
         object = "🔒 [Alerte sécurité] Nouvelle connexion détectée sur votre compte Klivar"
     elif lang == "en-US":
-        path = "notification/alert_security/index-en.html" 
-        path_txt = "notification/alert_security/index-en.txt" 
+        path = "user-management/alert_security/index-en.html" 
+        path_txt = "user-management/alert_security/index-en.txt" 
         object = "🔒 [Security Alert] New login detected on your Klivar account"
     else:
-        path = "notification/alert_security/index-fr.html"
-        path_txt = "notification/alert_security/index-fr.txt"  
+        path = "user-management/alert_security/index-fr.html"
+        path_txt = "user-management/alert_security/index-fr.txt"  
         object = "🔒 [Alerte sécurité] Nouvelle connexion détectée sur votre compte Klivar"
     
    
@@ -57,19 +57,18 @@ def mail_new_devise_service(  name, dest_email, company,  os_name, device_type, 
 def mail_new_network_service(  name, dest_email, company,  os_name, device_name, browser_name, ip_address, connection_time, back_url=None, lang=None ):
     # object and description
     if lang == "fr-FR" :
-        path = "notification/alert_security/notif-network-fr.html" 
-        path_txt = "notification/alert_security/index-fr.txt" 
+        path = "user-management/alert_security/notif-network-fr.html" 
+        path_txt = "user-management/alert_security/index-fr.txt" 
         object = "Notification de sécurité – Nouvelle localisation/réseau détecté"
     elif lang == "en-US":
-        path = "notification/alert_security/notif-network-en.html" 
-        path_txt = "notification/alert_security/index-en.txt" 
+        path = "user-management/alert_security/notif-network-en.html" 
+        path_txt = "user-management/alert_security/index-en.txt" 
         object = "Security Notification – New Location/Network Detected"
     else:
-        path = "notification/alert_security/notif-network-fr.html"
-        path_txt = "notification/alert_security/index-fr.txt"  
+        path = "user-management/alert_security/notif-network-fr.html"
+        path_txt = "user-management/alert_security/index-fr.txt"  
         object = "Notification de sécurité – Nouvelle localisation/réseau détecté"
     
-   
     context = {
         "name":name,  
         "device_name":device_name,  
@@ -81,7 +80,6 @@ def mail_new_network_service(  name, dest_email, company,  os_name, device_name,
         "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
     }
  
-    print('data context', context)
     body_content = render_to_string(
         path,
         context

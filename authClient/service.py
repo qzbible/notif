@@ -16,19 +16,18 @@ from service.utils import send_mail_created
 def mail_welcome_service(  name, dest_email, company, url, back_url=None, lang=None ):
     # object and description
     if lang == "fr-FR" :
-        path = "notification/welcome/index-fr.html" 
-        path_txt = "notification/welcome/index-fr.txt" 
+        path = "user-management/welcome/index-fr.html" 
+        path_txt = "user-management/welcome/index-fr.txt" 
         object = "Bienvenue dans votre espace Klivar – Accédez dès maintenant à vos ressources clés 🚀"
     elif lang == "en-US":
-        path = "notification/welcome/index-en.html" 
-        path_txt = "notification/welcome/index-en.txt" 
+        path = "user-management/welcome/index-en.html" 
+        path_txt = "user-management/welcome/index-en.txt" 
         object = "Welcome to your Klivar space – Access your key resources now 🚀"
     else:
-        path = "notification/welcome/index-fr.html"
-        path_txt = "notification/welcome/index-fr.txt"  
+        path = "user-management/welcome/index-fr.html"
+        path_txt = "user-management/welcome/index-fr.txt"  
         object = "Bienvenue sur Klivar"
     
-    print("url", url)
     context = {
         "name":name,  
         "title": object, 
@@ -53,18 +52,18 @@ def mail_welcome_service(  name, dest_email, company, url, back_url=None, lang=N
 def mail_forgrt_service(  name, dest_email, company, url, back_url=None, lang=None ):
     # object and description
     if lang == "fr-FR" :
-        path = "notification/resetPassword/index-fr.html" 
-        path_txt = "notification/welcome/index-fr.txt" 
+        path = "user-management/resetPassword/index-fr.html" 
+        path_txt = "user-management/welcome/index-fr.txt" 
         object = "Modifier votre mot de passe"
     elif lang == "en-US":
-        path = "notification/resetPassword/index-en.html" 
-        path_txt = "notification/welcome/index-en.txt" 
+        path = "user-management/resetPassword/index-en.html" 
+        path_txt = "user-management/welcome/index-en.txt" 
         object = "Change your password"
     else:
-        path = "notification/resetPassword/index-fr.html"
+        path = "user-management/resetPassword/index-fr.html"
         path_txt = "notification/welcome/index-fr.txt"  
         object = "Modifier votre mot de passe"
-    print("URL ==>",url)
+
     context = {
         "name":name,  
         "title": object, 

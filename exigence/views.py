@@ -363,9 +363,7 @@ class ExigenceApprobatorView(APIView):
                 lang = lang,
                 is_notification=False,
                 is_approver=True, 
-            )
-            print("langue ---------->", data.get("lang"))
-         
+            ) 
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in data and data.get("scope"):
                 exigence.scope = data.get("scope")
@@ -585,17 +583,17 @@ class sendMailAuthCodeView(APIView):
                     expires_at=expires_at
                 )
                 if custom_ins !=None and custom_ins.lang == "fr-FR":
-                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    path = "user-management/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification" + " " + get_formatted_date(custom_ins.lang)
                 elif custom_ins !=None and custom_ins.lang == "en-US":
-                    path = "notification/2fa_auth/2FA-auth-en.html"
+                    path = "user-management/2fa_auth/2FA-auth-en.html"
                     object = "Authentication code" + " " +  get_formatted_date(custom_ins.lang)
 
                 else:
-                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    path = "user-management/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification" + " "  +get_formatted_date(custom_ins.lang)
 
-                path_txt = "notification/2fa_auth/2FA-auth.txt"
+                path_txt = "user-management/2fa_auth/2FA-auth.txt"
                 
                 context = {  
                     "user_name": '',
@@ -620,17 +618,17 @@ class sendMailAuthCodeView(APIView):
                 auth_code_instance.save() 
                 
                 if custom_ins !=None and custom_ins.lang == "fr-FR":
-                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    path = "user-management/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification " + get_formatted_date(custom_ins.lang)
                 elif custom_ins !=None and custom_ins.lang == "en-US":
-                    path = "notification/2fa_auth/2FA-auth-en.html"
+                    path = "user-management/2fa_auth/2FA-auth-en.html"
                     object = "Authentication code "  +  get_formatted_date(custom_ins.lang)
 
                 else:
-                    path = "notification/2fa_auth/2FA-auth-fr.html"
+                    path = "user-management/2fa_auth/2FA-auth-fr.html"
                     object = "Code d'authentification "  +  get_formatted_date(custom_ins.lang)
 
-                path_txt = "notification/2fa_auth/2FA-auth.txt" 
+                path_txt = "user-management/2fa_auth/2FA-auth.txt" 
 
                 context = {  
                     "user_name": "",

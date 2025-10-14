@@ -139,13 +139,13 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         
     if lang == "fr-FR" :
-        path = "notification/evaluation/responsable-exigence-fr.html" 
+        path = "deployer/evaluation/responsable-exigence-fr.html" 
     elif lang == "en-US":
-        path = "notification/evaluation/responsable-exigence-en.html" 
+        path = "deployer/evaluation/responsable-exigence-en.html" 
     else:
-        path = "notification/evaluation/responsable-exigence-fr.html" 
+        path = "deployer/evaluation/responsable-exigence-fr.html" 
 
-    path_txt = "notification/evaluation/responsable-exigence.txt" 
+    path_txt = "deployer/evaluation/responsable-exigence.txt" 
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
@@ -205,13 +205,13 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
     
     if lang == "fr-FR" :
-        path = "notification/evaluation/tache-conformite-fr.html" 
+        path = "deployer/evaluation/tache-conformite-fr.html" 
     elif lang == "en-US":
-        path = "notification/evaluation/tache-conformite-en.html" 
+        path = "deployer/evaluation/tache-conformite-en.html" 
     else:
-        path = "notification/evaluation/tache-conformite-fr.html" 
+        path = "deployer/evaluation/tache-conformite-fr.html" 
 
-    path_txt = "notification/evaluation/tache-conformite.txt" 
+    path_txt = "deployer/evaluation/tache-conformite.txt" 
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
@@ -285,14 +285,14 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
         
    
     if lang == "fr-FR" :
-        path = "notification/evaluation/exigence-approbation-fr.html" 
+        path = "deployer/evaluation/exigence-approbation-fr.html" 
     elif lang == "en-US":
-        path = "notification/evaluation/exigence-approbation-en.html" 
+        path = "deployer/evaluation/exigence-approbation-en.html" 
     else:
-        path = "notification/evaluation/exigence-approbation-fr.html" 
+        path = "deployer/evaluation/exigence-approbation-fr.html" 
 
     # path = "notification/evaluation/exigence-approbation.html" 
-    path_txt = "notification/evaluation/exigence-approbation.txt" 
+    path_txt = "deployer/evaluation/exigence-approbation.txt" 
     # print("execution")
     context = {
         "sender_name":sender_name, 
@@ -371,14 +371,14 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
 
 
     if lang == "fr-FR" :
-        path = "notification/evaluation/exigence-notification-fr.html" 
+        path = "deployer/evaluation/exigence-notification-fr.html" 
     elif lang == "en-US":
-        path = "notification/evaluation/exigence-notification-en.html" 
+        path = "deployer/evaluation/exigence-notification-en.html" 
     else:
-        path = "notification/evaluation/exigence-notification-fr.html" 
+        path = "deployer/evaluation/exigence-notification-fr.html" 
 
     # path = "notification/evaluation/exigence-notification.html" 
-    path_txt = "notification/evaluation/exigence-notification.txt" 
+    path_txt = "deployer/evaluation/exigence-notification.txt" 
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
@@ -418,13 +418,13 @@ def accept_anwser( object, email,  type_task, description, title, dest_name, com
     try:
         # object and description 
         if lang == "fr-FR" :
-            path = "notification/evaluation/accept_answer-fr.html" 
+            path = "deployer/evaluation/accept_answer-fr.html" 
         elif lang == "en-US":
-            path = "notification/evaluation/accept_answer-en.html" 
+            path = "deployer/evaluation/accept_answer-en.html" 
         else:
-            path = "notification/evaluation/accept_answer-fr.html"  
+            path = "deployer/evaluation/accept_answer-fr.html"  
 
-        path_txt = "notification/evaluation/exigence-notification.txt" 
+        path_txt = "deployer/evaluation/exigence-notification.txt" 
         context = {
             "name": dest_name,
             "title": title,  
@@ -456,13 +456,13 @@ def accept_anwser( object, email,  type_task, description, title, dest_name, com
 def rejet_anwser( object, email,  type_task, description, title, dest_name, company, back_url=None, lang=None ):
     # object and description 
     if lang == "fr-FR" :
-        path = "notification/evaluation/rejet_answer-fr.html" 
+        path = "deployer/evaluation/rejet_answer-fr.html" 
     elif lang == "en-US":
-        path = "notification/evaluation/rejet_answer-en.html" 
+        path = "deployer/evaluation/rejet_answer-en.html" 
     else:
-        path = "notification/evaluation/rejet_answer-fr.html"  
+        path = "deployer/evaluation/rejet_answer-fr.html"  
         
-    path_txt = "notification/evaluation/exigence-notification.txt" 
+    path_txt = "deployer/evaluation/exigence-notification.txt" 
     context = { 
         "name": dest_name,
         "title": title,  
