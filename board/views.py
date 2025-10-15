@@ -1,7 +1,7 @@
 import os
 import random
 from board.serializers import DecisionSerializer, MeetingReminderSerializer
-from board.service import mail_decision_service
+from board.service import mail_decision_service, mail_meeting_reminder_service
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
@@ -311,7 +311,7 @@ class MeetingReminderView(APIView):
                 date_debut=validated_data.get('date_debut'),
                 date_fin=validated_data.get('date_fin'),
                 company=validated_data.get('company'),
-                back_url=validated_data.get('base_url'),
+                back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR')
             )
             
