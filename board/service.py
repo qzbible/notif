@@ -148,16 +148,16 @@ def mail_meeting_reminder_service(
     
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
-        path = "board/meeting/reminder-fr.html"
-        path_txt = "board/meeting/reminder-fr.txt"
+        path = "board/meeting/create-meeting-fr.html"
+        path_txt = "board/meeting/create-meeting-fr.txt"
         object_email = f"Rappel : Réunion du comité {committee_name}"
     elif lang == "en-US":
-        path = "board/meeting/reminder-en.html"
-        path_txt = "board/meeting/reminder-en.txt"
+        path = "board/meeting/rcreate-meeting-en.html"
+        path_txt = "board/meeting/create-meeting-en.txt"
         object_email = f"Reminder: {committee_name} meeting"
     else:
-        path = "board/meeting/reminder-fr.html"
-        path_txt = "board/meeting/reminder-fr.txt"
+        path = "board/meeting/create-meeting-fr.html"
+        path_txt = "board/meeting/create-meeting-fr.txt"
         object_email = f"Rappel : Réunion du comité {committee_name}"
     
     # Contexte pour le template
