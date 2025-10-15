@@ -103,41 +103,97 @@ def mail_decision_service(
     except Exception as e:
         print(f"Erreur lors de l'envoi de l'email: {str(e)}")
         return False
-
-def mail_forgrt_service(  name, dest_email, company, url, back_url=None, lang=None ):
-    # object and description
-    if lang == "fr-FR" :
-        path = "user-management/resetPassword/index-fr.html" 
-        path_txt = "user-management/welcome/index-fr.txt" 
-        object = "Modifier votre mot de passe"
-    elif lang == "en-US":
-        path = "user-management/resetPassword/index-en.html" 
-        path_txt = "user-management/welcome/index-en.txt" 
-        object = "Change your password"
-    else:
-        path = "user-management/resetPassword/index-fr.html"
-        path_txt = "notification/welcome/index-fr.txt"  
-        object = "Modifier votre mot de passe"
-
-    context = {
-        "name":name,  
-        "title": object, 
-        "url": url,
-        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
-    }
  
-    body_content = render_to_string(
-        path,
-        context
-    )
-    text_content = render_to_string(
-            path_txt,
-            context
-    ) 
-    x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
-    x.start() 
+
+def mail_meeting_reminder_service(
+    name,
+    committee_name,
+    date_reunion,
+    heure_reunion,
+    lieu_reunion,
+    participants,
+    dest_email,
+    url_session,
+    instance_name,
+    instance_description,
+    date_debut,
+    date_fin,
+    company,
+    back_host,
+    lang=None
+):
+    """
+    Service d'envoi d'email pour le rappel de réunion du comité
     
-    return True
+    Args:
+        name: Nom du destinataire
+        committee_name: Nom du comité
+        date_reunion: Date de la réunion
+        heure_reunion: Heure de la réunion
+        lieu_reunion: Lieu ou lien de réunion
+        participants: Liste des participants
+        dest_email: Email du destinataire
+        url_session: URL pour accéder à la session
+        instance_name: Nom de l'instance
+        instance_description: Description de l'instance
+        date_debut: Date de début
+        date_fin: Date de fin
+        company: Nom de l'entreprise
+        back_url: URL de base du backend
+        lang: Langue (fr-FR ou en-US)
+    
+    Returns:
+        bool: True si l'envoi a réussi
+    """
+    
+    # Déterminer les templates selon la langue
+    if lang == "fr-FR":
+        path = "board/meeting/reminder-fr.html"
+        path_txt = "board/meeting/reminder-fr.txt"
+        object_email = f"Rappel : Réunion du comité {committee_name}"
+    elif lang == "en-US":
+        path = "board/meeting/reminder-en.html"
+        path_txt = "board/meeting/reminder-en.txt"
+        object_email = f"Reminder: {committee_name} meeting"
+    else:
+        path = "board/meeting/reminder-fr.html"
+        path_txt = "board/meeting/reminder-fr.txt"
+        object_email = f"Rappel : Réunion du comité {committee_name}"
+    
+    # Contexte pour le template
+    context = {
+        "name": name,
+        "committee_name": committee_name,
+        "date_reunion": date_reunion,
+        "heure_reunion": heure_reunion,
+        "lieu_reunion": lieu_reunion,
+        "participants": participants,
+        "url_session": url_session,
+        "instance_name": instance_name,
+        "instance_description": instance_description,
+        "date_debut": date_debut,
+        "date_fin": date_fin,
+        "company": company,
+        "back_host": back_host
+    }
+    
+    try:
+        # Rendu des templates
+        body_content = render_to_string(path, context)
+        text_content = render_to_string(path_txt, context)
+        
+        # Envoi asynchrone de l'email
+        email_thread = threading.Thread(
+            target=send_mail_created,
+            args=([dest_email], object_email, text_content, body_content, company,)
+        )
+        email_thread.start()
+        
+        return True
+        
+    except Exception as e:
+        print(f"Erreur lors de l'envoi de l'email de rappel: {str(e)}")
+        return False
 
  
 

@@ -112,3 +112,107 @@ class DecisionSerializer(serializers.Serializer):
         if not value:
             raise serializers.ValidationError("L'adresse email est requise")
         return value.lower()
+    
+
+
+class MeetingReminderSerializer(serializers.Serializer):
+    """Serializer pour le rappel de réunion du comité"""
+    
+    # Informations destinataire
+    dest_email = serializers.EmailField(
+        required=True,
+        help_text="Adresse email du destinataire"
+    )
+    name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du destinataire"
+    )
+    
+    # Informations de la réunion
+    committee_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du comité"
+    )
+    date_reunion = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Date de la réunion"
+    )
+    heure_reunion = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Heure de la réunion"
+    )
+    lieu_reunion = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=500,
+        help_text="Lieu ou lien de réunion"
+    )
+    participants = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Liste des participants (séparés par des virgules)"
+    )
+    
+    # Informations de l'instance
+    instance_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'instance"
+    )
+    instance_description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Description de l'instance"
+    )
+    
+    # Détails de l'instance
+    date_debut = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Date de début (format: DD-MM-YYYY)"
+    )
+    date_fin = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Date de fin (format: DD-MM-YYYY)"
+    )
+    
+    # URL et entreprise
+    url_session = serializers.URLField(
+        required=False,
+        allow_blank=True,
+        help_text="URL pour accéder à la session"
+    )
+    company = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'entreprise"
+    )
+    
+    # URL de base
+    base_url = serializers.URLField(
+        required=True,
+        help_text="URL de base du backend"
+    )
+    
+    # Configuration
+    client_id = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Identifiant unique du client"
+    )
+    lang = serializers.ChoiceField(
+        choices=['fr-FR', 'en-US'],
+        default='fr-FR',
+        help_text="Langue de l'email (fr-FR ou en-US)"
+    )
+    
+    def validate_dest_email(self, value):
+        """Valider le format de l'email"""
+        if not value:
+            raise serializers.ValidationError("L'adresse email est requise")
+        return value.lower()

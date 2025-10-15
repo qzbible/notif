@@ -8,6 +8,7 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('decision/', DecisionView.as_view(), name='welcome'),
+    path('meeting/', DecisionView.as_view(), name='welcome'),
     
     
     
