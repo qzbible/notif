@@ -155,7 +155,7 @@ class DecisionView(APIView):
                 date_fin=validated_data.get('date_fin'),
                 lieu_reunion=validated_data.get('lieu_reunion', ''),
                 participants=validated_data.get('participants', ''),
-                back_url= os.environ.get("BACK_HOST_URL", ""),
+                back_host= os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR')
             )
             
