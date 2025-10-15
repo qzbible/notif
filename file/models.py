@@ -16,7 +16,7 @@ class File(models.Model):
     @classmethod
     def initialize_data(cls, directory_path='file/icons', destination='icons'):
 
-        images_directory = os.path.join(settings.BASE_DIR, directory_path)  
+        images_directory = os.path.join(settings.BASE_DIR_FOLDER, directory_path)  
         print("f", images_directory)
         destination_directory = os.path.join(settings.MEDIA_ROOT, destination)
         print("f", destination_directory)

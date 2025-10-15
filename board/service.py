@@ -28,7 +28,7 @@ def mail_decision_service(
     date_fin,
     lieu_reunion,
     participants,
-    back_url,
+    back_host,
     lang=None
 ):
     """
@@ -48,7 +48,7 @@ def mail_decision_service(
         date_fin: Date de fin
         lieu_reunion: Lieu de réunion
         participants: Liste des participants
-        back_url: URL de base du backend
+        back_host: URL de base du backend
         lang: Langue (fr-FR ou en-US)
     
     Returns:
@@ -83,7 +83,7 @@ def mail_decision_service(
         "lieu_reunion": lieu_reunion,
         "participants": participants,
         "company": company,
-        "back_url": back_url
+        "back_host": back_host
     }
     
     try:
