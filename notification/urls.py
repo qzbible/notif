@@ -33,7 +33,9 @@ from drf_spectacular.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('board/', include('board.urls')),
     path('exigence/', include('exigence.urls')),
+    path('file/', include('file.urls')),
     path('update/', include('updateMaster.urls')),
     path('auth-client/', include('authClient.urls')),
     path('security/', include('alert_security.urls')),

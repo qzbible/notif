@@ -20,7 +20,7 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/static
-      - media_volume:/app/media
+      - media_volume:/app/media:ro
     expose:
       - "9081"
     networks:
@@ -107,7 +107,7 @@ services:
       - daphne
     volumes:
       - static_volume:/app/staticfiles
-      - media_volume:/app/mediafiles
+      - media_volume:/app/media
     build:
       context: ./docker/local/nginx
       dockerfile: Dockerfile

@@ -1,0 +1,114 @@
+from rest_framework import serializers
+
+
+class DecisionSerializer(serializers.Serializer):
+    """Serializer pour la création et l'envoi des décisions du comité"""
+    
+    # Informations destinataire
+    dest_email = serializers.EmailField(
+        required=True,
+        help_text="Adresse email du destinataire"
+    )
+    name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du destinataire"
+    )
+    
+    # Informations du comité
+    committee_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du comité"
+    )
+    committee_date = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Date de la réunion du comité"
+    )
+    
+    # Liste des décisions
+    decisions_list = serializers.ListField(
+        child=serializers.CharField(max_length=500),
+        required=True,
+        help_text="Liste des décisions prises"
+    )
+    
+    # Informations de l'instance
+    instance_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'instance"
+    )
+    instance_description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Description de l'instance"
+    )
+    
+    # Détails de la réunion
+    date_debut = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Date de début (format: DD-MM-YYYY)"
+    )
+    date_fin = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Date de fin (format: DD-MM-YYYY)"
+    )
+    lieu_reunion = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=500,
+        help_text="Lieu ou lien de réunion"
+    )
+    participants = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Liste des participants (séparés par des virgules)"
+    )
+    
+    # Informations de connexion
+    url_connect = serializers.URLField(
+        required=False,
+        allow_blank=True,
+        help_text="URL de connexion"
+    )
+    
+    # Informations entreprise
+    company = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'entreprise"
+    )
+    
+    # URL de base
+    base_url = serializers.URLField(
+        required=True,
+        help_text="URL de base du backend"
+    )
+    
+    # Configuration
+    client_id = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Identifiant unique du client"
+    )
+    lang = serializers.ChoiceField(
+        choices=['fr-FR', 'en-US'],
+        default='fr-FR',
+        help_text="Langue de l'email (fr-FR ou en-US)"
+    )
+    
+    def validate_decisions_list(self, value):
+        """Valider que la liste des décisions n'est pas vide"""
+        if not value or len(value) == 0:
+            raise serializers.ValidationError("La liste des décisions ne peut pas être vide")
+        return value
+    
+    def validate_dest_email(self, value):
+        """Valider le format de l'email"""
+        if not value:
+            raise serializers.ValidationError("L'adresse email est requise")
+        return value.lower()
