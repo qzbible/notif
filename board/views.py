@@ -377,6 +377,17 @@ class CommitteeCreatedView(APIView):
                     'company': 'Klivar',
                     'base_url': 'https://api.example.com/',
                     'client_id': 'client_12345',
+                    'periodicity':{
+                                "start_date": "2025-10-16T13:28:06.092Z",
+                                "interval": 3,
+                                "unit": "months",
+                                "recurrence_config": {
+                                    "day_of_month": 1
+                                },
+                                "end_type": "on",
+                                "end_date": "2027-12-31",
+                                "occurrence_count": None
+                            },
                     'lang': 'fr-FR'
                 },
                 request_only=True,
