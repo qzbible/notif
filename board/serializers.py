@@ -182,7 +182,7 @@ class MeetingReminderSerializer(serializers.Serializer):
     )
     
     # URL et entreprise
-    url_session = serializers.URLField(
+    url_connect = serializers.URLField(
         required=False,
         allow_blank=True,
         help_text="URL pour accéder à la session"

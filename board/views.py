@@ -221,7 +221,7 @@ class MeetingReminderView(APIView):
                     'instance_description': 'Ce comité a pour objectif d\'examiner les risques critiques...',
                     'date_debut': '07-07-2025, 13:00',
                     'date_fin': '25-07-2025, 18:00',
-                    'url_session': 'https://app.example.com/meeting/start',
+                    'url_connect': 'https://app.example.com/meeting/start',
                     'company': 'Klivar',
                     'base_url': 'https://api.example.com/',
                     'client_id': 'client_12345',
@@ -292,9 +292,9 @@ class MeetingReminderView(APIView):
                 token = auth_header[7:]
             
             # Construction de l'URL de session avec token si nécessaire
-            url_session = validated_data.get('url_session', '')
-            if token and url_session:
-                url_session = f"{url_session}?token={token}"
+            url_connect = validated_data.get('url_connect', '')
+            if token and url_connect:
+                url_connect = f"{url_connect}?token={token}"
             
             # Envoi de l'email via le service
             result = mail_meeting_reminder_service(
@@ -305,7 +305,7 @@ class MeetingReminderView(APIView):
                 lieu_reunion=validated_data.get('lieu_reunion', ''),
                 participants=validated_data.get('participants', ''),
                 dest_email=validated_data.get('dest_email'),
-                url_session=url_session,
+                url_connect=url_connect,
                 instance_name=validated_data.get('instance_name'),
                 instance_description=validated_data.get('instance_description', ''),
                 date_debut=validated_data.get('date_debut'),

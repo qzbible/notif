@@ -113,7 +113,7 @@ def mail_meeting_reminder_service(
     lieu_reunion,
     participants,
     dest_email,
-    url_session,
+    url_connect,
     instance_name,
     instance_description,
     date_debut,
@@ -150,15 +150,15 @@ def mail_meeting_reminder_service(
     if lang == "fr-FR":
         path = "board/meeting/create-meeting-fr.html"
         path_txt = "board/meeting/create-meeting-fr.txt"
-        object_email = f"Rappel : Réunion du comité {committee_name}"
+        object_email = f"Réunion du comité {committee_name}"
     elif lang == "en-US":
         path = "board/meeting/rcreate-meeting-en.html"
         path_txt = "board/meeting/create-meeting-en.txt"
-        object_email = f"Reminder: {committee_name} meeting"
+        object_email = f"{committee_name} meeting"
     else:
         path = "board/meeting/create-meeting-fr.html"
         path_txt = "board/meeting/create-meeting-fr.txt"
-        object_email = f"Rappel : Réunion du comité {committee_name}"
+        object_email = f"Réunion du comité {committee_name}"
     
     # Contexte pour le template
     context = {
@@ -168,7 +168,7 @@ def mail_meeting_reminder_service(
         "heure_reunion": heure_reunion,
         "lieu_reunion": lieu_reunion,
         "participants": participants,
-        "url_session": url_session,
+        "url_connect": url_connect,
         "instance_name": instance_name,
         "instance_description": instance_description,
         "date_debut": date_debut,
