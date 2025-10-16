@@ -325,16 +325,16 @@ def mail_arbitrage_created_service(
     
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
-        path = "board/arbitrage/created-fr.html"
-        path_txt = "board/arbitrage/created-fr.txt"
+        path = "board/arbitrage/create-folders-fr.html"
+        path_txt = "board/arbitrage/create-folders-fr.txt"
         object_email = f"Nouveau dossier d'arbitrage créé - {committee_name}"
     elif lang == "en-US":
-        path = "board/arbitrage/created-en.html"
-        path_txt = "board/arbitrage/created-en.txt"
+        path = "board/arbitrage/create-folders-en.html"
+        path_txt = "board/arbitrage/create-folders-en.txt"
         object_email = f"New arbitration file created - {committee_name}"
     else:
-        path = "board/arbitrage/created-fr.html"
-        path_txt = "board/arbitrage/created-fr.txt"
+        path = "board/arbitrage/create-folders-fr.html"
+        path_txt = "board/arbitrage/create-folders-fr.txt"
         object_email = f"Nouveau dossier d'arbitrage créé - {committee_name}"
     
     # Contexte pour le template
