@@ -216,3 +216,209 @@ class MeetingReminderSerializer(serializers.Serializer):
         if not value:
             raise serializers.ValidationError("L'adresse email est requise")
         return value.lower()
+
+
+
+class CommitteeCreatedSerializer(serializers.Serializer):
+    """Serializer pour la notification de création de comité d'instance"""
+    
+    # Informations destinataire
+    dest_email = serializers.EmailField(
+        required=True,
+        help_text="Adresse email du destinataire"
+    )
+    name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du destinataire"
+    )
+    
+    # Informations du comité
+    committee_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du comité d'instance"
+    )
+    committee_description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Description du comité"
+    )
+    
+    # Dates et lieu
+    start_date = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Date de début (format: DD MMMM YYYY, HH:MM)"
+    )
+    end_date = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Date de fin (format: DD MMMM YYYY, HH:MM)"
+    )
+    location = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=500,
+        help_text="Lieu ou lien de réunion"
+    )
+    participants = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Liste des participants (séparés par des virgules)"
+    )
+    
+    # URL et entreprise
+    url_connect = serializers.URLField(
+        required=False,
+        allow_blank=True,
+        help_text="URL de connexion pour accéder au comité"
+    )
+    company = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'entreprise"
+    )
+    
+    # URL de base
+    base_url = serializers.URLField(
+        required=True,
+        help_text="URL de base du backend"
+    )
+    
+    # Configuration
+    client_id = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Identifiant unique du client"
+    )
+    lang = serializers.ChoiceField(
+        choices=['fr-FR', 'en-US'],
+        default='fr-FR',
+        help_text="Langue de l'email (fr-FR ou en-US)"
+    )
+    
+    def validate_dest_email(self, value):
+        """Valider le format de l'email"""
+        if not value:
+            raise serializers.ValidationError("L'adresse email est requise")
+        return value.lower()
+    
+
+class ArbitrageCreatedSerializer(serializers.Serializer):
+    """Serializer pour la notification de création de dossier d'arbitrage"""
+    
+    # Informations destinataire
+    dest_email = serializers.EmailField(
+        required=True,
+        help_text="Adresse email du destinataire"
+    )
+    name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du destinataire"
+    )
+    
+    # Informations du comité
+    committee_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du comité"
+    )
+    committee_date = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Date de la réunion du comité"
+    )
+    
+    # Éléments d'arbitrage
+    nomber_elements = serializers.IntegerField(
+        required=True,
+        min_value=1,
+        help_text="Nombre d'éléments à arbitrer"
+    )
+    type_arbitration_elements = serializers.CharField(
+        required=True,
+        max_length=500,
+        help_text="Types d'éléments (ex: Risques, Exigences, Incidents, etc.)"
+    )
+    priorite_arbitrage = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Priorité (Haute / Moyenne / Basse)"
+    )
+    
+    # Informations de l'instance
+    instance_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'instance"
+    )
+    instance_description = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Description de l'instance"
+    )
+    instance_start_date = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Date de début de l'instance"
+    )
+    instance_end_date = serializers.CharField(
+        required=True,
+        max_length=100,
+        help_text="Date de fin de l'instance"
+    )
+    instance_location = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=500,
+        help_text="Lieu ou lien de réunion de l'instance"
+    )
+    instance_participants = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Liste des participants de l'instance"
+    )
+    
+    # URL et entreprise
+    url_connect = serializers.URLField(
+        required=False,
+        allow_blank=True,
+        help_text="URL de connexion pour accéder au dossier"
+    )
+    company = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'entreprise"
+    )
+    
+    # URL de base
+    base_url = serializers.URLField(
+        required=True,
+        help_text="URL de base du backend"
+    )
+    
+    # Configuration
+    client_id = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Identifiant unique du client"
+    )
+    lang = serializers.ChoiceField(
+        choices=['fr-FR', 'en-US'],
+        default='fr-FR',
+        help_text="Langue de l'email (fr-FR ou en-US)"
+    )
+    
+    def validate_dest_email(self, value):
+        """Valider le format de l'email"""
+        if not value:
+            raise serializers.ValidationError("L'adresse email est requise")
+        return value.lower()
+    
+    def validate_nomber_elements(self, value):
+        """Valider le nombre d'éléments"""
+        if value < 1:
+            raise serializers.ValidationError("Le nombre d'éléments doit être supérieur à 0")
+        return value

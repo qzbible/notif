@@ -1,1 +1,34 @@
-s
+Dear {{name}},
+
+A new arbitration file has been created for the {{committee_name}} committee scheduled for {{committee_date}}.
+
+This file contains the following elements to review:
+
+- {{nomber_elements}} elements to arbitrate
+- Types of elements: {{type_arbitration_elements}}
+- Priority: {{priorite_arbitrage}}
+
+Please review these elements before the meeting and prepare your arbitration proposals.
+
+{% if url_connect %}
+Connect: {{url_connect}}
+{% endif %}
+
+Instance details:
+
+Instance – {{instance_name}}
+
+{{instance_description}}
+
+Start: {{instance_start_date}}
+End: {{instance_end_date}}
+
+Meeting location / Link: {{instance_location}}
+
+Participants: {{instance_participants}}
+
+Your {{company}} team
+
+---
+https://www.klivar.fr/
+avotreecoute@klivar.co

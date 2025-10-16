@@ -1,0 +1,34 @@
+Cher {{name}},
+
+Un nouveau dossier d'arbitrage a été créé dans le cadre du comité {{committee_name}} prévu le {{committee_date}}.
+
+Ce dossier contient les éléments suivants à examiner :
+
+- {{nomber_elements}} éléments à arbitrer
+- Types d'éléments : {{type_arbitration_elements}}
+- Priorité : {{priorite_arbitrage}}
+
+Merci de consulter ces éléments avant la réunion et de préparer vos propositions d'arbitrage.
+
+{% if url_connect %}
+Connectez-vous : {{url_connect}}
+{% endif %}
+
+Détail de l'instance :
+
+Instance – {{instance_name}}
+
+{{instance_description}}
+
+Début : {{instance_start_date}}
+Fin : {{instance_end_date}}
+
+Lieu / Lien de réunion : {{instance_location}}
+
+Participants : {{instance_participants}}
+
+Votre équipe {{company}}
+
+---
+https://www.klivar.fr/
+avotreecoute@klivar.com

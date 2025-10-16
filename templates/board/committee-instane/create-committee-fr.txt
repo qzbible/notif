@@ -1,0 +1,28 @@
+Bonjour {{name}},
+
+Bravo! Un nouveau comité d'instance intitulé {{committee_name}} vient d'être créé.
+
+Détail de l'instance :
+
+Comité d'instance – {{committee_name}}
+
+{{committee_description}}
+
+Début : {{start_date}}
+Fin : {{end_date}}
+
+Lieu / Lien de réunion : {{location}}
+
+Participants : {{participants}}
+
+Vous pouvez consulter le périmètre défini et préparer vos observations avant la réunion.
+
+{% if url_connect %}
+Connectez-vous : {{url_connect}}
+{% endif %}
+
+Votre équipe {{company}}
+
+---
+https://www.klivar.fr/
+avotreecoute@klivar.com

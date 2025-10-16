@@ -1,0 +1,28 @@
+Hello {{name}},
+
+Congratulations! A new committee instance titled {{committee_name}} has been created.
+
+Instance details:
+
+Committee instance – {{committee_name}}
+
+{{committee_description}}
+
+Start: {{start_date}}
+End: {{end_date}}
+
+Meeting location / Link: {{location}}
+
+Participants: {{participants}}
+
+You can review the defined scope and prepare your observations before the meeting.
+
+{% if url_connect %}
+Connect: {{url_connect}}
+{% endif %}
+
+Your {{company}} team
+
+---
+https://www.klivar.fr/
+avotreecoute@klivar.com
