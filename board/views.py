@@ -461,7 +461,8 @@ class CommitteeCreatedView(APIView):
                 url_connect=url_connect,
                 company=validated_data.get('company'),
                 back_host=os.environ.get("BACK_HOST_URL", ""),
-                lang=validated_data.get('lang', 'fr-FR')
+                lang=validated_data.get('lang', 'fr-FR'),
+                periodicity=validated_data.get("periodicity", {})
             )
             
             if result:

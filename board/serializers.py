@@ -297,6 +297,11 @@ class CommitteeCreatedSerializer(serializers.Serializer):
         default='fr-FR',
         help_text="Langue de l'email (fr-FR ou en-US)"
     )
+
+    periodicity = serializers.JSONField(
+        required=False,
+        help_text="Fichier JSON optionnel"
+    )
     
     def validate_dest_email(self, value):
         """Valider le format de l'email"""

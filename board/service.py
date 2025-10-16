@@ -5,6 +5,7 @@ import threading
 from django.template.loader import render_to_string
  
 from datetime import datetime, timedelta
+from board.utils import explain_recurrence_simple
 from icalendar import Calendar, Event, vCalAddress, vText
 import os
 import uuid
@@ -208,6 +209,8 @@ def mail_committee_created_service(
     url_connect,
     company,
     back_host,
+ 
+    periodicity,
     lang=None
 ):
     """
@@ -230,20 +233,23 @@ def mail_committee_created_service(
     Returns:
         bool: True si l'envoi a réussi
     """
-    
+    periodicity_l = None 
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
         path = "board/instance/create-committee-fr.html"
         path_txt = "board/instance/create-committee-fr.txt"
         object_email = f"Nouveau comité d'instance créé : {committee_name}"
+        periodicity_l = explain_recurrence_simple(periodicity, 'fr')
     elif lang == "en-US":
         path = "board/instance/create-committe-en.html"
         path_txt = "board/instance/create-committee-en.txt"
         object_email = f"New committee instance created: {committee_name}"
+        periodicity_l = explain_recurrence_simple(periodicity, 'en')
     else:
         path = "board/instance/create-committee-fr.html"
         path_txt = "board/instance/create-committee-fr.txt"
         object_email = f"Nouveau comité d'instance créé : {committee_name}"
+        periodicity_l = explain_recurrence_simple(periodicity, 'fr')
     
     # Contexte pour le template
     context = {
@@ -256,7 +262,8 @@ def mail_committee_created_service(
         "participants": participants,
         "url_connect": url_connect,
         "company": company,
-        "back_host": back_host
+        "back_host": back_host,
+        'periodicity':periodicity_l
     }
     
     try:
