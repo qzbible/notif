@@ -493,6 +493,7 @@ class CommitteeCreatedView(APIView):
             )
             company_object = validated_data.get('client')
             # Envoi de l'email via le service
+             
             result = mail_committee_created_service(
                 # name=validated_data.get('name'),
                 title=validated_data.get('title', ''),
@@ -504,7 +505,8 @@ class CommitteeCreatedView(APIView):
                 back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR'),
                 periodicity=validated_data.get("recurrence_config", {}),
-                ponctuel_config = validated_data.get("ponctuel_config", {})
+                ponctuel_config = validated_data.get("ponctuel_config", {}),
+                created=created
             )
             
             if result:
