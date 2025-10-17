@@ -5,7 +5,7 @@ import threading
 from django.template.loader import render_to_string
  
 from datetime import datetime, timedelta
-from board.utils import explain_recurrence_simple, format_ponctuel_date, format_recurrence_schedule
+from board.utils import explain_recurrence_simple, format_date_hour, format_ponctuel_date, format_recurrence_schedule
 from icalendar import Calendar, Event, vCalAddress, vText
 import os
 import uuid
@@ -14,7 +14,7 @@ from django.conf import settings
 
 from typing import List, Dict, Tuple
 from service.utils import send_mail_created
-
+from celery import shared_task
 
 def list_actors_info(actors: List[Dict]) -> Tuple[List[str], str]:
     """
@@ -153,21 +153,18 @@ def mail_decision_service(
         return False
  
 
+@shared_task
 def mail_meeting_reminder_service(
-    name,
-    committee_name,
-    date_reunion,
-    heure_reunion,
-    lieu_reunion,
-    participants,
-    dest_email,
+    title,
+    description, 
+    link,
     url_connect,
-    instance_name,
-    instance_description,
-    date_debut,
-    date_fin,
     company,
     back_host,
+    periodicity,
+    ponctuel_config,
+    actors = [],
+    date=None,
     lang=None
 ):
     """
@@ -194,48 +191,82 @@ def mail_meeting_reminder_service(
         bool: True si l'envoi a réussi
     """
     
+    periodicity_l = None 
+    date_instance = ''
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
         path = "board/meeting/create-meeting-fr.html"
         path_txt = "board/meeting/create-meeting-fr.txt"
-        object_email = f"Rappel : Réunion du comité {committee_name}"
+        object_email = f"Rappel : Réunion du comité {title}"
+        periodicity_l = explain_recurrence_simple(periodicity, 'fr')
+        if periodicity :
+            date_instance = format_recurrence_schedule(periodicity, 'fr')
+        elif ponctuel_config :
+            date_instance = format_ponctuel_date(ponctuel_config, 'fr')
+        else :
+            date_instance = ''
+        date_only, hour = format_date_hour(date, 'fr')
+    
     elif lang == "en-US":
         path = "board/meeting/rcreate-meeting-en.html"
         path_txt = "board/meeting/create-meeting-en.txt"
-        object_email = f"Reminder: {committee_name} meeting"
+        object_email = f"Reminder: {title} meeting"
+        periodicity_l = explain_recurrence_simple(periodicity, 'en')
+        if periodicity :
+            date_instance = format_recurrence_schedule(periodicity, 'en')
+        elif ponctuel_config :
+            date_instance = format_ponctuel_date(ponctuel_config, 'en')
+        else :
+            date_instance = ''
+        date_only, hour = format_date_hour(date, 'fr')
     else:
         path = "board/meeting/create-meeting-fr.html"
         path_txt = "board/meeting/create-meeting-fr.txt"
-        object_email = f"Rappel : Réunion du comité {committee_name}"
-    
+        object_email = f"Rappel : Réunion du comité {title}"
+        periodicity_l = explain_recurrence_simple(periodicity, 'fr')
+        if periodicity :
+            date_instance = format_recurrence_schedule(periodicity, 'fr')
+        elif ponctuel_config :
+            date_instance = format_ponctuel_date(ponctuel_config, 'fr')
+        else :
+            date_instance = ''
+        date_only, hour = format_date_hour(date, 'fr')
+
+    emails, fullnames = list_actors_info(actors)
     # Contexte pour le template
-    context = {
-        "name": name,
-        "committee_name": committee_name,
-        "date_reunion": date_reunion,
-        "heure_reunion": heure_reunion,
-        "lieu_reunion": lieu_reunion,
-        "participants": participants,
-        "url_connect": url_connect,
-        "instance_name": instance_name,
-        "instance_description": instance_description,
-        "date_debut": date_debut,
-        "date_fin": date_fin,
-        "company": company,
-        "back_host": back_host
-    }
-    
+     
     try:
-        # Rendu des templates
-        body_content = render_to_string(path, context)
-        text_content = render_to_string(path_txt, context)
         
-        # Envoi asynchrone de l'email
-        email_thread = threading.Thread(
-            target=send_mail_created,
-            args=([dest_email], object_email, text_content, body_content, company,)
-        )
-        email_thread.start()
+        for act in actors: 
+            # Retirer l'email du destinataire actuel de la liste des CC
+            other_emails = [email for email in emails if email != act.get('email')]
+            
+            context = { 
+                "name": act.get('first_name', '') + ' ' + act.get('last_name', ''),
+                "committee_name": title + ' '+date_only+' '+hour,
+                "date_reunion": date_only,
+                "heure_reunion": hour,
+                "lieu_reunion": link,
+                "participants": fullnames,
+                "url_connect": url_connect,
+                "instance_name": title,
+                "instance_description": description,
+                "date": date_instance, 
+                "company": company,
+                "back_host": back_host,
+                "periodicity": periodicity_l
+            } 
+            # Rendu des templates
+            body_content = render_to_string(path, context)
+            text_content = render_to_string(path_txt, context)
+            
+            # Envoi asynchrone de l'email avec les autres en copie cachée
+            email_thread = threading.Thread(
+                target=send_mail_created,
+                args=([act.get('email')], object_email, text_content, body_content),
+                kwargs={'cc_emails': other_emails, 'company': company}
+            )
+            email_thread.start()
         
         return True
         

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import calendar
 
 
@@ -288,7 +288,64 @@ def format_ponctuel_date(ponctuel_config: Dict, lang: str = "fr") -> str:
     else:
         return _format_datetime_en(dt, include_time=True)
 
+ 
 
+def format_date_hour(date_str: str, lang: str = "fr") -> Tuple[str, str]:
+    """
+    Formate la date et extrait l'heure
+    
+    Args:
+        date_str: Date au format ISO (ex: "2025-10-17T11:35:47.233Z")
+        lang: Langue ("fr" ou "en")
+        
+    Returns:
+        Tuple (date_formatée, heure)
+        - date_formatée: Date en toutes lettres
+        - heure: Heure au format "HH:MM"
+    """
+    if not date_str:
+        empty = "Date non définie" if lang == "fr" else "Date not defined"
+        return (empty, "")
+    
+    dt = _parse_date(date_str)
+    if not dt:
+        invalid = "Date invalide" if lang == "fr" else "Invalid date"
+        return (invalid, "")
+    
+    # Extraire l'heure
+    time_part = dt.strftime("%H:%M")
+    
+    if lang == "fr":
+        days_fr = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']
+        months_fr = ['', 'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+        
+        day_name = days_fr[dt.weekday()]
+        day = dt.day
+        month = months_fr[dt.month]
+        year = dt.year
+        
+        date_formatted = f"{day_name} {day} {month} {year}"
+        return (date_formatted, time_part)
+    
+    else:  # English
+        days_en = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+        months_en = ['', 'January', 'February', 'March', 'April', 'May', 'June',
+                     'July', 'August', 'September', 'October', 'November', 'December']
+        
+        day_name = days_en[dt.weekday()]
+        day = dt.day
+        month = months_en[dt.month]
+        year = dt.year
+        
+        # Suffixe pour le jour
+        if 10 <= day % 100 <= 20:
+            suffix = 'th'
+        else:
+            suffix = {1: 'st', 2: 'nd', 3: 'rd'}.get(day % 10, 'th')
+        
+        date_formatted = f"{day_name}, {month} {day}{suffix}, {year}"
+        return (date_formatted, time_part)
 
 
 def _format_datetime_fr(dt: datetime, include_time: bool = True) -> str:

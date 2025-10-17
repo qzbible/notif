@@ -3,6 +3,7 @@ import random
 from board.models import InstanceBoard
 from board.serializers import ArbitrageCreatedSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
 from board.service import mail_arbitrage_created_service, mail_committee_created_service, mail_decision_service, mail_meeting_reminder_service
+from board.utils import calculate_next_occurrences
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
@@ -500,7 +501,7 @@ class CommitteeCreatedView(APIView):
                 description=validated_data.get('description', ''),
                 link=validated_data.get('link', ''),
                 actors=validated_data.get('actors',[] ),
-                url_connect= validated_data.get('url_connect',[] ),
+                url_connect= validated_data.get('url_connect','' ),
                 company = company_object["denomination"] if validated_data.get('client') else "",
                 back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR'),
@@ -508,17 +509,38 @@ class CommitteeCreatedView(APIView):
                 ponctuel_config = validated_data.get("ponctuel_config", {}),
                 created=created
             )
+            if created:
+                # on recupere les 5 prochaine date
+                dates = []
+                if validated_data.get('recurrence_config', None) :
+                    dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=5)
+                elif validated_data.get('ponctuel_config', None):
+                    dates.append(validated_data.get('ponctuel_config', None).get('date'))
+                print('date + ', dates)
+                for date in dates:
+                    task = mail_meeting_reminder_service.apply_async(
+                        args=[
+                            validated_data.get('title', ''),
+                            validated_data.get('description', ''),
+                            validated_data.get('link', ''),
+                            validated_data.get('url_connect','' ),
+                            company_object["denomination"] if validated_data.get('client') else "",
+                            os.environ.get("BACK_HOST_URL", ""),
+                            validated_data.get("recurrence_config", {}),
+                            validated_data.get("ponctuel_config", {}),
+                            validated_data.get('actors',[] ),
+                            date,
+                            validated_data.get('lang', 'fr-FR')
+                        ],
+                        eta=date
+                    )
+                    print('f retourn', task)
             
             if result:
                 response_data = {
                     "message": "Email de création de comité envoyé avec succès",
                     "status": "success",
-                    "code": status.HTTP_200_OK,
-                    "data": {
-                        "dest_email": validated_data.get('dest_email'),
-                        "committee_name": validated_data.get('committee_name'),
-                        "sent_at": timezone.now().isoformat()
-                    }
+                    "code": status.HTTP_200_OK, 
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
             else:
