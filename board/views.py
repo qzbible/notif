@@ -491,7 +491,7 @@ class CommitteeCreatedView(APIView):
 
                 }
             )
-            company_object = validated_data.get('company')
+            company_object = validated_data.get('client')
             # Envoi de l'email via le service
             result = mail_committee_created_service(
                 # name=validated_data.get('name'),
@@ -500,7 +500,7 @@ class CommitteeCreatedView(APIView):
                 link=validated_data.get('link', ''),
                 actors=validated_data.get('actors',[] ),
                 url_connect= validated_data.get('url_connect',[] ),
-                company = company_object["denomination"] if validated_data.get('company') else "",
+                company = company_object["denomination"] if validated_data.get('client') else "",
                 back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR'),
                 periodicity=validated_data.get("recurrence_config", {})
