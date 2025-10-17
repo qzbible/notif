@@ -206,7 +206,7 @@ def send_mail_created(to_emails, title, text_content, html_content, cc_emails=No
                 body=text_content,
                 from_email=from_formatted,
                 to=[to_email],
-                bcc=cc_filtered,  # Copie cachée des autres participants
+                # bcc=cc_filtered,  # Copie cachée des autres participants
                 headers=headers
             )
             
