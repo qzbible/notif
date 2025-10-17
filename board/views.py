@@ -473,25 +473,25 @@ class CommitteeCreatedView(APIView):
             if token and url_connect:
                 url_connect = f"{url_connect}?token={token}"
             
-            # ins_created, created = InstanceBoard.objects.get_or_create(
-            #     id_instance=validated_data.get('id_instance'),
-            #     defaults={
-            #         'title': validated_data.get('title'),
-            #         'description': validated_data.get('description'),
-            #         'url_connect': validated_data.get('url_connect'),
-            #         'type': validated_data.get('type'),
-            #         'format': validated_data.get('format'),
-            #         'link': validated_data.get('link'),
-            #         'lang': validated_data.get('lang'),
-            #         'client': validated_data.get('client'),
-            #         'recurrence_config': validated_data.get('recurrence_config', None),
-            #         'ponctuel_config': validated_data.get('ponctuel_config', None),
-            #         'perimeter': validated_data.get('perimeter', []),
-            #         'actors': validated_data.get('actors',[] )
+            ins_created, created = InstanceBoard.objects.get_or_create(
+                id_instance=validated_data.get('id_instance'),
+                defaults={
+                    'title': validated_data.get('title'),
+                    'description': validated_data.get('description'),
+                    'url_connect': validated_data.get('url_connect'),
+                    'type': validated_data.get('type'),
+                    'format': validated_data.get('format'),
+                    'link': validated_data.get('link'),
+                    'lang': validated_data.get('lang'),
+                    'client': validated_data.get('client'),
+                    'recurrence_config': validated_data.get('recurrence_config', None),
+                    'ponctuel_config': validated_data.get('ponctuel_config', None),
+                    'perimeter': validated_data.get('perimeter', []),
+                    'actors': validated_data.get('actors',[] )
 
-            #     }
-            # )
-            company = validated_data.get('company')
+                }
+            )
+            company_object = validated_data.get('company')
             # Envoi de l'email via le service
             result = mail_committee_created_service(
                 # name=validated_data.get('name'),
@@ -500,7 +500,7 @@ class CommitteeCreatedView(APIView):
                 link=validated_data.get('link', ''),
                 actors=validated_data.get('actors',[] ),
                 url_connect= validated_data.get('url_connect',[] ),
-                company=company["denomination"] if company else "",
+                company = company_object["denomination"] if validated_data.get('company') else "",
                 back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR'),
                 periodicity=validated_data.get("recurrence_config", {})
