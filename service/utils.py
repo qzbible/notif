@@ -96,6 +96,7 @@ def send_mail(to_emails, title, text_content, html_content, company):
 #         msg.send()
 #     return True
 
+
 def send_mail_created(to_emails, title, text_content, html_content,   company=None):
     """
     Envoie un email à plusieurs destinataires en utilisant Django's EmailMultiAlternatives.
@@ -131,6 +132,64 @@ def send_mail_created(to_emails, title, text_content, html_content,   company=No
         try:
             # Création du message avec les en-têtes optimisés
             cc_filtered = [email for email in to_emails if email != to_email]
+            msg = EmailMultiAlternatives(
+                subject=title,
+                body=text_content,
+                from_email=from_formatted,
+                to=[to_email],
+                cc= cc_filtered,
+                headers=headers
+            )
+            
+            # Ajout de la version HTML si disponible
+            if html_content:
+                msg.attach_alternative(html_content, 'text/html')
+            
+            # Envoi du message
+            msg.send(fail_silently=False)
+            
+        except Exception as e:
+            # Journalisation des erreurs sans arrêter le processus
+            print(f"Erreur lors de l'envoi à {to_email}: {str(e)}")
+            success = False
+    
+    return success
+
+def send_mail_created(to_emails, title, text_content, html_content, cc_emails =[],  company=None):
+    """
+    Envoie un email à plusieurs destinataires en utilisant Django's EmailMultiAlternatives.
+    
+    Args:
+        to_emails (list): Liste des adresses email des destinataires
+        title (str): Sujet de l'email
+        text_content (str): Contenu en format texte
+        html_content (str): Contenu en format HTML (optionnel)
+        company (str, optional): Nom de l'entreprise expéditrice. Défaut à None.
+    
+    Returns:
+        bool: True si l'envoi a réussi
+    """
+    from django.core.mail import EmailMultiAlternatives
+    from django.conf import settings
+    import uuid
+    
+    from_email = settings.EMAIL_HOST_USER
+    sender_name = company + ' Via Klivar' if company else 'Klivar'
+    from_formatted = f'{sender_name} <{from_email}>'
+    
+    # Ajout d'options d'en-têtes pour améliorer la délivrabilité
+    headers = {
+        'Reply-To': from_email,
+        'X-Entity-Ref-ID': str(uuid.uuid4()),  # ID unique pour chaque message
+        'List-Unsubscribe': f'<mailto:{from_email}?subject=unsubscribe>'
+    }
+    
+    success = True
+    
+    for to_email in to_emails:
+        try:
+            # Création du message avec les en-têtes optimisés
+            cc_filtered = [email for email in cc_emails if email != to_email]
             msg = EmailMultiAlternatives(
                 subject=title,
                 body=text_content,
