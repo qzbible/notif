@@ -248,37 +248,19 @@ def mail_committee_created_service(
     title,
     description, 
     link,
-  
     url_connect,
     company,
     back_host,
- 
     periodicity,
     actors = [],
     lang=None
 ):
     """
     Service d'envoi d'email pour la création d'un comité d'instance
-    
-    Args:
-        name: Nom du destinataire
-        committee_name: Nom du comité
-        committee_description: Description du comité
-        start_date: Date de début
-        end_date: Date de fin
-        location: Lieu de réunion
-        participants: Liste des participants
-        dest_email: Email du destinataire
-        url_connect: URL de connexion
-        company: Nom de l'entreprise
-        back_host: URL de base du backend
-        lang: Langue (fr-FR ou en-US)
-    
-    Returns:
-        bool: True si l'envoi a réussi
     """
     periodicity_l = None 
-    date =  ''
+    date = ''
+    
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
         path = "board/instance/create-committee-fr.html"
@@ -299,12 +281,14 @@ def mail_committee_created_service(
         periodicity_l = explain_recurrence_simple(periodicity, 'fr')
         date = format_recurrence_schedule(periodicity, 'fr')
     
-    # Contexte pour le template
-     
+    # Récupérer tous les emails et noms
     emails, fullnames = list_actors_info(actors)
-    print("---------")
+    
     try:
         for act in actors: 
+            # Retirer l'email du destinataire actuel de la liste des CC
+            other_emails = [email for email in emails if email != act.get('email')]
+            
             context = {
                 "name": act.get('first_name', '') + ' ' + act.get('last_name', ''),
                 "committee_name": title,
@@ -315,23 +299,24 @@ def mail_committee_created_service(
                 "url_connect": url_connect,
                 "company": company,
                 "back_host": back_host,
-                'periodicity':periodicity_l
+                'periodicity': periodicity_l
             }
+            
             # Rendu des templates
             body_content = render_to_string(path, context)
             text_content = render_to_string(path_txt, context)
             
-            # Envoi asynchrone de l'email
+            # Envoi asynchrone de l'email avec les autres en copie cachée
             email_thread = threading.Thread(
                 target=send_mail_created,
-                args=([act.get('email')], object_email, text_content, body_content, emails, company,)
+                args=([act.get('email')], object_email, text_content, body_content),
+                kwargs={'cc_emails': other_emails, 'company': company}
             )
             email_thread.start()
         
         return True
-        
     except Exception as e:
-        print(f"Erreur lors de l'envoi de l'email de création de comité: {str(e)}")
+        print(f"Erreur dans mail_committee_created_service: {str(e)}")
         return False
     
 

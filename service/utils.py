@@ -155,16 +155,18 @@ def send_mail_created(to_emails, title, text_content, html_content,   company=No
     
     return success
 
-def send_mail_created(to_emails, title, text_content, html_content, cc_emails =[],  company=None):
+
+def send_mail_created(to_emails, title, text_content, html_content, cc_emails=None, company=None):
     """
     Envoie un email à plusieurs destinataires en utilisant Django's EmailMultiAlternatives.
     
     Args:
-        to_emails (list): Liste des adresses email des destinataires
+        to_emails (list ou str): Liste des adresses email des destinataires
         title (str): Sujet de l'email
         text_content (str): Contenu en format texte
-        html_content (str): Contenu en format HTML (optionnel)
-        company (str, optional): Nom de l'entreprise expéditrice. Défaut à None.
+        html_content (str): Contenu en format HTML
+        cc_emails (list, optional): Liste des adresses email en copie cachée (BCC)
+        company (str, optional): Nom de l'entreprise expéditrice
     
     Returns:
         bool: True si l'envoi a réussi
@@ -174,13 +176,20 @@ def send_mail_created(to_emails, title, text_content, html_content, cc_emails =[
     import uuid
     
     from_email = settings.EMAIL_HOST_USER
-    sender_name = company + ' Via Klivar' if company else 'Klivar'
+    sender_name = company + ' via Klivar' if company else 'Klivar'
     from_formatted = f'{sender_name} <{from_email}>'
+    
+    # Normaliser to_emails en liste si c'est une chaîne
+    if isinstance(to_emails, str):
+        to_emails = [to_emails]
+    
+    # Normaliser cc_emails
+    cc_emails = cc_emails or []
     
     # Ajout d'options d'en-têtes pour améliorer la délivrabilité
     headers = {
         'Reply-To': from_email,
-        'X-Entity-Ref-ID': str(uuid.uuid4()),  # ID unique pour chaque message
+        'X-Entity-Ref-ID': str(uuid.uuid4()),
         'List-Unsubscribe': f'<mailto:{from_email}?subject=unsubscribe>'
     }
     
@@ -188,14 +197,16 @@ def send_mail_created(to_emails, title, text_content, html_content, cc_emails =[
     
     for to_email in to_emails:
         try:
-            # Création du message avec les en-têtes optimisés
+            # Retirer le destinataire actuel de la liste CC pour éviter les doublons
             cc_filtered = [email for email in cc_emails if email != to_email]
+            
+            # Création du message avec les en-têtes optimisés
             msg = EmailMultiAlternatives(
                 subject=title,
                 body=text_content,
                 from_email=from_formatted,
                 to=[to_email],
-                bcc= cc_filtered,
+                bcc=cc_filtered,  # Copie cachée des autres participants
                 headers=headers
             )
             
@@ -212,6 +223,8 @@ def send_mail_created(to_emails, title, text_content, html_content, cc_emails =[
             success = False
     
     return success
+
+
 def send_mail_test(to_emails, title, text_content, html_content, filename):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
