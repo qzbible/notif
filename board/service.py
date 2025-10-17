@@ -5,7 +5,7 @@ import threading
 from django.template.loader import render_to_string
  
 from datetime import datetime, timedelta
-from board.utils import explain_recurrence_simple, format_recurrence_schedule
+from board.utils import explain_recurrence_simple, format_ponctuel_date, format_recurrence_schedule
 from icalendar import Calendar, Event, vCalAddress, vText
 import os
 import uuid
@@ -252,6 +252,7 @@ def mail_committee_created_service(
     company,
     back_host,
     periodicity,
+    ponctuel_config,
     actors = [],
     lang=None
 ):
@@ -267,19 +268,37 @@ def mail_committee_created_service(
         path_txt = "board/instance/create-committee-fr.txt"
         object_email = f"Nouveau comité d'instance créé : {title}"
         periodicity_l = explain_recurrence_simple(periodicity, 'fr')
-        date = format_recurrence_schedule(periodicity, 'fr')
+        if periodicity :
+            date = format_recurrence_schedule(periodicity, 'fr')
+        elif ponctuel_config :
+            date = format_ponctuel_date(ponctuel_config, 'fr')
+        else :
+            date = ''
+        
     elif lang == "en-US":
         path = "board/instance/create-committe-en.html"
         path_txt = "board/instance/create-committee-en.txt"
         object_email = f"New committee instance created: {title}"
         periodicity_l = explain_recurrence_simple(periodicity, 'en')
-        date = format_recurrence_schedule(periodicity, 'en')
+        
+        if periodicity :
+            date = format_recurrence_schedule(periodicity, 'en')
+        elif ponctuel_config :
+            date = format_ponctuel_date(ponctuel_config, 'en')
+        else :
+            date = ''
     else:
         path = "board/instance/create-committee-fr.html"
         path_txt = "board/instance/create-committee-fr.txt"
         object_email = f"Nouveau comité d'instance créé : {title}"
         periodicity_l = explain_recurrence_simple(periodicity, 'fr')
-        date = format_recurrence_schedule(periodicity, 'fr')
+         
+        if periodicity :
+            date = format_recurrence_schedule(periodicity, 'fr')
+        elif ponctuel_config :
+            date = format_ponctuel_date(ponctuel_config, 'fr')
+        else :
+            date = ''
     
     # Récupérer tous les emails et noms
     emails, fullnames = list_actors_info(actors)

@@ -260,6 +260,35 @@ def explain_recurrence_simple(config: Dict, lang: str = "fr") -> str:
 
 
 
+def format_ponctuel_date(ponctuel_config: Dict, lang: str = "fr") -> str:
+    """
+    Formate la date d'un événement ponctuel
+    
+    Args:
+        ponctuel_config: Configuration ponctuelle avec:
+            - date: Date de l'événement (ISO format)
+            - priority: Priorité (optionnel)
+        lang: Langue ("fr" ou "en")
+        
+    Returns:
+        Date formatée avec jour, date et heure
+    """
+    
+    date_str = ponctuel_config.get('date')
+    if not date_str:
+        return "Date non définie" if lang == "fr" else "Date not defined"
+    
+    dt = _parse_date(date_str)
+    if not dt:
+        return "Date invalide" if lang == "fr" else "Invalid date"
+    
+    # Formater selon la langue
+    if lang == "fr":
+        return _format_datetime_fr(dt, include_time=True)
+    else:
+        return _format_datetime_en(dt, include_time=True)
+
+
 
 
 def _format_datetime_fr(dt: datetime, include_time: bool = True) -> str:

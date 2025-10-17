@@ -503,7 +503,8 @@ class CommitteeCreatedView(APIView):
                 company = company_object["denomination"] if validated_data.get('client') else "",
                 back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR'),
-                periodicity=validated_data.get("recurrence_config", {})
+                periodicity=validated_data.get("recurrence_config", {}),
+                ponctuel_config = validated_data.get("ponctuel_config", {})
             )
             
             if result:
