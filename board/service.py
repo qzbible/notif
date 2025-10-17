@@ -254,6 +254,7 @@ def mail_committee_created_service(
     periodicity,
     ponctuel_config,
     actors = [],
+    created=False,
     lang=None
 ):
     """
@@ -266,7 +267,10 @@ def mail_committee_created_service(
     if lang == "fr-FR":
         path = "board/instance/create-committee-fr.html"
         path_txt = "board/instance/create-committee-fr.txt"
-        object_email = f"Nouveau comité d'instance créé : {title}"
+        if created:
+            object_email = f"Nouveau comité d'instance créé : {title}"
+        else:
+            object_email = f"Comité d'instance mis à jour : {title}"
         periodicity_l = explain_recurrence_simple(periodicity, 'fr')
         if periodicity :
             date = format_recurrence_schedule(periodicity, 'fr')
@@ -278,7 +282,11 @@ def mail_committee_created_service(
     elif lang == "en-US":
         path = "board/instance/create-committe-en.html"
         path_txt = "board/instance/create-committee-en.txt"
-        object_email = f"New committee instance created: {title}"
+        if created:
+            object_email = f"New committee instance created : {title}"
+        else:
+            object_email = f"Committee instance updated : {title}"
+         
         periodicity_l = explain_recurrence_simple(periodicity, 'en')
         
         if periodicity :
@@ -290,7 +298,11 @@ def mail_committee_created_service(
     else:
         path = "board/instance/create-committee-fr.html"
         path_txt = "board/instance/create-committee-fr.txt"
-        object_email = f"Nouveau comité d'instance créé : {title}"
+        if created:
+            object_email = f"Nouveau comité d'instance créé : {title}"
+        else:
+            object_email = f"Comité d'instance mis à jour : {title}" 
+
         periodicity_l = explain_recurrence_simple(periodicity, 'fr')
          
         if periodicity :
