@@ -324,7 +324,7 @@ def mail_committee_created_service(
             # Envoi asynchrone de l'email
             email_thread = threading.Thread(
                 target=send_mail_created,
-                args=([emails], object_email, text_content, body_content, company,)
+                args=(emails, object_email, text_content, body_content, company,)
             )
             email_thread.start()
         

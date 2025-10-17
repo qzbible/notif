@@ -376,7 +376,7 @@ class CommitteeCreatedView(APIView):
                         "lang": "fr-FR",
                         "client": {
                             "id": "CLI-2025",
-                            "nom": "Entreprise ABC",
+                            "denomination": "Entreprise ABC",
                             "secteur": "Finance"
                         },
                         "recurrence_config":  {
@@ -394,37 +394,14 @@ class CommitteeCreatedView(APIView):
                         },
                         "actors": [
                             {
-                            "nom": "Jean Dupont",
+                            "first_name": " Dupont",
+                            "last_name": "Jean ",
                             "email": "jean.dupont@exemple.com",
                             "role": "Président"
-                            },
-                            {
-                            "nom": "Sophie Martin",
-                            "email": "sophie.martin@exemple.com",
-                            "role": "Secrétaire"
-                            },
-                            {
-                            "nom": "Paul Nguema",
-                            "email": "paul.nguema@exemple.com",
-                            "role": "Membre"
-                            }
+                            } 
                         ],
                         "perimeter": [
-                            {
-                            "nom": "Jean Dupont",
-                            "email": "jean.dupont@exemple.com",
-                            "role": "Président"
-                            },
-                            {
-                            "nom": "Sophie Martin",
-                            "email": "sophie.martin@exemple.com",
-                            "role": "Secrétaire"
-                            },
-                            {
-                            "nom": "Paul Nguema",
-                            "email": "paul.nguema@exemple.com",
-                            "role": "Membre"
-                            }
+                             
                         ]
                         },
                 request_only=True,
