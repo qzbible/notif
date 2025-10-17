@@ -16,7 +16,7 @@ def _parse_date(date_str: str) -> Optional[datetime]:
         return datetime.fromisoformat(date_str + 'T00:00:00+00:00')
 
 
-  
+ 
 
 def _build_french_sentence(interval, unit, recurrence_config, end_type, end_date, occurrence_count):
     """Construit une phrase en français"""
@@ -237,9 +237,9 @@ def explain_recurrence_simple(config: Dict, lang: str = "fr") -> str:
     Returns:
         Une phrase simple décrivant la récurrence
     """
-    print('ici 1 ---')
+   
     interval = config['interval']
-    print('ici 1 ---')
+ 
     unit = config['unit']
     end_type = config['end_type']
     end_date = config.get('end_date')
@@ -455,6 +455,140 @@ def format_recurrence_schedule(config: Dict, lang: str = "fr") -> str:
             return f"Starts on {start_str} Ends on {end_str}"
         
         return f"Starts on {start_str}"
+
+
+def _format_to_iso(dt: datetime) -> str:
+    """Formate une date en ISO avec Z"""
+    return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+
+def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
+    """
+    Calcule les N prochaines occurrences d'une récurrence
+    
+    Args:
+        config: Configuration de récurrence
+        count: Nombre d'occurrences à calculer (défaut: 5)
+        
+    Returns:
+        Liste des dates au format ISO (ex: "2025-10-17T11:35:47.233Z")
+    """
+    start_date = _parse_date(config.get('start_date'))
+    if not start_date:
+        return []
+    
+    interval = config.get('interval', 1)
+    unit = config.get('unit')
+    recurrence_config = config.get('recurrence_config', {})
+    end_type = config.get('end_type', 'never')
+    end_date = _parse_date(config.get('end_date')) if config.get('end_date') else None
+    occurrence_count = config.get('occurrence_count')
+    
+    occurrences = []
+    current_date = start_date
+    
+    # Limiter le nombre d'occurrences selon end_type
+    max_count = count
+    if end_type == "after" and occurrence_count:
+        max_count = min(count, occurrence_count)
+    
+    iteration = 0
+    max_iterations = 1000  # Sécurité pour éviter les boucles infinies
+    
+    while len(occurrences) < max_count and iteration < max_iterations:
+        iteration += 1
+        
+        # Vérifier si on dépasse la date de fin
+        if end_type == "on" and end_date and current_date > end_date:
+            break
+        
+        # Ajouter l'occurrence selon le type de récurrence
+        if unit == "days":
+            occurrences.append(_format_to_iso(current_date))
+            current_date += timedelta(days=interval)
+        
+        elif unit == "weeks":
+            weekdays = recurrence_config.get('weekdays', [])
+            if weekdays:
+                # Mapper les jours de la semaine
+                day_map = {
+                    'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
+                    'friday': 4, 'saturday': 5, 'sunday': 6
+                }
+                target_days = sorted([day_map[d] for d in weekdays])
+                
+                # Trouver le prochain jour correspondant
+                current_weekday = current_date.weekday()
+                
+                # Chercher dans la semaine courante
+                found = False
+                for target_day in target_days:
+                    if target_day >= current_weekday or len(occurrences) == 0:
+                        days_ahead = (target_day - current_weekday) % 7
+                        if days_ahead == 0 and len(occurrences) > 0:
+                            days_ahead = 7
+                        next_date = current_date + timedelta(days=days_ahead)
+                        occurrences.append(_format_to_iso(next_date))
+                        current_date = next_date + timedelta(days=1)
+                        found = True
+                        break
+                
+                if not found:
+                    # Passer à la semaine suivante
+                    days_to_next_week = 7 - current_weekday + target_days[0]
+                    current_date += timedelta(days=days_to_next_week)
+            else:
+                occurrences.append(_format_to_iso(current_date))
+                current_date += timedelta(weeks=interval)
+        
+        elif unit == "months":
+            if 'day_of_month' in recurrence_config:
+                day = recurrence_config['day_of_month']
+                
+                # Gérer le dernier jour du mois
+                if day == 31:
+                    last_day = calendar.monthrange(current_date.year, current_date.month)[1]
+                    next_date = current_date.replace(day=last_day)
+                else:
+                    try:
+                        next_date = current_date.replace(day=min(day, calendar.monthrange(current_date.year, current_date.month)[1]))
+                    except ValueError:
+                        next_date = current_date
+                
+                occurrences.append(_format_to_iso(next_date))
+                
+                # Passer au mois suivant
+                month = current_date.month + interval
+                year = current_date.year
+                while month > 12:
+                    month -= 12
+                    year += 1
+                current_date = current_date.replace(year=year, month=month, day=1)
+            
+            elif 'week_position' in recurrence_config:
+                # Premier, deuxième, troisième, quatrième ou dernier jour de la semaine du mois
+                occurrences.append(_format_to_iso(current_date))
+                
+                # Passer au mois suivant
+                month = current_date.month + interval
+                year = current_date.year
+                while month > 12:
+                    month -= 12
+                    year += 1
+                current_date = current_date.replace(year=year, month=month, day=1)
+            else:
+                occurrences.append(_format_to_iso(current_date))
+                month = current_date.month + interval
+                year = current_date.year
+                while month > 12:
+                    month -= 12
+                    year += 1
+                current_date = current_date.replace(year=year, month=month)
+        
+        elif unit == "years":
+            occurrences.append(_format_to_iso(current_date))
+            current_date = current_date.replace(year=current_date.year + interval)
+    
+    return occurrences[:max_count]
 
 # Exemple d'utilisation
 if __name__ == "__main__":
