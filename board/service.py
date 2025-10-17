@@ -5,14 +5,61 @@ import threading
 from django.template.loader import render_to_string
  
 from datetime import datetime, timedelta
-from board.utils import explain_recurrence_simple
+from board.utils import explain_recurrence_simple, format_recurrence_schedule
 from icalendar import Calendar, Event, vCalAddress, vText
 import os
 import uuid
 import secrets
 from django.conf import settings
 
+from typing import List, Dict, Tuple
 from service.utils import send_mail_created
+
+
+def list_actors_info(actors: List[Dict]) -> Tuple[List[str], str]:
+    """
+    Liste tous les emails et noms complets des acteurs
+    
+    Args:
+        actors: Liste des acteurs
+        
+    Returns:
+        Tuple (emails, fullnames)
+        - emails: Liste des emails (avec doublons possibles)
+        - fullnames: Chaîne avec tous les noms séparés par des virgules
+    """
+    emails = []
+    fullnames_list = []
+    
+    for actor in actors:
+        # Email principal
+        if actor.get('email'):
+            emails.append(actor['email'])
+        
+        # Email secondaire
+        if actor.get('email_second'):
+            emails.append(actor['email_second'])
+        
+        # Nom complet
+        first_name = actor.get('first_name', '').strip()
+        last_name = actor.get('last_name', '').strip()
+        
+        if first_name and last_name:
+            full_name = f"{first_name} {last_name}"
+        elif first_name:
+            full_name = first_name
+        elif last_name:
+            full_name = last_name
+        else:
+            continue
+        
+        fullnames_list.append(full_name)
+    
+    # Joindre les noms avec des virgules
+    fullnames = ", ".join(fullnames_list)
+    
+    return emails, fullnames
+
 
 
 def mail_decision_service(
@@ -197,20 +244,17 @@ def mail_meeting_reminder_service(
         return False
 
  
-def mail_committee_created_service(
-    name,
-    committee_name,
-    committee_description,
-    start_date,
-    end_date,
-    location,
-    participants,
-    dest_email,
+def mail_committee_created_service( 
+    title,
+    description, 
+    link,
+  
     url_connect,
     company,
     back_host,
  
     periodicity,
+    actors = [],
     lang=None
 ):
     """
@@ -234,49 +278,55 @@ def mail_committee_created_service(
         bool: True si l'envoi a réussi
     """
     periodicity_l = None 
+    date =  ''
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
         path = "board/instance/create-committee-fr.html"
         path_txt = "board/instance/create-committee-fr.txt"
-        object_email = f"Nouveau comité d'instance créé : {committee_name}"
+        object_email = f"Nouveau comité d'instance créé : {title}"
         periodicity_l = explain_recurrence_simple(periodicity, 'fr')
+        date = format_recurrence_schedule(periodicity, 'fr')
     elif lang == "en-US":
         path = "board/instance/create-committe-en.html"
         path_txt = "board/instance/create-committee-en.txt"
-        object_email = f"New committee instance created: {committee_name}"
+        object_email = f"New committee instance created: {title}"
         periodicity_l = explain_recurrence_simple(periodicity, 'en')
+        date = format_recurrence_schedule(periodicity, 'en')
     else:
         path = "board/instance/create-committee-fr.html"
         path_txt = "board/instance/create-committee-fr.txt"
-        object_email = f"Nouveau comité d'instance créé : {committee_name}"
+        object_email = f"Nouveau comité d'instance créé : {title}"
         periodicity_l = explain_recurrence_simple(periodicity, 'fr')
+        date = format_recurrence_schedule(periodicity, 'fr')
     
     # Contexte pour le template
-    context = {
-        "name": name,
-        "committee_name": committee_name,
-        "committee_description": committee_description,
-        "start_date": start_date,
-        "end_date": end_date,
-        "location": location,
-        "participants": participants,
-        "url_connect": url_connect,
-        "company": company,
-        "back_host": back_host,
-        'periodicity':periodicity_l
-    }
-    
+     
+    emails, fullnames = list_actors_info(actors)
+    print("---------")
     try:
-        # Rendu des templates
-        body_content = render_to_string(path, context)
-        text_content = render_to_string(path_txt, context)
-        
-        # Envoi asynchrone de l'email
-        email_thread = threading.Thread(
-            target=send_mail_created,
-            args=([dest_email], object_email, text_content, body_content, company,)
-        )
-        email_thread.start()
+        for act in actors: 
+            context = {
+                "name": act.get('first_name', '') + ' ' + act.get('last_name', ''),
+                "committee_name": title,
+                "committee_description": description,
+                "date": date, 
+                "location": link,
+                "participants": fullnames,
+                "url_connect": url_connect,
+                "company": company,
+                "back_host": back_host,
+                'periodicity':periodicity_l
+            }
+            # Rendu des templates
+            body_content = render_to_string(path, context)
+            text_content = render_to_string(path_txt, context)
+            
+            # Envoi asynchrone de l'email
+            email_thread = threading.Thread(
+                target=send_mail_created,
+                args=([emails], object_email, text_content, body_content, company,)
+            )
+            email_thread.start()
         
         return True
         

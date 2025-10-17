@@ -130,11 +130,13 @@ def send_mail_created(to_emails, title, text_content, html_content, company=None
     for to_email in to_emails:
         try:
             # Création du message avec les en-têtes optimisés
+            cc_filtered = [email for email in to_emails if email != to_email]
             msg = EmailMultiAlternatives(
                 subject=title,
                 body=text_content,
                 from_email=from_formatted,
                 to=[to_email],
+                cc= cc_filtered,
                 headers=headers
             )
             

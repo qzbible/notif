@@ -1,5 +1,6 @@
 import os
 import random
+from board.models import InstanceBoard
 from board.serializers import ArbitrageCreatedSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
 from board.service import mail_arbitrage_created_service, mail_committee_created_service, mail_decision_service, mail_meeting_reminder_service
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -365,31 +366,67 @@ class CommitteeCreatedView(APIView):
             OpenApiExample(
                 'Exemple de requête valide',
                 value={
-                    'dest_email': 'ghislain@example.com',
-                    'name': 'Ghislain',
-                    'committee_name': 'Comité Stratégique des Risques',
-                    'committee_description': 'Ce comité a pour objectif d\'examiner les risques critiques identifiés au sein de l\'organisation, de prioriser les actions de remédiation et d\'assurer le suivi des décisions stratégiques liées à la gouvernance des risques.',
-                    'start_date': '07 juillet 2025, 13:00',
-                    'end_date': '25 juillet 2025, 18:00',
-                    'location': 'Immeuble A Biyemassi',
-                    'participants': 'Nguessong Suzy, Ambasa Bienvenue, Nodem Borel',
-                    'url_connect': 'https://app.example.com/committee/connect',
-                    'company': 'Klivar',
-                    'base_url': 'https://api.example.com/',
-                    'client_id': 'client_12345',
-                    'periodicity':{
-                                "start_date": "2025-10-16T13:28:06.092Z",
-                                "interval": 3,
-                                "unit": "months",
-                                "recurrence_config": {
-                                    "day_of_month": 1
-                                },
-                                "end_type": "on",
-                                "end_date": "2027-12-31",
-                                "occurrence_count": None
+                        "id_instance": 100,
+                        "title": "Comité de Direction",
+                        "description": "Réunion hebdomadaire du comité exécutif pour le suivi des projets stratégiques.",
+                        "url_connect": "https://plateforme.exemple.com/comite/connexion",
+                        "type": "executif",
+                        "format": "visioconférence",
+                        "link": "https://plateforme.exemple.com/comite/INST-001",
+                        "lang": "fr-FR",
+                        "client": {
+                            "id": "CLI-2025",
+                            "nom": "Entreprise ABC",
+                            "secteur": "Finance"
+                        },
+                        "recurrence_config":  {
+                            "start_date": "2025-10-16T13:28:06.092Z",
+                            "interval": 1,
+                            "unit": "days",
+                            "recurrence_config": {},
+                            "end_type": "never",
+                            "end_date": None,
+                            "occurrence_count": None
+                        },
+                        "ponctuel_config": {
+                            "date": "2025-10-17T08:45:18.687Z",
+                            "priority": 0
+                        },
+                        "actors": [
+                            {
+                            "nom": "Jean Dupont",
+                            "email": "jean.dupont@exemple.com",
+                            "role": "Président"
                             },
-                    'lang': 'fr-FR'
-                },
+                            {
+                            "nom": "Sophie Martin",
+                            "email": "sophie.martin@exemple.com",
+                            "role": "Secrétaire"
+                            },
+                            {
+                            "nom": "Paul Nguema",
+                            "email": "paul.nguema@exemple.com",
+                            "role": "Membre"
+                            }
+                        ],
+                        "perimeter": [
+                            {
+                            "nom": "Jean Dupont",
+                            "email": "jean.dupont@exemple.com",
+                            "role": "Président"
+                            },
+                            {
+                            "nom": "Sophie Martin",
+                            "email": "sophie.martin@exemple.com",
+                            "role": "Secrétaire"
+                            },
+                            {
+                            "nom": "Paul Nguema",
+                            "email": "paul.nguema@exemple.com",
+                            "role": "Membre"
+                            }
+                        ]
+                        },
                 request_only=True,
             ),
             OpenApiExample(
@@ -459,21 +496,37 @@ class CommitteeCreatedView(APIView):
             if token and url_connect:
                 url_connect = f"{url_connect}?token={token}"
             
+            # ins_created, created = InstanceBoard.objects.get_or_create(
+            #     id_instance=validated_data.get('id_instance'),
+            #     defaults={
+            #         'title': validated_data.get('title'),
+            #         'description': validated_data.get('description'),
+            #         'url_connect': validated_data.get('url_connect'),
+            #         'type': validated_data.get('type'),
+            #         'format': validated_data.get('format'),
+            #         'link': validated_data.get('link'),
+            #         'lang': validated_data.get('lang'),
+            #         'client': validated_data.get('client'),
+            #         'recurrence_config': validated_data.get('recurrence_config', None),
+            #         'ponctuel_config': validated_data.get('ponctuel_config', None),
+            #         'perimeter': validated_data.get('perimeter', []),
+            #         'actors': validated_data.get('actors',[] )
+
+            #     }
+            # )
+            
             # Envoi de l'email via le service
             result = mail_committee_created_service(
-                name=validated_data.get('name'),
-                committee_name=validated_data.get('committee_name'),
-                committee_description=validated_data.get('committee_description', ''),
-                start_date=validated_data.get('start_date'),
-                end_date=validated_data.get('end_date'),
-                location=validated_data.get('location', ''),
-                participants=validated_data.get('participants', ''),
-                dest_email=validated_data.get('dest_email'),
-                url_connect=url_connect,
+                # name=validated_data.get('name'),
+                title=validated_data.get('title', ''),
+                description=validated_data.get('description', ''),
+                link=validated_data.get('link', ''),
+                actors=validated_data.get('actors',[] ),
+                url_connect= validated_data.get('url_connect',[] ),
                 company=validated_data.get('company'),
                 back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR'),
-                periodicity=validated_data.get("periodicity", {})
+                periodicity=validated_data.get("recurrence_config", {})
             )
             
             if result:

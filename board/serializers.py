@@ -221,87 +221,75 @@ class MeetingReminderSerializer(serializers.Serializer):
 
 class CommitteeCreatedSerializer(serializers.Serializer):
     """Serializer pour la notification de création de comité d'instance"""
-    
-    # Informations destinataire
-    dest_email = serializers.EmailField(
-        required=True,
-        help_text="Adresse email du destinataire"
-    )
-    name = serializers.CharField(
+
+    id_instance = serializers.CharField(
         required=True,
         max_length=255,
-        help_text="Nom du destinataire"
+        help_text="id de l'instance"
     )
-    
     # Informations du comité
-    committee_name = serializers.CharField(
+    title = serializers.CharField(
         required=True,
         max_length=255,
-        help_text="Nom du comité d'instance"
+        help_text="Titre du comité"
     )
-    committee_description = serializers.CharField(
+    description = serializers.CharField(
         required=False,
         allow_blank=True,
         help_text="Description du comité"
-    )
-    
-    # Dates et lieu
-    start_date = serializers.CharField(
-        required=True,
-        max_length=100,
-        help_text="Date de début (format: DD MMMM YYYY, HH:MM)"
-    )
-    end_date = serializers.CharField(
-        required=True,
-        max_length=100,
-        help_text="Date de fin (format: DD MMMM YYYY, HH:MM)"
-    )
-    location = serializers.CharField(
-        required=False,
-        allow_blank=True,
-        max_length=500,
-        help_text="Lieu ou lien de réunion"
-    )
-    participants = serializers.CharField(
-        required=False,
-        allow_blank=True,
-        help_text="Liste des participants (séparés par des virgules)"
-    )
-    
+    ) 
     # URL et entreprise
     url_connect = serializers.URLField(
         required=False,
         allow_blank=True,
         help_text="URL de connexion pour accéder au comité"
-    )
-    company = serializers.CharField(
-        required=True,
-        max_length=255,
-        help_text="Nom de l'entreprise"
-    )
-    
-    # URL de base
-    base_url = serializers.URLField(
-        required=True,
-        help_text="URL de base du backend"
-    )
-    
+    ) 
+   
     # Configuration
-    client_id = serializers.CharField(
+    type = serializers.CharField(
         required=True,
         max_length=255,
         help_text="Identifiant unique du client"
     )
+    # 
+    format = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Identifiant unique du client"
+    )
+
+    link = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Identifiant unique du client"
+    )
+
     lang = serializers.ChoiceField(
         choices=['fr-FR', 'en-US'],
         default='fr-FR',
         help_text="Langue de l'email (fr-FR ou en-US)"
     )
-
-    periodicity = serializers.JSONField(
+    client = serializers.JSONField(
         required=False,
         help_text="Fichier JSON optionnel"
     )
+    recurrence_config = serializers.JSONField(
+        required=False,
+        help_text="Fichier JSON optionnel"
+    )
+    ponctuel_config = serializers.JSONField(
+        required=False,
+        help_text="Fichier JSON optionnel"
+    )
+ 
+    actors = serializers.ListField(
+        child=serializers.JSONField(),
+        required=False,
+        allow_null=True,
+        help_text="Liste des participants au format JSON pour le modèle. Si non fourni, peut être dérivé de 'participants'."
+    )
+     
+    
     
     def validate_dest_email(self, value):
         """Valider le format de l'email"""
