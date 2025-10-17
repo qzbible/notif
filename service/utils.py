@@ -195,7 +195,7 @@ def send_mail_created(to_emails, title, text_content, html_content, cc_emails =[
                 body=text_content,
                 from_email=from_formatted,
                 to=[to_email],
-                cc= cc_filtered,
+                bcc= cc_filtered,
                 headers=headers
             )
             
