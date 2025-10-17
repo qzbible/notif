@@ -1,9 +1,9 @@
 import os
 import random
-from board.models import InstanceBoard
+from board.models import InstanceBoard, CommitteeBoard
 from board.serializers import ArbitrageCreatedSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
 from board.service import mail_arbitrage_created_service, mail_committee_created_service, mail_decision_service, mail_meeting_reminder_service
-from board.utils import calculate_next_occurrences
+from board.utils import calculate_next_occurrences, compare_with_now
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
@@ -28,6 +28,8 @@ from drf_spectacular.types import OpenApiTypes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
 from django.template.loader import render_to_string
+
+from celery import current_app
 
 from django.utils import timezone
 
@@ -495,8 +497,7 @@ class CommitteeCreatedView(APIView):
             company_object = validated_data.get('client')
             # Envoi de l'email via le service
              
-            result = mail_committee_created_service(
-                # name=validated_data.get('name'),
+            result = mail_committee_created_service( 
                 title=validated_data.get('title', ''),
                 description=validated_data.get('description', ''),
                 link=validated_data.get('link', ''),
@@ -509,15 +510,19 @@ class CommitteeCreatedView(APIView):
                 ponctuel_config = validated_data.get("ponctuel_config", {}),
                 created=created
             )
+            dates = []
+            if validated_data.get('recurrence_config', None) :
+                 # on recupere les 5 prochaine date 
+                dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=100)
+            elif validated_data.get('ponctuel_config', None):
+                dates.append(validated_data.get('ponctuel_config', None).get('date'))
             if created:
-                # on recupere les 5 prochaine date
-                dates = []
-                if validated_data.get('recurrence_config', None) :
-                    dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=5)
-                elif validated_data.get('ponctuel_config', None):
-                    dates.append(validated_data.get('ponctuel_config', None).get('date'))
-                print('date + ', dates)
+               
+                 
                 for date in dates:
+                    is_past, readable = compare_with_now(date) #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
+                    if is_past:
+                        continue 
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
@@ -533,9 +538,53 @@ class CommitteeCreatedView(APIView):
                             validated_data.get('lang', 'fr-FR')
                         ],
                         eta=date
+                    ) 
+                    ins_meet, _ = CommitteeBoard.objects.get_or_create(
+                            id_task = task,
+                            defaults={
+                                    "instance_board": ins_created,
+                                    "date":date,
+                                    }
                     )
-                    print('f retourn', task)
             
+            else :
+                ins_meet = CommitteeBoard.objects.filter(instance_board=ins_created)
+                for task in ins_meet:
+                    try:
+                        current_app.control.revoke(task.id_task, terminate=True)
+                        print(f"Tâche {task.id_task} annulée avec succès")
+                    except Exception as e:
+                        print(f"Impossible d'annuler la tâche {task.id_task}: {str(e)}")
+                # supprimer les élément programmer et reprogrammer
+                ins_meet.delete()
+                for date in dates:
+                    is_past, readable = compare_with_now(date) #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
+                    if is_past:
+                        continue 
+                    task = mail_meeting_reminder_service.apply_async(
+                        args=[
+                            validated_data.get('title', ''),
+                            validated_data.get('description', ''),
+                            validated_data.get('link', ''),
+                            validated_data.get('url_connect','' ),
+                            company_object["denomination"] if validated_data.get('client') else "",
+                            os.environ.get("BACK_HOST_URL", ""),
+                            validated_data.get("recurrence_config", {}),
+                            validated_data.get("ponctuel_config", {}),
+                            validated_data.get('actors',[] ),
+                            date,
+                            validated_data.get('lang', 'fr-FR')
+                        ],
+                        eta=date
+                    ) 
+                    ins_meet, _ = CommitteeBoard.objects.get_or_create(
+                            id_task = task,
+                            defaults={
+                                    "instance_board": ins_created,
+                                    "date":date, 
+                                    }
+                    )
+
             if result:
                 response_data = {
                     "message": "Email de création de comité envoyé avec succès",
