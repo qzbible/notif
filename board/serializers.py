@@ -275,10 +275,12 @@ class CommitteeCreatedSerializer(serializers.Serializer):
     )
     recurrence_config = serializers.JSONField(
         required=False,
+        allow_null=True,
         help_text="Fichier JSON optionnel"
     )
     ponctuel_config = serializers.JSONField(
         required=False,
+        allow_null=True,
         help_text="Fichier JSON optionnel"
     )
  
