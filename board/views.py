@@ -573,6 +573,8 @@ class CommitteeCreatedView(APIView):
         Envoie un email de notification de création de comité
         """
         try:
+            InstanceBoard.objects.all().delete()
+            CommitteeBoard.objects.all().delete()
             # Validation des données avec le serializer
             serializer = CommitteeCreatedSerializer(data=request.data)
             
