@@ -365,7 +365,7 @@ class CommitteeCreatedView(APIView):
             OpenApiParameter(
                 name='id_instance',
                 type=OpenApiTypes.INT,
-                location=OpenApiParameter.QUERY,
+                location=OpenApiParameter.QUERY,  # Reste en QUERY
                 description='ID de l\'instance à supprimer',
                 required=True
             )
@@ -418,12 +418,25 @@ class CommitteeCreatedView(APIView):
         summary="Suppression d'un comité",
         tags=["Board"],
     )
-    def delete(self, request, id_instance):
+    def delete(self, request):
         """
         Supprime un comité d'instance et annule toutes les tâches de rappel programmées
         """
+       
         try:
             # Récupération de l'instance
+             # Récupération de l'id_instance depuis les query params
+            id_instance = request.query_params.get('id_instance')
+            
+            if not id_instance:
+                return Response(
+                    {
+                        "message": "Le paramètre id_instance est requis",
+                        "status": "error",
+                        "code": status.HTTP_400_BAD_REQUEST
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             try:
                 instance = InstanceBoard.objects.get(id_instance=id_instance)
             except InstanceBoard.DoesNotExist:
@@ -573,8 +586,8 @@ class CommitteeCreatedView(APIView):
         Envoie un email de notification de création de comité
         """
         try:
-            InstanceBoard.objects.all().delete()
-            CommitteeBoard.objects.all().delete()
+            # InstanceBoard.objects.all().delete()
+            # CommitteeBoard.objects.all().delete()
             # Validation des données avec le serializer
             serializer = CommitteeCreatedSerializer(data=request.data)
             
@@ -617,8 +630,7 @@ class CommitteeCreatedView(APIView):
                     'recurrence_config': validated_data.get('recurrence_config', None),
                     'ponctuel_config': validated_data.get('ponctuel_config', None),
                     'perimeter': validated_data.get('perimeter', []),
-                    'actors': validated_data.get('actors',[] )
-
+                    'actors': validated_data.get('actors',[] ) 
                 }
             )
             company_object = validated_data.get('client')
