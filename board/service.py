@@ -5,7 +5,7 @@ import threading
 from django.template.loader import render_to_string
  
 from datetime import datetime, timedelta
-from board.utils import explain_recurrence_simple, format_date_hour, format_ponctuel_date, format_recurrence_schedule
+from board.utils import explain_recurrence_simple, format_date_hour, format_perimeter_for_email, format_ponctuel_date, format_recurrence_schedule
 from icalendar import Calendar, Event, vCalAddress, vText
 import os
 import uuid
@@ -164,6 +164,7 @@ def mail_meeting_reminder_service(
     periodicity,
     ponctuel_config,
     actors = [],
+    perimeter = [],
     date=None,
     lang=None
 ):
@@ -267,6 +268,26 @@ def mail_meeting_reminder_service(
                 kwargs={'cc_emails': other_emails, 'company': company}
             )
             email_thread.start()
+
+            # send elt arb 
+            result = mail_arbitrage_created_service(
+                name=act.get('first_name', '') + ' ' + act.get('last_name', ''),
+                committee_name=title + ' '+date_only+' '+hour,
+                committee_date= date_only+' '+hour,
+                nomber_elements= len(perimeter),
+                type_arbitration_elements= format_perimeter_for_email(perimeter, 'fr' if lang=="fr-FR" else "en"), 
+                instance_name=title,
+                instance_description=description,
+                instance_start_date=date_instance,
+                # instance_end_date=validated_data.get('instance_end_date'),
+                instance_location=link,
+                instance_participants=fullnames,
+                dest_email=act.get('email'),
+                url_connect=url_connect,
+                company=company,
+                back_host=os.environ.get("BACK_HOST_URL", ""),
+                lang=lang
+            )
         
         return True
         
@@ -375,24 +396,26 @@ def mail_committee_created_service(
                 kwargs={'cc_emails': other_emails, 'company': company}
             )
             email_thread.start()
-        
+
+            
         return True
     except Exception as e:
         print(f"Erreur dans mail_committee_created_service: {str(e)}")
         return False
     
 
+ 
 def mail_arbitrage_created_service(
     name,
     committee_name,
     committee_date,
     nomber_elements,
     type_arbitration_elements,
-    priorite_arbitrage,
+ 
     instance_name,
     instance_description,
-    instance_start_date,
-    instance_end_date,
+    instance_date,
+ 
     instance_location,
     instance_participants,
     dest_email,
@@ -448,11 +471,10 @@ def mail_arbitrage_created_service(
         "committee_date": committee_date,
         "nomber_elements": nomber_elements,
         "type_arbitration_elements": type_arbitration_elements,
-        "priorite_arbitrage": priorite_arbitrage,
+        
         "instance_name": instance_name,
         "instance_description": instance_description,
-        "instance_start_date": instance_start_date,
-        "instance_end_date": instance_end_date,
+        "instance_date": instance_date, 
         "instance_location": instance_location,
         "instance_participants": instance_participants,
         "url_connect": url_connect,

@@ -389,11 +389,9 @@
                     <strong> {{nomber_elements}} </strong> éléments à arbitrer
                   </li>
                   <li class="list-item">
-                    <strong>Types d'éléments :</strong> {{type_arbitration_elements}}
+                    <strong>Types d'éléments :</strong> {{type_arbitration_elements | safe }}
                   </li>
-                  <li class="list-item">
-                    <strong>Priorité :</strong> {{priorite_arbitrage}}
-                  </li>
+                   
                 </ul>
               </td>
             </tr>
@@ -458,26 +456,10 @@
                       <!-- Dates (Début et Fin côte à côte) -->
                       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 12px;">
                         <tr>
-                          <td width="50%" style="padding-right: 10px; vertical-align: top;">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                              <tr>
-                                <td class="info-label" style="padding-bottom: 2px;">
-                                  <strong>Début :</strong> {{instance_start_date}}
-                                </td>
-                              </tr>
-                               
-                            </table>
+                          <td class="info-label" style="padding-bottom: 2px;">
+                            {{instance_date}}
                           </td>
-                          <td width="50%" style="padding-left: 10px; vertical-align: top;">
-                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                              <tr>
-                                <td class="info-label" style="padding-bottom: 2px;">
-                                  <strong>Fin :</strong>  {{instance_end_date}}
-                                </td>
-                              </tr>
-                               
-                            </table>
-                          </td>
+                           
                         </tr>
                       </table>
                       

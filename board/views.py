@@ -162,9 +162,7 @@ class DecisionView(APIView):
                 participants=validated_data.get('participants', ''),
                 back_host= os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR')
-            )
-            
-            print("BACK_HOST_URL",os.environ.get("BACK_HOST_URL", "") )
+            ) 
             if result:
                 response_data = {
                     "message": "Email envoyé avec succès",
@@ -876,7 +874,12 @@ class CommitteeCreatedView(APIView):
                 periodicity=validated_data.get("recurrence_config", {}),
                 ponctuel_config = validated_data.get("ponctuel_config", {}),
                 created=created
+
             )
+            # creation des elements a arbitrer ....
+            
+            
+            
             dates = []
             if validated_data.get('recurrence_config', None) :
                  # on recupere les 5 prochaine date 
@@ -914,7 +917,9 @@ class CommitteeCreatedView(APIView):
                                     "date":date,
                                     }
                     )
-            
+                    # send element a arbitrer
+
+             
             else :
                 ins_meet = CommitteeBoard.objects.filter(instance_board=ins_created)
                 for task in ins_meet:

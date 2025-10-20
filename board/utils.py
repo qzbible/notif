@@ -641,6 +641,74 @@ def compare_with_now(target_date, lang='en'):
 
         return False,  ''
 
+
+def format_perimeter_for_email(perimeter, lang='fr'):
+    """
+    Version optimisée pour les emails (inline styles complets) - Bilingue
+    
+    Args:
+        perimeter: Liste de dictionnaires
+        lang: 'fr' pour français, 'en' pour anglais
+        
+    Returns:
+        str: HTML formaté pour email
+    """
+    if not perimeter:
+        no_perimeter_text = "Aucun périmètre défini" if lang == 'fr' else "No perimeter defined"
+        return f"<p>{no_perimeter_text}</p>"
+    
+    # Traductions
+    translations = {
+        'fr': {
+            1: "Très faible",
+            2: "Faible",
+            3: "Moyen",
+            4: "Élevé",
+            5: "Très Élevé",
+        },
+        'en': {
+            1: "Very Low",
+            2: "Low",
+            3: "Medium",
+            4: "Very",
+            5: "Very Very",
+        }
+    }
+    
+    priority_mapping = {
+        1: {"color": "#28a745", "bg": "#d4edda"},
+        2: {"color": "#20c997", "bg": "#d1ecf1"},
+        3: {"color": "#ffc107", "bg": "#fff3cd"},
+        4: {"color": "#fd7e14", "bg": "#ffe5d0"},
+        5: {"color": "#dc3545", "bg": "#f8d7da"},
+    }
+    
+    priority_labels = translations.get(lang, translations['fr'])
+    
+    html = '<div style="margin: 10px 0;">'
+    
+    for item in perimeter:
+        label = item.get('label', item.get('value', 'N/A'))
+        priority = item.get('priority', 0)
+        priority_info = priority_mapping.get(priority, priority_mapping[0])
+        priority_label = priority_labels.get(priority, priority_labels[0])
+        
+        html += f'''
+        <span style="display: inline-block; padding: 6px 14px; margin: 4px 4px 4px 0; 
+                     background-color: {priority_info['bg']}; 
+                     color: {priority_info['color']}; 
+                     border: 1px solid {priority_info['color']}; 
+                     border-radius: 16px; 
+                     font-size: 13px; 
+                     font-weight: 600;
+                     font-family: Arial, sans-serif;">
+            {label} <span style="font-weight: 400; opacity: 0.85;">({priority_label})</span>
+        </span>
+        '''
+    
+    html += '</div>'
+    return html
+
 # Exemple d'utilisation
 if __name__ == "__main__":
     
