@@ -631,7 +631,7 @@ def compare_with_now(target_date, lang='en'):
         target_date = target_date.strip().replace('\xa0', '').replace('\u00a0', '')
         # Parser la date avec _parse_date
         target_date = _parse_date(target_date)
-        
+        print('date ---2', target_date)
         if target_date is None:
             raise ValueError("Invalid date format")
     
@@ -639,84 +639,9 @@ def compare_with_now(target_date, lang='en'):
     now = datetime.now(timezone.utc)
     
     # Determine if the date is in the past
-    is_past = target_date < now
-    
-    # Calculate the absolute difference
-    if is_past:
-        diff = now - target_date
-        prefix = "ago" if lang == 'en' else "il y a"
-    else:
-        diff = target_date - now
-        prefix = "in" if lang == 'en' else "dans"
-    
-    # Calculate time components (in absolute value)
-    total_seconds = abs(int(diff.total_seconds()))
-    
-    # If it's now (less than 1 minute)
-    if total_seconds < 60:
-        return (is_past, "now" if lang == 'en' else "maintenant")
-    
-    # Years
-    years = total_seconds // (365 * 24 * 3600)
-    if years > 0:
-        if lang == 'en':
-            label = "year" if years == 1 else "years"
-            return (is_past, f"{years} {label} {prefix}" if is_past else f"{prefix} {years} {label}")
-        else:
-            label = "an" if years == 1 else "ans"
-            return (is_past, f"{prefix} {years} {label}")
-    
-    # Months (approximate: 30 days)
-    months = total_seconds // (30 * 24 * 3600)
-    if months > 0:
-        if lang == 'en':
-            label = "month" if months == 1 else "months"
-            return (is_past, f"{months} {label} {prefix}" if is_past else f"{prefix} {months} {label}")
-        else:
-            return (is_past, f"{prefix} {months} mois")
-    
-    # Weeks
-    weeks = total_seconds // (7 * 24 * 3600)
-    if weeks > 0:
-        if lang == 'en':
-            label = "week" if weeks == 1 else "weeks"
-            return (is_past, f"{weeks} {label} {prefix}" if is_past else f"{prefix} {weeks} {label}")
-        else:
-            label = "semaine" if weeks == 1 else "semaines"
-            return (is_past, f"{prefix} {weeks} {label}")
-    
-    # Days
-    days = total_seconds // (24 * 3600)
-    if days > 0:
-        if lang == 'en':
-            label = "day" if days == 1 else "days"
-            return (is_past, f"{days} {label} {prefix}" if is_past else f"{prefix} {days} {label}")
-        else:
-            label = "jour" if days == 1 else "jours"
-            return (is_past, f"{prefix} {days} {label}")
-    
-    # Hours
-    hours = total_seconds // 3600
-    if hours > 0:
-        if lang == 'en':
-            label = "hour" if hours == 1 else "hours"
-            return (is_past, f"{hours} {label} {prefix}" if is_past else f"{prefix} {hours} {label}")
-        else:
-            label = "heure" if hours == 1 else "heures"
-            return (is_past, f"{prefix} {hours} {label}")
-    
-    # Minutes
-    minutes = total_seconds // 60
-    if minutes > 0:
-        if lang == 'en':
-            label = "minute" if minutes == 1 else "minutes"
-            return (is_past, f"{minutes} {label} {prefix}" if is_past else f"{prefix} {minutes} {label}")
-        else:
-            label = "minute" if minutes == 1 else "minutes"
-            return (is_past, f"{prefix} {minutes} {label}")
-    
+    is_past = target_date < now 
     # Default
-    return (is_past, "now" if lang == 'en' else "maintenant")
+    return (is_past,  '')
     
 
 # Exemple d'utilisation
