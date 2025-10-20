@@ -209,7 +209,7 @@ class MeetingReminderView(APIView):
             name='CommitteeBoardUpdateSerializer',
             fields={
                 'instance_id': serializers.IntegerField(required=True, help_text='ID du instance'),
-                'old_date': serializers.DateTimeField(required=True, help_text='Nouvelle date de la réunion'),
+                'old_date': serializers.DateTimeField(required=True, help_text='old date de la réunion'),
                 'new_date': serializers.DateTimeField(required=True, help_text='Nouvelle date de la réunion'),
             }
         ),
