@@ -636,7 +636,7 @@ def compare_with_now(target_date, lang='en'):
             raise ValueError("Invalid date format")
     
     # Current date (timezone-aware) en UTC
-    now = datetime.now(datetime.timezone.utc)
+    now = datetime.now(timezone.utc)
     
     # Determine if the date is in the past
     is_past = target_date < now
