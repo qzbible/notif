@@ -203,6 +203,7 @@ class MeetingReminderView(APIView):
     """API pour envoyer un rappel de réunion du comité par email"""
     
     permission_classes = [AllowAny]
+
     @extend_schema(
         request=inline_serializer(
             name='CommitteeBoardUpdateSerializer',
@@ -222,7 +223,8 @@ class MeetingReminderView(APIView):
             OpenApiExample(
                 'Exemple de requête valide',
                 value={
-                    "committee_board_id": 45,
+                    "instance_id": 45,
+                    "new_date": "2025-11-20T14:00:00Z",
                     "new_date": "2025-11-20T14:00:00Z"
                 },
                 request_only=True,
