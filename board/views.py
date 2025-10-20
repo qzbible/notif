@@ -764,7 +764,8 @@ class CommitteeBoardUpdateView(APIView):
         request=inline_serializer(
             name='CommitteeBoardUpdateSerializer',
             fields={
-                'committee_board_id': serializers.IntegerField(required=True, help_text='ID du CommitteeBoard'),
+                'instance_id': serializers.IntegerField(required=True, help_text='ID du instance'),
+                'old_date': serializers.DateTimeField(required=True, help_text='Nouvelle date de la réunion'),
                 'new_date': serializers.DateTimeField(required=True, help_text='Nouvelle date de la réunion'),
             }
         ),
@@ -832,10 +833,11 @@ class CommitteeBoardUpdateView(APIView):
         """
         try:
             # Validation des données
-            committee_board_id = request.data.get('committee_board_id')
+            instance_id = request.data.get('instance_id')
             new_date = request.data.get('new_date')
+            old_date = request.data.get('old_date')
             
-            if not committee_board_id:
+            if not instance_id:
                 return Response(
                     {
                         "message": "Le champ committee_board_id est requis",
@@ -855,10 +857,21 @@ class CommitteeBoardUpdateView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
+            if not old_date:
+                return Response(
+                    {
+                        "message": "Le champ old_date est requis",
+                        "status": "error",
+                        "code": status.HTTP_400_BAD_REQUEST
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
             # Conversion de la date
             try:
                 from dateutil import parser
                 new_date_parsed = parser.parse(new_date)
+                old_date_parsed = parser.parse(old_date)
             except Exception as e:
                 return Response(
                     {
@@ -885,7 +898,8 @@ class CommitteeBoardUpdateView(APIView):
             
             # Récupération du CommitteeBoard
             try:
-                committee_meeting = CommitteeBoard.objects.get(id=committee_board_id)
+                print("f------", old_date_parsed)
+                committee_meeting = CommitteeBoard.objects.get(instance_board__id=instance_id, date=old_date_parsed)
             except CommitteeBoard.DoesNotExist:
                 return Response(
                     {
@@ -951,7 +965,7 @@ class CommitteeBoardUpdateView(APIView):
                 "status": "success",
                 "code": status.HTTP_200_OK,
                 "data": {
-                    "committee_board_id": committee_board_id,
+                    "instant_board": instance_id,
                     "old_date": old_date.isoformat() if old_date else None,
                     "new_date": new_date_parsed.isoformat(),
                     "old_task_id": old_task_id,
@@ -974,6 +988,9 @@ class CommitteeBoardUpdateView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
+
+
+
 class ArbitrageCreatedView(APIView):
     """API pour envoyer une notification de création de dossier d'arbitrage"""
     
