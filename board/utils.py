@@ -593,29 +593,55 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
     
     return occurrences[:max_count]
 
+from datetime import datetime
+from typing import Optional
+
+
+def _parse_date(date_str: str) -> Optional[datetime]:
+    """Parse une date avec gestion du timezone"""
+    if not date_str:
+        return None
+    
+    # Si la date contient 'Z' ou un timezone
+    if 'Z' in date_str or '+' in date_str or date_str.count('-') > 2:
+        return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+    else:
+        # Date sans timezone, ajouter minuit en UTC
+        return datetime.fromisoformat(date_str + 'T00:00:00+00:00')
+
 
 def compare_with_now(target_date, lang='en'):
     """
-    Compare a date with the current date (supports English and French)
+    Compare a date with the current date and returns whether it is in the past
+    along with a readable description of the difference.
     
     Args:
         target_date: datetime object or ISO format string
-        lang: 'en' for English, 'fr' for French
+        lang: 'en' for English, 'fr' for French (default: 'en')
         
     Returns:
         tuple: (is_past: bool, readable: str)
+            - is_past: True if the date is in the past, False if in the future
+            - readable: Readable description of the difference
     """
     # Convert to datetime if necessary
     if isinstance(target_date, str):
+        # Nettoyer les caractères invisibles
+        print('date ---', target_date)
         target_date = target_date.strip().replace('\xa0', '').replace('\u00a0', '')
-        target_date = date_parser.parse(target_date)
+        # Parser la date avec _parse_date
+        target_date = _parse_date(target_date)
+        
+        if target_date is None:
+            raise ValueError("Invalid date format")
     
-    if timezone.is_naive(target_date):
-        target_date = timezone.make_aware(target_date, timezone=timezone.utc)
+    # Current date (timezone-aware) en UTC
+    now = datetime.now(datetime.timezone.utc)
     
-    now = timezone.now()
+    # Determine if the date is in the past
     is_past = target_date < now
     
+    # Calculate the absolute difference
     if is_past:
         diff = now - target_date
         prefix = "ago" if lang == 'en' else "il y a"
@@ -623,85 +649,73 @@ def compare_with_now(target_date, lang='en'):
         diff = target_date - now
         prefix = "in" if lang == 'en' else "dans"
     
+    # Calculate time components (in absolute value)
     total_seconds = abs(int(diff.total_seconds()))
     
+    # If it's now (less than 1 minute)
     if total_seconds < 60:
         return (is_past, "now" if lang == 'en' else "maintenant")
-    
-    # Labels bilingues
-    labels = {
-        'en': {
-            'year': ('year', 'years'),
-            'month': ('month', 'months'),
-            'week': ('week', 'weeks'),
-            'day': ('day', 'days'),
-            'hour': ('hour', 'hours'),
-            'minute': ('minute', 'minutes'),
-        },
-        'fr': {
-            'year': ('an', 'ans'),
-            'month': ('mois', 'mois'),
-            'week': ('semaine', 'semaines'),
-            'day': ('jour', 'jours'),
-            'hour': ('heure', 'heures'),
-            'minute': ('minute', 'minutes'),
-        }
-    }
     
     # Years
     years = total_seconds // (365 * 24 * 3600)
     if years > 0:
-        label = labels[lang]['year'][0 if years == 1 else 1]
         if lang == 'en':
+            label = "year" if years == 1 else "years"
             return (is_past, f"{years} {label} {prefix}" if is_past else f"{prefix} {years} {label}")
         else:
+            label = "an" if years == 1 else "ans"
             return (is_past, f"{prefix} {years} {label}")
     
-    # Months
+    # Months (approximate: 30 days)
     months = total_seconds // (30 * 24 * 3600)
     if months > 0:
-        label = labels[lang]['month'][0 if months == 1 else 1]
         if lang == 'en':
+            label = "month" if months == 1 else "months"
             return (is_past, f"{months} {label} {prefix}" if is_past else f"{prefix} {months} {label}")
         else:
-            return (is_past, f"{prefix} {months} {label}")
+            return (is_past, f"{prefix} {months} mois")
     
     # Weeks
     weeks = total_seconds // (7 * 24 * 3600)
     if weeks > 0:
-        label = labels[lang]['week'][0 if weeks == 1 else 1]
         if lang == 'en':
+            label = "week" if weeks == 1 else "weeks"
             return (is_past, f"{weeks} {label} {prefix}" if is_past else f"{prefix} {weeks} {label}")
         else:
+            label = "semaine" if weeks == 1 else "semaines"
             return (is_past, f"{prefix} {weeks} {label}")
     
     # Days
     days = total_seconds // (24 * 3600)
     if days > 0:
-        label = labels[lang]['day'][0 if days == 1 else 1]
         if lang == 'en':
+            label = "day" if days == 1 else "days"
             return (is_past, f"{days} {label} {prefix}" if is_past else f"{prefix} {days} {label}")
         else:
+            label = "jour" if days == 1 else "jours"
             return (is_past, f"{prefix} {days} {label}")
     
     # Hours
     hours = total_seconds // 3600
     if hours > 0:
-        label = labels[lang]['hour'][0 if hours == 1 else 1]
         if lang == 'en':
+            label = "hour" if hours == 1 else "hours"
             return (is_past, f"{hours} {label} {prefix}" if is_past else f"{prefix} {hours} {label}")
         else:
+            label = "heure" if hours == 1 else "heures"
             return (is_past, f"{prefix} {hours} {label}")
     
     # Minutes
     minutes = total_seconds // 60
     if minutes > 0:
-        label = labels[lang]['minute'][0 if minutes == 1 else 1]
         if lang == 'en':
+            label = "minute" if minutes == 1 else "minutes"
             return (is_past, f"{minutes} {label} {prefix}" if is_past else f"{prefix} {minutes} {label}")
         else:
+            label = "minute" if minutes == 1 else "minutes"
             return (is_past, f"{prefix} {minutes} {label}")
     
+    # Default
     return (is_past, "now" if lang == 'en' else "maintenant")
     
 
