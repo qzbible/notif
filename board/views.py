@@ -443,6 +443,128 @@ class CommitteeCreatedView(APIView):
         summary="Notification de création de comité",
         tags=["Board"],
     )
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='id_instance',
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description='ID de l\'instance à supprimer',
+                required=True
+            )
+        ],
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+            404: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Comité supprimé avec succès',
+                    'status': 'success',
+                    'code': 200,
+                    'data': {
+                        'id_instance': 100,
+                        'title': 'Comité de Direction',
+                        'deleted_at': '2025-10-20T14:30:00Z',
+                        'cancelled_tasks': 5
+                    }
+                },
+                response_only=True,
+                status_codes=['200'],
+            ),
+            OpenApiExample(
+                'Réponse d\'erreur - Paramètre manquant',
+                value={
+                    'message': 'Le paramètre id_instance est requis',
+                    'status': 'error',
+                    'code': 400
+                },
+                response_only=True,
+                status_codes=['400'],
+            ),
+            OpenApiExample(
+                'Réponse d\'erreur - Non trouvé',
+                value={
+                    'message': 'Comité non trouvé',
+                    'status': 'error',
+                    'code': 404
+                },
+                response_only=True,
+                status_codes=['404'],
+            ),
+        ],
+        description="Supprime un comité d'instance et annule toutes les tâches programmées associées",
+        summary="Suppression d'un comité",
+        tags=["Board"],
+    )
+    def delete(self, request, id_instance):
+        """
+        Supprime un comité d'instance et annule toutes les tâches de rappel programmées
+        """
+        try:
+            # Récupération de l'instance
+            try:
+                instance = InstanceBoard.objects.get(id_instance=id_instance)
+            except InstanceBoard.DoesNotExist:
+                return Response(
+                    {
+                        "message": "Comité non trouvé",
+                        "status": "error",
+                        "code": status.HTTP_404_NOT_FOUND
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Récupération des informations avant suppression
+            instance_title = instance.title 
+            # Récupération et annulation de toutes les tâches planifiées
+            committee_meetings = CommitteeBoard.objects.filter(instance_board=instance)
+            cancelled_tasks_count = 0
+            
+            for meeting in committee_meetings:
+                try:
+                    # Annulation de la tâche Celery
+                    current_app.control.revoke(meeting.id_task, terminate=True)
+                    cancelled_tasks_count += 1
+                    print(f"Tâche {meeting.id_task} annulée avec succès")
+                except Exception as e:
+                    print(f"Impossible d'annuler la tâche {meeting.id_task}: {str(e)}")
+            
+            # Suppression des réunions programmées
+            committee_meetings.delete()
+            
+            # Suppression de l'instance
+            instance.delete()
+            
+            response_data = {
+                "message": "Comité supprimé avec succès",
+                "status": "success",
+                "code": status.HTTP_200_OK,
+                "data": {
+                    "id_instance": id_instance,
+                    "title": instance_title,
+                    "cancelled_tasks": cancelled_tasks_count,
+                    "deleted_at": datetime.now().isoformat()
+                }
+            }
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+                
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Erreur lors de la suppression du comité",
+                    "status": "error",
+                    "error": str(e),
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     def post(self, request):
         """
         Envoie un email de notification de création de comité
@@ -613,6 +735,60 @@ class CommitteeCreatedView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+
+# class CommitteeDeleteView(APIView):
+#     """API pour supprimer un comité d'instance"""
+    
+#     permission_classes = [AllowAny]
+
+#     @extend_schema(
+#         parameters=[
+#             OpenApiParameter(
+#                 name='id_instance',
+#                 type=OpenApiTypes.INT,
+#                 location=OpenApiParameter.PATH,
+#                 description='ID de l\'instance à supprimer',
+#                 required=True
+#             )
+#         ],
+#         responses={
+#             200: OpenApiTypes.OBJECT,
+#             404: OpenApiTypes.OBJECT,
+#             500: OpenApiTypes.OBJECT,
+#         },
+#         examples=[
+#             OpenApiExample(
+#                 'Réponse de succès',
+#                 value={
+#                     'message': 'Comité supprimé avec succès',
+#                     'status': 'success',
+#                     'code': 200,
+#                     'data': {
+#                         'id_instance': 100,
+#                         'title': 'Comité de Direction',
+#                         'deleted_at': '2025-10-20T14:30:00Z',
+#                         'cancelled_tasks': 5
+#                     }
+#                 },
+#                 response_only=True,
+#                 status_codes=['200'],
+#             ),
+#             OpenApiExample(
+#                 'Réponse d\'erreur - Non trouvé',
+#                 value={
+#                     'message': 'Comité non trouvé',
+#                     'status': 'error',
+#                     'code': 404
+#                 },
+#                 response_only=True,
+#                 status_codes=['404'],
+#             ),
+#         ],
+#         description="Supprime un comité d'instance et annule toutes les tâches programmées associées",
+#         summary="Suppression d'un comité",
+#         tags=["Board"],
+#     )
+    
 class ArbitrageCreatedView(APIView):
     """API pour envoyer une notification de création de dossier d'arbitrage"""
     
