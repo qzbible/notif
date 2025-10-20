@@ -41,7 +41,7 @@ def update_instance_board_reference(sender, instance, **kwargs):
 class CommitteeBoard(models.Model):
     id_task =  models.CharField(max_length=255, null=True, blank=True)
     instance_board = models.ForeignKey(InstanceBoard, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField(null=True, blank=True)
+    date = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'committee_board'
