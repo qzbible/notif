@@ -359,91 +359,6 @@ class CommitteeCreatedView(APIView):
     
     permission_classes = [AllowAny]
 
-    @extend_schema(
-        request=CommitteeCreatedSerializer,
-        responses={
-            200: OpenApiTypes.OBJECT,
-            400: OpenApiTypes.OBJECT,
-            500: OpenApiTypes.OBJECT,
-        },
-        examples=[
-            OpenApiExample(
-                'Exemple de requête valide',
-                value={
-                        "id_instance": 100,
-                        "title": "Comité de Direction",
-                        "description": "Réunion hebdomadaire du comité exécutif pour le suivi des projets stratégiques.",
-                        "url_connect": "https://plateforme.exemple.com/comite/connexion",
-                        "type": "executif",
-                        "format": "visioconférence",
-                        "link": "https://plateforme.exemple.com/comite/INST-001",
-                        "lang": "fr-FR",
-                        "client": {
-                            "id": "CLI-2025",
-                            "denomination": "Entreprise ABC",
-                            "secteur": "Finance"
-                        },
-                        "recurrence_config":  {
-                            "start_date": "2025-10-16T13:28:06.092Z",
-                            "interval": 1,
-                            "unit": "days",
-                            "recurrence_config": {},
-                            "end_type": "never",
-                            "end_date": None,
-                            "occurrence_count": None
-                        },
-                        "ponctuel_config": {
-                            "date": "2025-10-17T08:45:18.687Z",
-                            "priority": 0
-                        },
-                        "actors": [
-                            {
-                            "first_name": " Dupont",
-                            "last_name": "Jean ",
-                            "email": "jean.dupont@exemple.com",
-                            "role": "Président"
-                            } 
-                        ],
-                        "perimeter": [
-                             
-                        ]
-                        },
-                request_only=True,
-            ),
-            OpenApiExample(
-                'Réponse de succès',
-                value={
-                    'message': 'Email de création de comité envoyé avec succès',
-                    'status': 'success',
-                    'code': 200,
-                    'data': {
-                        'dest_email': 'ghislain@example.com',
-                        'committee_name': 'Comité Stratégique des Risques',
-                        'sent_at': '2025-10-15T15:30:00Z'
-                    }
-                },
-                response_only=True,
-                status_codes=['200'],
-            ),
-            OpenApiExample(
-                'Réponse d\'erreur - Validation',
-                value={
-                    'message': 'Erreur de validation des données',
-                    'status': 'error',
-                    'code': 400,
-                    'errors': {
-                        'dest_email': ['Ce champ est requis.'],
-                        'committee_name': ['Ce champ est requis.']
-                    }
-                },
-                response_only=True,
-                status_codes=['400'],
-            ),
-        ],
-        description="Envoie un email de notification lorsqu'un nouveau comité d'instance est créé",
-        summary="Notification de création de comité",
-        tags=["Board"],
-    )
 
     @extend_schema(
         parameters=[
@@ -566,6 +481,93 @@ class CommitteeCreatedView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+    
+    
+    @extend_schema(
+        request=CommitteeCreatedSerializer,
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                        "id_instance": 100,
+                        "title": "Comité de Direction",
+                        "description": "Réunion hebdomadaire du comité exécutif pour le suivi des projets stratégiques.",
+                        "url_connect": "https://plateforme.exemple.com/comite/connexion",
+                        "type": "executif",
+                        "format": "visioconférence",
+                        "link": "https://plateforme.exemple.com/comite/INST-001",
+                        "lang": "fr-FR",
+                        "client": {
+                            "id": "CLI-2025",
+                            "denomination": "Entreprise ABC",
+                            "secteur": "Finance"
+                        },
+                        "recurrence_config":  {
+                            "start_date": "2025-10-16T13:28:06.092Z",
+                            "interval": 1,
+                            "unit": "days",
+                            "recurrence_config": {},
+                            "end_type": "never",
+                            "end_date": None,
+                            "occurrence_count": None
+                        },
+                        "ponctuel_config": {
+                            "date": "2025-10-17T08:45:18.687Z",
+                            "priority": 0
+                        },
+                        "actors": [
+                            {
+                            "first_name": " Dupont",
+                            "last_name": "Jean ",
+                            "email": "jean.dupont@exemple.com",
+                            "role": "Président"
+                            } 
+                        ],
+                        "perimeter": [
+                             
+                        ]
+                        },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Email de création de comité envoyé avec succès',
+                    'status': 'success',
+                    'code': 200,
+                    'data': {
+                        'dest_email': 'ghislain@example.com',
+                        'committee_name': 'Comité Stratégique des Risques',
+                        'sent_at': '2025-10-15T15:30:00Z'
+                    }
+                },
+                response_only=True,
+                status_codes=['200'],
+            ),
+            OpenApiExample(
+                'Réponse d\'erreur - Validation',
+                value={
+                    'message': 'Erreur de validation des données',
+                    'status': 'error',
+                    'code': 400,
+                    'errors': {
+                        'dest_email': ['Ce champ est requis.'],
+                        'committee_name': ['Ce champ est requis.']
+                    }
+                },
+                response_only=True,
+                status_codes=['400'],
+            ),
+        ],
+        description="Envoie un email de notification lorsqu'un nouveau comité d'instance est créé",
+        summary="Notification de création de comité",
+        tags=["Board"],
+    )
     def post(self, request):
         """
         Envoie un email de notification de création de comité
