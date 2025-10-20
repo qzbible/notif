@@ -644,20 +644,19 @@ def compare_with_now(target_date, lang='en'):
 
 def format_perimeter_for_email(perimeter, lang='fr'):
     """
-    Version optimisée pour les emails (inline styles complets) - Bilingue
+    Version simplifiée avec indicateur "et X autres" et gestion sans priorité
     
     Args:
         perimeter: Liste de dictionnaires
         lang: 'fr' pour français, 'en' pour anglais
         
     Returns:
-        str: HTML formaté pour email
+        str: Texte formaté limité à 3 types
     """
     if not perimeter:
-        no_perimeter_text = "Aucun périmètre défini" if lang == 'fr' else "No perimeter defined"
-        return f"<p>{no_perimeter_text}</p>"
+        return "Aucun périmètre défini" if lang == 'fr' else "No perimeter defined"
     
-    # Traductions
+    # Traductions des priorités
     translations = {
         'fr': {
             1: "Très faible",
@@ -670,44 +669,89 @@ def format_perimeter_for_email(perimeter, lang='fr'):
             1: "Very Low",
             2: "Low",
             3: "Medium",
-            4: "Very",
-            5: "Very Very",
+            4: "High",
+            5: "Very High",
         }
     }
     
-    priority_mapping = {
-        1: {"color": "#28a745", "bg": "#d4edda"},
-        2: {"color": "#20c997", "bg": "#d1ecf1"},
-        3: {"color": "#ffc107", "bg": "#fff3cd"},
-        4: {"color": "#fd7e14", "bg": "#ffe5d0"},
-        5: {"color": "#dc3545", "bg": "#f8d7da"},
+    # Traductions des types
+    type_translations = {
+        'fr': {
+            'risk': 'Risques',
+            'opportunity': 'Opportunités',
+            'issue': 'Problèmes',
+            'objective': 'Objectifs',
+            'threat': 'Menaces',
+        },
+        'en': {
+            'risk': 'Risks',
+            'opportunity': 'Opportunities',
+            'issue': 'Issues',
+            'objective': 'Objectives',
+            'threat': 'Threats',
+        }
     }
     
     priority_labels = translations.get(lang, translations['fr'])
+    type_labels = type_translations.get(lang, type_translations['fr'])
     
-    html = '<div style="margin: 10px 0;">'
+    # Regrouper par type_value
+    grouped = {}
+    has_priority = False  # Vérifier si au moins un élément a une priorité
     
     for item in perimeter:
-        label = item.get('label', item.get('value', 'N/A'))
-        priority = item.get('priority', 0)
-        priority_info = priority_mapping.get(priority, priority_mapping[0])
-        priority_label = priority_labels.get(priority, priority_labels[0])
+        type_value = item.get('type_value', 'other')
+        priority = item.get('priority')
         
-        html += f'''
-        <span style="display: inline-block; padding: 6px 14px; margin: 4px 4px 4px 0; 
-                     background-color: {priority_info['bg']}; 
-                     color: {priority_info['color']}; 
-                     border: 1px solid {priority_info['color']}; 
-                     border-radius: 16px; 
-                     font-size: 13px; 
-                     font-weight: 600;
-                     font-family: Arial, sans-serif;">
-            {label} <span style="font-weight: 400; opacity: 0.85;">({priority_label})</span>
-        </span>
-        '''
+        # Vérifier si la priorité existe et est valide
+        if priority is not None and priority > 0:
+            has_priority = True
+            if type_value not in grouped:
+                grouped[type_value] = priority
+            else:
+                if priority > grouped[type_value]:
+                    grouped[type_value] = priority
+        else:
+            # Pas de priorité, juste ajouter le type
+            if type_value not in grouped:
+                grouped[type_value] = None
     
-    html += '</div>'
-    return html
+    # Trier par priorité décroissante (les None en dernier)
+    sorted_types = sorted(
+        grouped.items(), 
+        key=lambda x: (x[1] is None, -(x[1] if x[1] is not None else 0))
+    )
+    
+    total_types = len(sorted_types)
+    
+    # Limiter à 3
+    display_types = sorted_types[:3]
+    
+    # Construire le texte
+    result_parts = []
+    for type_value, max_priority in display_types:
+        type_label = type_labels.get(type_value, type_value.capitalize())
+        
+        # Si la priorité existe, l'afficher
+        if max_priority is not None:
+            priority_label = priority_labels.get(max_priority, priority_labels[1])
+            result_parts.append(f"{type_label} [{priority_label}]")
+        else:
+            # Pas de priorité, afficher juste le type
+            result_parts.append(type_label)
+    
+    result = ", ".join(result_parts)
+    
+    # Ajouter "et X autres" si plus de 3 types
+    if total_types > 3:
+        remaining = total_types - 3
+        if lang == 'fr':
+            result += f" et {remaining} autre{'s' if remaining > 1 else ''}"
+        else:
+            result += f" and {remaining} other{'s' if remaining > 1 else ''}"
+    
+    return result
+
 
 # Exemple d'utilisation
 if __name__ == "__main__":

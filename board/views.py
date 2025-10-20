@@ -1,7 +1,7 @@
 import os
 import random
 from board.models import InstanceBoard, CommitteeBoard
-from board.serializers import ArbitrageCreatedSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
+from board.serializers import ArbitrageCreatedSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
 from board.service import mail_arbitrage_created_service, mail_committee_created_service, mail_decision_service, mail_meeting_reminder_service
 from board.utils import calculate_next_occurrences, compare_with_now
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -203,73 +203,91 @@ class MeetingReminderView(APIView):
     permission_classes = [AllowAny]
 
     @extend_schema(
-        request=inline_serializer(
-            name='CommitteeBoardUpdateSerializer',
-            fields={
-                'instance_id': serializers.IntegerField(required=True, help_text='ID du instance'),
-                'old_date': serializers.DateTimeField(required=True, help_text='old date de la réunion'),
-                'new_date': serializers.DateTimeField(required=True, help_text='Nouvelle date de la réunion'),
-            }
+    request=CommitteeBoardUpdateSerializer,
+    responses={
+        200: OpenApiTypes.OBJECT,
+        400: OpenApiTypes.OBJECT,
+        404: OpenApiTypes.OBJECT,
+        500: OpenApiTypes.OBJECT,
+    },
+    examples=[
+        OpenApiExample(
+            'Exemple de requête valide',
+            value={
+                "instance_id": 45,
+                "old_date": "2025-10-20T14:00:00Z",
+                "new_date": "2025-11-20T14:00:00Z",
+                "perimeter":[
+                    {
+                        "id": 607,
+                        "label": "Data Breach Risk",
+                        "value": "Data Breach Risk",
+                        "type_value": "risk",
+                        "priority": 2
+                    },
+                ]
+            },
+            request_only=True,
         ),
-        responses={
-            200: OpenApiTypes.OBJECT,
-            400: OpenApiTypes.OBJECT,
-            404: OpenApiTypes.OBJECT,
-            500: OpenApiTypes.OBJECT,
-        },
-        examples=[
-            OpenApiExample(
-                'Exemple de requête valide',
-                value={
-                    "instance_id": 45,
-                    "new_date": "2025-11-20T14:00:00Z",
-                    "new_date": "2025-11-20T14:00:00Z"
-                },
-                request_only=True,
-            ),
-            OpenApiExample(
-                'Réponse de succès',
-                value={
-                    'message': 'Réunion reprogrammée avec succès',
-                    'status': 'success',
-                    'code': 200,
-                    'data': {
-                        'committee_board_id': 45,
-                        'old_date': '2025-10-20T14:00:00Z',
-                        'new_date': '2025-11-20T14:00:00Z',
-                        'old_task_id': 'abc123-def456-ghi789',
-                        'new_task_id': 'xyz789-uvw456-rst123',
-                        'committee_title': 'Comité de Direction'
-                    }
-                },
-                response_only=True,
-                status_codes=['200'],
-            ),
-            OpenApiExample(
-                'Réponse d\'erreur - Date dans le passé',
-                value={
-                    'message': 'La nouvelle date doit être dans le futur',
-                    'status': 'error',
-                    'code': 400
-                },
-                response_only=True,
-                status_codes=['400'],
-            ),
-            OpenApiExample(
-                'Réponse d\'erreur - Réunion non trouvée',
-                value={
-                    'message': 'Réunion non trouvée',
-                    'status': 'error',
-                    'code': 404
-                },
-                response_only=True,
-                status_codes=['404'],
-            ),
-        ],
-        description="Modifie la date d'une réunion de comité et reprogramme la tâche de rappel",
-        summary="Reprogrammation d'une réunion de comité",
-        tags=["Board"],
-    )
+        OpenApiExample(
+            'Réponse de succès',
+            value={
+                'message': 'Réunion reprogrammée avec succès',
+                'status': 'success',
+                'code': 200,
+                'data': {
+                    'instance_id': 45,
+                    'old_date': '2025-10-20T14:00:00Z',
+                    'new_date': '2025-11-20T14:00:00Z',
+                    'old_task_id': 'abc123-def456-ghi789',
+                    'new_task_id': 'xyz789-uvw456-rst123',
+                    'committee_title': 'Comité de Direction'
+                }
+            },
+            response_only=True,
+            status_codes=['200'],
+        ),
+        OpenApiExample(
+            'Réponse d\'erreur - Dates identiques',
+            value={
+                'message': 'Erreur de validation des données',
+                'status': 'error',
+                'code': 400,
+                'errors': {
+                    'non_field_errors': ['La nouvelle date doit être différente de l\'ancienne date']
+                }
+            },
+            response_only=True,
+            status_codes=['400'],
+        ),
+        OpenApiExample(
+            'Réponse d\'erreur - Date dans le passé',
+            value={
+                'message': 'Erreur de validation des données',
+                'status': 'error',
+                'code': 400,
+                'errors': {
+                    'new_date': ['La nouvelle date doit être dans le futur']
+                }
+            },
+            response_only=True,
+            status_codes=['400'],
+        ),
+        OpenApiExample(
+            'Réponse d\'erreur - Réunion non trouvée',
+            value={
+                'message': 'Réunion non trouvée',
+                'status': 'error',
+                'code': 404
+            },
+            response_only=True,
+            status_codes=['404'],
+        ),
+    ],
+    description="Modifie la date d'une réunion de comité et reprogramme la tâche de rappel",
+    summary="Reprogrammation d'une réunion de comité",
+    tags=["Board"],
+)
     def patch(self, request):
         """
         Modifie la date d'une réunion et reprogramme la tâche Celery associée
@@ -279,6 +297,8 @@ class MeetingReminderView(APIView):
             instance_id = request.data.get('instance_id')
             new_date = request.data.get('new_date')
             old_date = request.data.get('old_date')
+            perimeter = request.data.get('perimeter', [])
+            
             
             if not instance_id:
                 return Response(
@@ -367,6 +387,7 @@ class MeetingReminderView(APIView):
                 'recurrence_config': instance_board.recurrence_config,
                 'ponctuel_config': instance_board.ponctuel_config,
                 'actors': instance_board.actors,
+                'perimeter': perimeter,
                 'lang': instance_board.lang
             }
             
@@ -391,6 +412,7 @@ class MeetingReminderView(APIView):
                     validated_data.get("recurrence_config", {}),
                     validated_data.get("ponctuel_config", {}),
                     validated_data.get('actors', []),
+                    validated_data.get('perimeter', []),
                     new_date_parsed,
                     validated_data.get('lang', 'fr-FR')
                 ],
@@ -856,7 +878,7 @@ class CommitteeCreatedView(APIView):
                     'recurrence_config': validated_data.get('recurrence_config', None),
                     'ponctuel_config': validated_data.get('ponctuel_config', None),
                     'perimeter': validated_data.get('perimeter', []),
-                    'actors': validated_data.get('actors',[] ) 
+                    'actors': validated_data.get('actors',[] )
                 }
             )
             company_object = validated_data.get('client')
@@ -866,7 +888,8 @@ class CommitteeCreatedView(APIView):
                 title=validated_data.get('title', ''),
                 description=validated_data.get('description', ''),
                 link=validated_data.get('link', ''),
-                actors=validated_data.get('actors',[] ),
+                actors=validated_data.get('actors',[] ), 
+                
                 url_connect= validated_data.get('url_connect','' ),
                 company = company_object["denomination"] if validated_data.get('client') else "",
                 back_host=os.environ.get("BACK_HOST_URL", ""),
@@ -905,6 +928,7 @@ class CommitteeCreatedView(APIView):
                             validated_data.get("recurrence_config", {}),
                             validated_data.get("ponctuel_config", {}),
                             validated_data.get('actors',[] ),
+                            validated_data.get('perimeter', []),
                             date,
                             validated_data.get('lang', 'fr-FR')
                         ],
@@ -945,6 +969,7 @@ class CommitteeCreatedView(APIView):
                             validated_data.get("recurrence_config", {}),
                             validated_data.get("ponctuel_config", {}),
                             validated_data.get('actors',[] ),
+                            validated_data.get('perimeter', []),
                             date,
                             validated_data.get('lang', 'fr-FR')
                         ],

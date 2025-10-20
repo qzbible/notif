@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-
+from datetime import datetime, timezone
 class DecisionSerializer(serializers.Serializer):
     """Serializer pour la création et l'envoi des décisions du comité"""
     
@@ -417,3 +417,37 @@ class ArbitrageCreatedSerializer(serializers.Serializer):
         if value < 1:
             raise serializers.ValidationError("Le nombre d'éléments doit être supérieur à 0")
         return value
+    
+
+class CommitteeBoardUpdateSerializer(serializers.Serializer):
+    instance_id = serializers.IntegerField(required=True, help_text='ID de l\'instance')
+    old_date = serializers.DateTimeField(required=True, help_text='Ancienne date de la réunion')
+    new_date = serializers.DateTimeField(required=True, help_text='Nouvelle date de la réunion')
+
+    perimeter = serializers.ListField(
+        child=serializers.JSONField(),
+        required=False,
+        allow_null=True,
+        help_text="Liste des participants au format JSON pour le modèle. Si non fourni, peut être dérivé de 'participants'."
+    )
+    def validate_new_date(self, value):
+        """Valider que la nouvelle date est dans le futur"""
+        now = datetime.now(timezone.utc)
+        if value < now:
+            raise serializers.ValidationError(
+                "La nouvelle date doit être dans le futur"
+            )
+        return value
+    
+    def validate(self, data):
+        """Validation croisée"""
+        old_date = data.get('old_date')
+        new_date = data.get('new_date')
+        
+        if old_date and new_date and old_date == new_date:
+            raise serializers.ValidationError(
+                "La nouvelle date doit être différente de l'ancienne date"
+            )
+        
+        return data
+
