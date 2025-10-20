@@ -648,7 +648,7 @@ class CommitteeCreatedView(APIView):
                  
                 for date in dates:
                     print(date)
-                    is_past, readable = compare_with_now(date) #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
+                    is_past, readable = compare_with_now(date, 'fr' if validated_data.get('lang', 'fr-FR') == 'fr-FR' else 'en') #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
                     if is_past:
                         continue 
                     task = mail_meeting_reminder_service.apply_async(
@@ -686,7 +686,7 @@ class CommitteeCreatedView(APIView):
                 # supprimer les élément programmer et reprogrammer
                 ins_meet.delete()
                 for date in dates:
-                    is_past, readable = compare_with_now(date) #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
+                    is_past, readable = compare_with_now(date,  'fr' if validated_data.get('lang', 'fr-FR') == 'fr-FR' else 'en') #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
                     if is_past:
                         continue 
                     task = mail_meeting_reminder_service.apply_async(
@@ -859,7 +859,7 @@ class CommitteeBoardUpdateView(APIView):
                 )
             
             # Vérifier si la date est dans le futur
-            is_past, readable = compare_with_now(new_date_parsed)
+            is_past, readable = compare_with_now(new_date_parsed, 'fr')
             if is_past:
                 return Response(
                     {

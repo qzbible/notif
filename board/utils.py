@@ -4,6 +4,7 @@ import calendar
 
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
+from dateutil import parser as date_parser
 
 def _parse_date(date_str: str) -> Optional[datetime]:
     """Parse une date avec gestion du timezone"""
@@ -593,98 +594,115 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
     return occurrences[:max_count]
 
 
-def compare_with_now(target_date):
+def compare_with_now(target_date, lang='en'):
     """
-    Compare une date avec la date actuelle et retourne si elle est passée
-    ainsi qu'une description lisible de la différence.
+    Compare a date with the current date (supports English and French)
     
     Args:
-        target_date: datetime object ou string ISO format
+        target_date: datetime object or ISO format string
+        lang: 'en' for English, 'fr' for French
         
     Returns:
         tuple: (is_past: bool, readable: str)
-            - is_past: True si la date est dans le passé, False si dans le futur
-            - readable: Description lisible de la différence
     """
-    try:
-        # Conversion en datetime si nécessaire
-        from dateutil import parser as date_parser
-        if isinstance(target_date, str):
-            # Nettoyer les caractères invisibles
-            target_date = target_date.strip().replace('\xa0', '').replace('\u00a0', '')
-            # Parser la date
-            target_date = date_parser.parse(target_date)
-        
-        # S'assurer que la date est timezone-aware
-        if timezone.is_naive(target_date):
-            target_date = timezone.make_aware(target_date, timezone=timezone.utc)
-        
-        # Date actuelle (timezone-aware)
-        now = timezone.now()
-        
-        # Debug: afficher les dates pour comprendre le problème
-        print(f"Date cible: {target_date}")
-        print(f"Date actuelle: {now}")
-        print(f"Différence: {target_date - now}")
-        
-        # Calculer la différence
-        if target_date < now:
-            is_past = True
-            diff = now - target_date
-            prefix = "il y a"
-        else:
-            is_past = False
-            diff = target_date - now
-            prefix = "dans"
-        
-        # Calculer les composants de temps
-        total_seconds = abs(int(diff.total_seconds()))
-        
-        # Si c'est maintenant (moins de 1 minute)
-        if total_seconds < 60:
-            return (is_past, "maintenant")
-        
-        # Années
-        years = total_seconds // (365 * 24 * 3600)
-        if years > 0:
-            label = "an" if years == 1 else "ans"
-            return (is_past, f"{prefix} {years} {label}")
-        
-        # Mois (approximatif: 30 jours)
-        months = total_seconds // (30 * 24 * 3600)
-        if months > 0:
-            return (is_past, f"{prefix} {months} mois")
-        
-        # Semaines
-        weeks = total_seconds // (7 * 24 * 3600)
-        if weeks > 0:
-            label = "semaine" if weeks == 1 else "semaines"
-            return (is_past, f"{prefix} {weeks} {label}")
-        
-        # Jours
-        days = total_seconds // (24 * 3600)
-        if days > 0:
-            label = "jour" if days == 1 else "jours"
-            return (is_past, f"{prefix} {days} {label}")
-        
-        # Heures
-        hours = total_seconds // 3600
-        if hours > 0:
-            label = "heure" if hours == 1 else "heures"
-            return (is_past, f"{prefix} {hours} {label}")
-        
-        # Minutes
-        minutes = total_seconds // 60
-        if minutes > 0:
-            label = "minute" if minutes == 1 else "minutes"
-            return (is_past, f"{prefix} {minutes} {label}")
-        
-        # Par défaut (ne devrait pas arriver)
-        return (is_past, "maintenant")
+    # Convert to datetime if necessary
+    if isinstance(target_date, str):
+        target_date = target_date.strip().replace('\xa0', '').replace('\u00a0', '')
+        target_date = date_parser.parse(target_date)
     
-    except Exception as e:
-        print(f"Erreur dans compare_with_now: {str(e)}")
-        raise ValueError(f"Erreur lors de la comparaison de date: {str(e)}")
+    if timezone.is_naive(target_date):
+        target_date = timezone.make_aware(target_date, timezone=timezone.utc)
+    
+    now = timezone.now()
+    is_past = target_date < now
+    
+    if is_past:
+        diff = now - target_date
+        prefix = "ago" if lang == 'en' else "il y a"
+    else:
+        diff = target_date - now
+        prefix = "in" if lang == 'en' else "dans"
+    
+    total_seconds = abs(int(diff.total_seconds()))
+    
+    if total_seconds < 60:
+        return (is_past, "now" if lang == 'en' else "maintenant")
+    
+    # Labels bilingues
+    labels = {
+        'en': {
+            'year': ('year', 'years'),
+            'month': ('month', 'months'),
+            'week': ('week', 'weeks'),
+            'day': ('day', 'days'),
+            'hour': ('hour', 'hours'),
+            'minute': ('minute', 'minutes'),
+        },
+        'fr': {
+            'year': ('an', 'ans'),
+            'month': ('mois', 'mois'),
+            'week': ('semaine', 'semaines'),
+            'day': ('jour', 'jours'),
+            'hour': ('heure', 'heures'),
+            'minute': ('minute', 'minutes'),
+        }
+    }
+    
+    # Years
+    years = total_seconds // (365 * 24 * 3600)
+    if years > 0:
+        label = labels[lang]['year'][0 if years == 1 else 1]
+        if lang == 'en':
+            return (is_past, f"{years} {label} {prefix}" if is_past else f"{prefix} {years} {label}")
+        else:
+            return (is_past, f"{prefix} {years} {label}")
+    
+    # Months
+    months = total_seconds // (30 * 24 * 3600)
+    if months > 0:
+        label = labels[lang]['month'][0 if months == 1 else 1]
+        if lang == 'en':
+            return (is_past, f"{months} {label} {prefix}" if is_past else f"{prefix} {months} {label}")
+        else:
+            return (is_past, f"{prefix} {months} {label}")
+    
+    # Weeks
+    weeks = total_seconds // (7 * 24 * 3600)
+    if weeks > 0:
+        label = labels[lang]['week'][0 if weeks == 1 else 1]
+        if lang == 'en':
+            return (is_past, f"{weeks} {label} {prefix}" if is_past else f"{prefix} {weeks} {label}")
+        else:
+            return (is_past, f"{prefix} {weeks} {label}")
+    
+    # Days
+    days = total_seconds // (24 * 3600)
+    if days > 0:
+        label = labels[lang]['day'][0 if days == 1 else 1]
+        if lang == 'en':
+            return (is_past, f"{days} {label} {prefix}" if is_past else f"{prefix} {days} {label}")
+        else:
+            return (is_past, f"{prefix} {days} {label}")
+    
+    # Hours
+    hours = total_seconds // 3600
+    if hours > 0:
+        label = labels[lang]['hour'][0 if hours == 1 else 1]
+        if lang == 'en':
+            return (is_past, f"{hours} {label} {prefix}" if is_past else f"{prefix} {hours} {label}")
+        else:
+            return (is_past, f"{prefix} {hours} {label}")
+    
+    # Minutes
+    minutes = total_seconds // 60
+    if minutes > 0:
+        label = labels[lang]['minute'][0 if minutes == 1 else 1]
+        if lang == 'en':
+            return (is_past, f"{minutes} {label} {prefix}" if is_past else f"{prefix} {minutes} {label}")
+        else:
+            return (is_past, f"{prefix} {minutes} {label}")
+    
+    return (is_past, "now" if lang == 'en' else "maintenant")
     
 
 # Exemple d'utilisation
