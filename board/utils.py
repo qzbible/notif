@@ -593,7 +593,6 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
     return occurrences[:max_count]
 
 
-
 def compare_with_now(target_date):
     """
     Compare une date avec la date actuelle et retourne si elle est passée
@@ -605,65 +604,89 @@ def compare_with_now(target_date):
     Returns:
         tuple: (is_past: bool, readable: str)
             - is_past: True si la date est dans le passé, False si dans le futur
-            - readable: Description lisible de la différence (ex: "dans 5 jours", "il y a 2 heures")
+            - readable: Description lisible de la différence
     """
-    # Conversion en datetime si nécessaire
-    if isinstance(target_date, str):
-        from dateutil import parser
-        target_date = parser.parse(target_date)
+    try:
+        # Conversion en datetime si nécessaire
+        from dateutil import parser as date_parser
+        if isinstance(target_date, str):
+            # Nettoyer les caractères invisibles
+            target_date = target_date.strip().replace('\xa0', '').replace('\u00a0', '')
+            # Parser la date
+            target_date = date_parser.parse(target_date)
+        
+        # S'assurer que la date est timezone-aware
+        if timezone.is_naive(target_date):
+            target_date = timezone.make_aware(target_date, timezone=timezone.utc)
+        
+        # Date actuelle (timezone-aware)
+        now = timezone.now()
+        
+        # Debug: afficher les dates pour comprendre le problème
+        print(f"Date cible: {target_date}")
+        print(f"Date actuelle: {now}")
+        print(f"Différence: {target_date - now}")
+        
+        # Calculer la différence
+        if target_date < now:
+            is_past = True
+            diff = now - target_date
+            prefix = "il y a"
+        else:
+            is_past = False
+            diff = target_date - now
+            prefix = "dans"
+        
+        # Calculer les composants de temps
+        total_seconds = abs(int(diff.total_seconds()))
+        
+        # Si c'est maintenant (moins de 1 minute)
+        if total_seconds < 60:
+            return (is_past, "maintenant")
+        
+        # Années
+        years = total_seconds // (365 * 24 * 3600)
+        if years > 0:
+            label = "an" if years == 1 else "ans"
+            return (is_past, f"{prefix} {years} {label}")
+        
+        # Mois (approximatif: 30 jours)
+        months = total_seconds // (30 * 24 * 3600)
+        if months > 0:
+            return (is_past, f"{prefix} {months} mois")
+        
+        # Semaines
+        weeks = total_seconds // (7 * 24 * 3600)
+        if weeks > 0:
+            label = "semaine" if weeks == 1 else "semaines"
+            return (is_past, f"{prefix} {weeks} {label}")
+        
+        # Jours
+        days = total_seconds // (24 * 3600)
+        if days > 0:
+            label = "jour" if days == 1 else "jours"
+            return (is_past, f"{prefix} {days} {label}")
+        
+        # Heures
+        hours = total_seconds // 3600
+        if hours > 0:
+            label = "heure" if hours == 1 else "heures"
+            return (is_past, f"{prefix} {hours} {label}")
+        
+        # Minutes
+        minutes = total_seconds // 60
+        if minutes > 0:
+            label = "minute" if minutes == 1 else "minutes"
+            return (is_past, f"{prefix} {minutes} {label}")
+        
+        # Par défaut (ne devrait pas arriver)
+        return (is_past, "maintenant")
     
-    # S'assurer que la date est timezone-aware
-    if timezone.is_naive(target_date):
-        target_date = timezone.make_aware(target_date)
+    except Exception as e:
+        print(f"Erreur dans compare_with_now: {str(e)}")
+        raise ValueError(f"Erreur lors de la comparaison de date: {str(e)}")
     
-    # Date actuelle
-    now = timezone.now()
-    
-    # Calculer la différence
-    if target_date < now:
-        is_past = True
-        diff = now - target_date
-        prefix = "il y a"
-    else:
-        is_past = False
-        diff = target_date - now
-        prefix = "dans"
-    
-    # Calculer les composants de temps
-    total_seconds = int(diff.total_seconds())
-    
-    # Années
-    years = total_seconds // (365 * 24 * 3600)
-    if years > 0:
-        label = "an" if years == 1 else "ans"
-        return (is_past, f"{prefix} {years} {label}")
-    
-    # Mois (approximatif)
-    months = total_seconds // (30 * 24 * 3600)
-    if months > 0:
-        return (is_past, f"{prefix} {months} mois")
-    
-    # Jours
-    days = total_seconds // (24 * 3600)
-    if days > 0:
-        label = "jour" if days == 1 else "jours"
-        return (is_past, f"{prefix} {days} {label}")
-    
-    # Heures
-    hours = total_seconds // 3600
-    if hours > 0:
-        label = "heure" if hours == 1 else "heures"
-        return (is_past, f"{prefix} {hours} {label}")
-    
-    # Minutes
-    minutes = total_seconds // 60
-    if minutes > 0:
-        label = "minute" if minutes == 1 else "minutes"
-        return (is_past, f"{prefix} {minutes} {label}")
-    
-    # Secondes
-    label = "seconde" if total_seconds == 1 else "secondes"
-    return (is_past, f"{prefix} {total_seconds} {label}")
+
 # Exemple d'utilisation
 if __name__ == "__main__":
     
