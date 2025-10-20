@@ -906,7 +906,7 @@ class CommitteeCreatedView(APIView):
             dates = []
             if validated_data.get('recurrence_config', None) :
                  # on recupere les 5 prochaine date 
-                dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=100)
+                dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=5)
             elif validated_data.get('ponctuel_config', None):
                 dates.append(validated_data.get('ponctuel_config', None).get('date'))
             if created:
@@ -958,7 +958,7 @@ class CommitteeCreatedView(APIView):
                     is_past, readable = compare_with_now(date,  'fr' if validated_data.get('lang', 'fr-FR') == 'fr-FR' else 'en') #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
                     if is_past:
                         continue 
-                    print("send ----->")
+                    print("send ----->", date)
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
