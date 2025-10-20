@@ -647,6 +647,7 @@ class CommitteeCreatedView(APIView):
                
                  
                 for date in dates:
+                    print(date)
                     is_past, readable = compare_with_now(date) #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
                     if is_past:
                         continue 
