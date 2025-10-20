@@ -644,10 +644,9 @@ class CommitteeCreatedView(APIView):
             elif validated_data.get('ponctuel_config', None):
                 dates.append(validated_data.get('ponctuel_config', None).get('date'))
             if created:
-               
-                 
                 for date in dates:
                     print(date)
+                   
                     is_past, readable = compare_with_now(date, 'fr' if validated_data.get('lang', 'fr-FR') == 'fr-FR' else 'en') #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
                     if is_past:
                         continue 

@@ -624,25 +624,22 @@ def compare_with_now(target_date, lang='en'):
             - is_past: True if the date is in the past, False if in the future
             - readable: Readable description of the difference
     """
-    # Convert to datetime if necessary
-    if isinstance(target_date, str):
-        # Nettoyer les caractères invisibles
-        print('date ---', target_date)
-        target_date = target_date.strip().replace('\xa0', '').replace('\u00a0', '')
-        # Parser la date avec _parse_date
+    try:
+        # Convert to datetime if necessary
         target_date = _parse_date(target_date)
-        print('date ---2', target_date)
-        if target_date is None:
-            raise ValueError("Invalid date format")
+
+        # Date actuelle
+        now = datetime.now(timezone.utc)
+        
+        # Determine if the date is in the past
+        is_past = target_date < now 
+        # Default
+        return (is_past,  '')
     
-    # Current date (timezone-aware) en UTC
-    now = datetime.now(timezone.utc)
-    
-    # Determine if the date is in the past
-    is_past = target_date < now 
-    # Default
-    return (is_past,  '')
-    
+    except Exception as e:
+        print("----error", str(e))
+
+        return False,  ''
 
 # Exemple d'utilisation
 if __name__ == "__main__":
