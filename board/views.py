@@ -906,7 +906,7 @@ class CommitteeCreatedView(APIView):
             dates = []
             if validated_data.get('recurrence_config', None) :
                  # on recupere les 5 prochaine date 
-                dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=5)
+                dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=100)
             elif validated_data.get('ponctuel_config', None):
                 dates.append(validated_data.get('ponctuel_config', None).get('date'))
             if created:
@@ -1011,9 +1011,6 @@ class CommitteeCreatedView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
- 
- 
-
 
 
 class ArbitrageCreatedView(APIView):
