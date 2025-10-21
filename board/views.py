@@ -1209,12 +1209,9 @@ class SendCommentCreatedEmailAPIView(APIView):
     """
     API pour envoyer un email de notification de création de commentaire
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     
-    """
-    API pour envoyer un email de notification de création de commentaire
-    """
-    permission_classes = [IsAuthenticated]
+    
     
     @extend_schema(
         request=CommentCreatedSerializer,
