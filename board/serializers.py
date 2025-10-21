@@ -60,11 +60,7 @@ class DecisionSerializer(serializers.Serializer):
         help_text="Nom de l'entreprise"
     )
     
-    # URL de base
-    base_url = serializers.URLField(
-        required=True,
-        help_text="URL de base du backend"
-    )
+   
     
     # Configuration
     client_id = serializers.CharField(
