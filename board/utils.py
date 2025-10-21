@@ -293,6 +293,8 @@ def explain_recurrence_simple(config: Dict, lang: str = "fr") -> str:
     Returns:
         Une phrase simple décrivant la récurrence
     """
+    if config == None:
+        return "Aucune récurrence définie" if lang == "fr" else "No recurrence defined"
    
     interval = config['interval']
  
@@ -473,7 +475,8 @@ def format_recurrence_schedule(config: Dict, lang: str = "fr") -> str:
     Returns:
         Description formatée avec dates et heures
     """
-    
+    if config == None:
+        return "Aucune récurrence définie" if lang == "fr" else "No recurrence defined"
     start_date = _parse_date(config.get('start_date'))
     end_type = config.get('end_type', 'never')
     end_date = _parse_date(config.get('end_date')) if config.get('end_date') else None

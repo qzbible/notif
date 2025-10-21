@@ -73,6 +73,16 @@ class DecisionSerializer(serializers.Serializer):
         default='fr-FR',
         help_text="Langue de l'email (fr-FR ou en-US)"
     )
+    recurrence_config = serializers.JSONField(
+        required=False,
+        allow_null=True,
+        help_text="Fichier JSON optionnel"
+    )
+    ponctuel_config = serializers.JSONField(
+        required=False,
+        allow_null=True,
+        help_text="Fichier JSON optionnel"
+    )
     
     actors = serializers.ListField(
         child=serializers.JSONField(),

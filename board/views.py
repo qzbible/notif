@@ -68,6 +68,19 @@ class DecisionView(APIView):
                     'company': 'Klivar', 
                     'lieu_reunion': 'Immeuble A Biyemassi', 
                     'client_id': 'client_12345',
+                    "recurrence_config":  {
+                            "start_date": "2025-10-16T13:28:06.092Z",
+                            "interval": 1,
+                            "unit": "days",
+                            "recurrence_config": {},
+                            "end_type": "never",
+                            "end_date": None,
+                            "occurrence_count": None
+                        },
+                    "ponctuel_config": {
+                        "date": "2025-10-17T08:45:18.687Z",
+                        "priority": 0
+                    },
                     "actors": [
                         {
                         "first_name": " Dupont",
@@ -155,10 +168,14 @@ class DecisionView(APIView):
                 instance_name=validated_data.get('instance_name'),
                 instance_description=validated_data.get('instance_description', ''),
                 company=validated_data.get('company'),
-                instance_date= "", 
+                
                 lieu_reunion=validated_data.get('lieu_reunion', ''),
                  actors= validated_data.get('actors',[] ),
                 back_host= os.environ.get("BACK_HOST_URL", ""),
+
+                periodicity=validated_data.get("recurrence_config", None),
+                ponctuel_config = validated_data.get("ponctuel_config", None),
+
                 lang=validated_data.get('lang', 'fr-FR')
             ) 
             if result:
@@ -407,8 +424,8 @@ class MeetingReminderView(APIView):
                     validated_data.get('url_connect', ''),
                     company_object["denomination"] if company_object else "",
                     os.environ.get("BACK_HOST_URL", ""),
-                    validated_data.get("recurrence_config", {}),
-                    validated_data.get("ponctuel_config", {}),
+                    validated_data.get("recurrence_config",None),
+                    validated_data.get("ponctuel_config", None),
                     validated_data.get('actors', []),
                     validated_data.get('perimeter', []),
                     new_date_parsed,
@@ -892,8 +909,8 @@ class CommitteeCreatedView(APIView):
                 company = company_object["denomination"] if validated_data.get('client') else "",
                 back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR'),
-                periodicity=validated_data.get("recurrence_config", {}),
-                ponctuel_config = validated_data.get("ponctuel_config", {}),
+                periodicity=validated_data.get("recurrence_config", None),
+                ponctuel_config = validated_data.get("ponctuel_config", None),
                 created=created
 
             )
@@ -937,8 +954,8 @@ class CommitteeCreatedView(APIView):
                             validated_data.get('url_connect','' ),
                             company_object["denomination"] if validated_data.get('client') else "",
                             os.environ.get("BACK_HOST_URL", ""),
-                            validated_data.get("recurrence_config", {}),
-                            validated_data.get("ponctuel_config", {}),
+                            validated_data.get("recurrence_config", None),
+                            validated_data.get("ponctuel_config", None),
                             validated_data.get('actors',[] ),
                             validated_data.get('perimeter', []),
                             date,
@@ -992,8 +1009,8 @@ class CommitteeCreatedView(APIView):
                             validated_data.get('url_connect','' ),
                             company_object["denomination"] if validated_data.get('client') else "",
                             os.environ.get("BACK_HOST_URL", ""),
-                            validated_data.get("recurrence_config", {}),
-                            validated_data.get("ponctuel_config", {}),
+                            validated_data.get("recurrence_config", None),
+                            validated_data.get("ponctuel_config", None),
                             validated_data.get('actors',[] ),
                             validated_data.get('perimeter', []),
                             date,

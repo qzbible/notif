@@ -63,7 +63,7 @@ def list_actors_info(actors: List[Dict]) -> Tuple[List[str], str]:
 
 
 def mail_decision_service(
-    instance_date,
+ 
     committee_name,
     committee_date,
     decisions_list, 
@@ -72,7 +72,9 @@ def mail_decision_service(
     instance_description,
     company,  
     lieu_reunion, 
-    back_host,
+    back_host, 
+    periodicity,
+    ponctuel_config,
     actors = [],
     lang=None
 ):
@@ -99,20 +101,44 @@ def mail_decision_service(
     Returns:
         bool: True si l'envoi a réussi
     """
-    
+    periodicity_l = None 
+    date_instance = ''
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
         path = "board/decision/create-decision-fr.html"
         path_txt = "board/decision/create-decision-fr.txt"
         object_email = f"Décisions du comité : {committee_name}"
+        periodicity_l = explain_recurrence_simple(periodicity, 'fr')
+        if periodicity :
+            date_instance = format_recurrence_schedule(periodicity, 'fr')
+        elif ponctuel_config :
+            date_instance = format_ponctuel_date(ponctuel_config, 'fr')
+        else :
+            date_instance = ''
+    
     elif lang == "en-US":
         path = "board/decision/create-decision-en.html"
         path_txt = "board/decision/create-decision-en.txt"
         object_email = f"Committee decisions: {committee_name}"
+        periodicity_l = explain_recurrence_simple(periodicity, 'en')
+        if periodicity :
+            date_instance = format_recurrence_schedule(periodicity, 'en')
+        elif ponctuel_config :
+            date_instance = format_ponctuel_date(ponctuel_config, 'en')
+        else :
+            date_instance = ''
     else:
         path = "board/decision/create-decision-fr.html"
         path_txt = "board/decision/create-decision-fr.txt"
         object_email = f"Décisions du comité : {committee_name}"
+
+        periodicity_l = explain_recurrence_simple(periodicity, 'fr')
+        if periodicity :
+            date_instance = format_recurrence_schedule(periodicity, 'fr')
+        elif ponctuel_config :
+            date_instance = format_ponctuel_date(ponctuel_config, 'fr')
+        else :
+            date_instance = ''
     
     # Contexte pour le template
     emails, fullnames = list_actors_info(actors)
@@ -126,11 +152,11 @@ def mail_decision_service(
                     "url_connect": url_connect,
                     "instance_name": instance_name,
                     "instance_description": instance_description,
-                    "instance_date": instance_date,
-                   
+                    "instance_date": date_instance, 
                     "lieu_reunion": lieu_reunion,
                     "participants": fullnames,
                     "company": company,
+                    "periodicity": periodicity_l,
                     "back_host": back_host
                 }
 
