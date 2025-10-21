@@ -292,8 +292,9 @@ def mail_meeting_reminder_service(
         return True
         
     except Exception as e:
-        print(f"Erreur lors de l'envoi de l'email de rappel: {str(e)}")
-        return False
+        print(f"Erreur: {str(e)}")
+        # print(f"Traceback: {traceback.format_exc()}")  # ✅ Voir toute la stack
+        raise  # ✅ Relancer pour que Celery puisse logger
  
 
 def mail_arbitrage_created_service(
@@ -394,8 +395,9 @@ def mail_arbitrage_created_service(
         # email_thread.start() 
         return True 
     except Exception as e:
-        print(f"Erreur lors de l'envoi de l'email de création de dossier d'arbitrage: {str(e)}")
-        return False
+        print(f"Erreur: {str(e)}")
+        print(f"Traceback:  ")  # ✅ Voir toute la stack
+        raise  # ✅ Relancer pour que Celery puisse logger
     
  
 def mail_committee_created_service( 
