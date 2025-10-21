@@ -453,34 +453,37 @@ class CommitteeBoardUpdateSerializer(serializers.Serializer):
 
 
 
-
 class CommentCreatedSerializer(serializers.Serializer):
-    """Serializer pour la notification de création de dossier d'arbitrage"""
+    """Serializer pour la notification de création de commentaire"""
 
     sender_name = serializers.CharField(
         required=True,
         max_length=255,
-        help_text="Nom du destinataire"
+        help_text="Nom de l'expéditeur"
     )
  
     actors = serializers.ListField(
-        child=serializers.JSONField(),
-        required=False,
-        allow_null=True,
-        help_text="Liste des participants au format JSON pour le modèle. Si non fourni, peut être dérivé de 'participants'."
+        child=serializers.DictField(),  # Plus clair que JSONField
+        required=True,
+        help_text="Liste des participants (doit contenir email, first_name, last_name)"
     )
       
-    # Informations du comité
+    # Informations du commentaire
     value = serializers.CharField(
         required=True,
         max_length=255,
-        help_text="Nom du comité"
+        help_text="Titre de la décision/tâche"
+    )
+    
+    comment = serializers.CharField(
+        required=True,
+        help_text="Contenu du commentaire"
     )
 
     date_send = serializers.CharField(
-        required=True,
+        required=False,
         max_length=255,
-        help_text="Date de la réunion du comité"
+        help_text="Date d'envoi (optionnel)"
     )
      
     company = serializers.CharField(
@@ -495,4 +498,11 @@ class CommentCreatedSerializer(serializers.Serializer):
         help_text="Langue de l'email (fr-FR ou en-US)"
     )
     
-     
+    def validate_actors(self, value):
+        """Valide que chaque acteur a les champs nécessaires"""
+        for actor in value:
+            if not actor.get('email'):
+                raise serializers.ValidationError(
+                    "Chaque acteur doit avoir un email"
+                )
+        return value
