@@ -918,6 +918,7 @@ class CommitteeCreatedView(APIView):
                         
                     #     continue 
                     print(date)
+                    date_utc = datetime.fromisoformat(date.replace('Z', '+00:00'))
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
@@ -933,7 +934,7 @@ class CommitteeCreatedView(APIView):
                             date,
                             validated_data.get('lang', 'fr-FR')
                         ],
-                        eta=date
+                        eta=date_utc
                     ) 
                     ins_meet, _ = CommitteeBoard.objects.get_or_create(
                             id_task = task,
@@ -960,6 +961,7 @@ class CommitteeCreatedView(APIView):
                     # if is_past:
                     #     continue 
                     print(date)
+                    date_utc = datetime.fromisoformat(date.replace('Z', '+00:00'))
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
@@ -975,7 +977,7 @@ class CommitteeCreatedView(APIView):
                             date,
                             validated_data.get('lang', 'fr-FR')
                         ],
-                        eta=date
+                        eta=date_utc
                     ) 
                     ins_meet, _ = CommitteeBoard.objects.get_or_create(
                             id_task = task,
