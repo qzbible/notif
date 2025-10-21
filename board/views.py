@@ -1202,9 +1202,6 @@ class ArbitrageCreatedView(APIView):
             )
         
 
-
- 
-
 class SendCommentCreatedEmailAPIView(APIView):
     """
     API pour envoyer un email de notification de création de commentaire
