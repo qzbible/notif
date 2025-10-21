@@ -1208,8 +1208,6 @@ class SendCommentCreatedEmailAPIView(APIView):
     """
     permission_classes = [AllowAny]
     
-    
-    
     @extend_schema(
         request=CommentCreatedSerializer,
         responses={
@@ -1372,6 +1370,7 @@ class SendCommentCreatedEmailAPIView(APIView):
                 sender_name=sender_name,
                 company=company,
                 actors=actors,
+                back_host=os.environ.get("BACK_HOST_URL", ""),
                 lang=lang
             )
             

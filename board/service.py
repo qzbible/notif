@@ -516,7 +516,9 @@ def mail_comment_created_service(
     comment, 
     sender_name, 
     company, 
+    back_host,
     actors = [],
+    
     lang=None
 ):
     """
@@ -556,7 +558,8 @@ def mail_comment_created_service(
                 "task_name": title, 
                 "date_send": date_send,
                 "comment": comment, 
-                "company": company 
+                "company": company,
+                "back_url": back_host
             }
             
             # Rendu des templates
