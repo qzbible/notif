@@ -184,7 +184,7 @@ def send_mail_created(to_emails, title, text_content, html_content, company=None
         to_emails = [to_emails]
     
     # Normaliser cc_emails
-    cc_emails = cc_emails or []
+     
     
     # Ajout d'options d'en-têtes pour améliorer la délivrabilité
     headers = {
@@ -198,8 +198,7 @@ def send_mail_created(to_emails, title, text_content, html_content, company=None
     for to_email in to_emails:
         try:
             # Retirer le destinataire actuel de la liste CC pour éviter les doublons
-            cc_filtered = [email for email in cc_emails if email != to_email]
-            
+              
             # Création du message avec les en-têtes optimisés
             msg = EmailMultiAlternatives(
                 subject=title,
