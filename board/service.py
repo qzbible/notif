@@ -278,7 +278,7 @@ def mail_meeting_reminder_service(
                 type_arbitration_elements= format_perimeter_for_email(perimeter, 'fr' if lang=="fr-FR" else "en"), 
                 instance_name=title,
                 instance_description=description,
-                instance_start_date=date_instance,
+                instance_date=date_instance,
                 # instance_end_date=validated_data.get('instance_end_date'),
                 instance_location=link,
                 instance_participants=fullnames,
@@ -500,6 +500,72 @@ def mail_committee_created_service(
                 kwargs={'cc_emails': other_emails, 'company': company}
             )
             email_thread.start()
+
+            
+        return True
+    except Exception as e:
+        print(f"Erreur dans mail_committee_created_service: {str(e)}")
+        return False
+    
+
+
+ 
+def mail_comment_created_service( 
+    dest,
+    title,
+    comment, 
+    sender_name, 
+    company, 
+    lang=None
+):
+    """
+    Service d'envoi d'email pour la création d'un  commentaire
+    """ 
+    date = ''
+    
+    # Déterminer les templates selon la langue
+    if lang == "fr-FR":
+        path = "board/comment/add-comment-fr.html"
+        path_txt = "board/comment/add-comment-fr.txt"
+        
+        object_email = f"Nouveau commentaire sur une décision: {title}"
+        
+        
+    elif lang == "en-US":
+        path = "board/comment/add-comment-en.html"
+        path_txt = "board/comment/add-comment-en.txt"
+       
+        object_email = f"New comment on a task : {title}" 
+         
+       
+    else:
+        path = "board/comment/add-comment-fr.html"
+        path_txt = "board/comment/add-comment-fr.txt"
+         
+        object_email = f"Nouveau commentaire sur une décision:  {title}"
+         
+    
+    try:
+         
+        context = {
+            "name": dest.get('first_name', '') + ' ' + dest.get('last_name', ''),
+            "sender_name": sender_name, 
+            "task_name": title, 
+            "date_send": date,
+            "comment": comment, 
+            "company": company 
+        }
+        
+        # Rendu des templates
+        body_content = render_to_string(path, context)
+        text_content = render_to_string(path_txt, context)
+        
+        # Envoi asynchrone de l'email avec les autres en copie cachée
+        email_thread = threading.Thread(
+            target=send_mail_created,
+            args=([dest_email], object_email, text_content, body_content),
+        )
+        email_thread.start()
 
             
         return True

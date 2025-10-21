@@ -163,11 +163,41 @@
 																style="padding-bottom:5px;padding-left:30px;padding-right:10px;padding-top:20px;text-align:center;width:100%;">
 																<h1
 																	style="margin: 0; color: #000000; direction: ltr; font-family: 'Poppins', sans-serif; font-size: 25px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: left; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 34.8px; text-align:center;">
-																	New comment on a task </h1>
+																	Nouveau commentaire sur une décision </h1>
 															</td>
 														</tr>
 													</table>
-													 
+													<!-- <table border="0" cellpadding="0" cellspacing="0"
+														class="paragraph_block block-4" role="presentation"
+														style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;"
+														width="100%">
+														<tr>
+															<td class="pad"
+																style="padding-bottom:5px;padding-left:30px;padding-right:30px;padding-top:15px;">
+																<div
+																	style="color:#393d47;font-family:'Poppins', sans-serif;font-size:15px;line-height:150%;text-align:left;mso-line-height-alt:24px;">
+																	<p style="margin: 0; word-break: break-word;"><span
+																			style="word-break: break-word;">Bonjour {{name}},</span></p>
+                                                                    </br>
+																	<p style="margin: 0; word-break: break-word;">
+                                                                        Un nouveau commentaire a été ajouté par [Nom de l’auteur du commentaire] sur la tâche [Nom de la tâche], le [Date/Heure].
+                                                                        <span
+                                      										style="color: #000000; font-weight: 700;">{{role_name}}</span> 
+                                                                    </p>
+                                                                    </br>
+                                                                    <p style="margin: 0; word-break: break-word;">
+                                                                        commentaire : 
+																	</p>
+                                                                </br>
+                                                                    <p style="margin: 0; word-break: break-word;">
+                                                                       Mon commentaire
+																	</p>
+
+                                                                </div>
+															</td>
+														</tr> 
+														 
+													</table> -->
                                                     <table border="0" cellpadding="0" cellspacing="0"
 														class="paragraph_block block-4" role="presentation"
 														style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;"
@@ -178,20 +208,20 @@
 																<div
 																	style="color:#393d47;font-family:'Poppins', sans-serif;font-size:15px;line-height:150%;text-align:left;mso-line-height-alt:24px;">
 																	<p style="margin: 0; word-break: break-word;"><span
-																			style="word-break: break-word;">Hi {{name}},</span></p>
+																			style="word-break: break-word;">Bonjour {{name}},</span></p>
                                                                     <br/>
 																	<p style="margin: 0; word-break: break-word;">
-																		A new comment has been added by <strong>{{sender_name}}</strong> on task  <strong>{{task_name}}</strong>on {{date_send}}
+                                                                        Un nouveau commentaire a été ajouté par <strong>{{sender_name}}</strong> sur la décision <strong>{{task_name}}</strong>, {{date_send}}
                                                                     </p>
                                                                     <br/>
                                                                     
                                                                     <!-- Bloc commentaire encadré -->
                                                                     <div class="comment-box" style="background-color: #f8f9fa; border: 1px solid #d1d5db; border-radius: 10px; padding: 15px; margin: 10px 0;">
                                                                         <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; font-weight: 600;">
-                                                                            💬 COMMENT
+                                                                            💬 COMMENTAIRE
                                                                         </p>
                                                                         <p style="margin: 0; color: #1f2937; font-size: 14px; line-height: 1.6;">
-                                                                             {{comment | safe}}
+                                                                             {{comment | safe }}
                                                                         </p>
                                                                     </div>
 
@@ -209,7 +239,7 @@
 																style="padding-bottom:30px;padding-left:30px;padding-right:30px;padding-top:20px; border-radius: 100px;">
 																<div
 																	style="color:#000000;font-family:'Poppins', sans-serif;font-size:15px;font-weight:400;line-height:150%;text-align:left;mso-line-height-alt:24px;">
-																	<p style="margin: 0; word-break: break-word;">  <br />Your {{company}} team</p>
+																	<p style="margin: 0; word-break: break-word;">  <br />Votre équipe {{company}}</p>
 																</div>
 															</td>
 														</tr>
