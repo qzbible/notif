@@ -968,7 +968,7 @@ class CommitteeCreatedView(APIView):
                         date_utc = date_utc.astimezone(timezone.utc)
                     
                     now_utc = datetime.now(timezone.utc)
-                    
+                    print(date_utc)
                     reminder_time = date_utc - timedelta(hours=1)
                     print(reminder_time)
                     # Si le rappel serait dans le passé, l'envoyer immédiatement
