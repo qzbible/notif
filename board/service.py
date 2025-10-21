@@ -265,7 +265,7 @@ def mail_meeting_reminder_service(
             email_thread = threading.Thread(
                 target=send_mail_created,
                 args=([act.get('email')], object_email, text_content, body_content),
-                kwargs={'cc_emails': other_emails, 'company': company}
+                kwargs={ 'company': company}
             )
             email_thread.start()
 
@@ -383,7 +383,7 @@ def mail_arbitrage_created_service(
             [dest_email], 
             object_email, 
             text_content, 
-            body_content, 
+            body_content,  
             company
         )
         
@@ -511,17 +511,18 @@ def mail_committee_created_service(
 
  
 def mail_comment_created_service( 
-    dest,
+     date_send,
     title,
     comment, 
     sender_name, 
     company, 
+    actors = [],
     lang=None
 ):
     """
     Service d'envoi d'email pour la création d'un  commentaire
     """ 
-    date = ''
+ 
     
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
@@ -546,26 +547,28 @@ def mail_comment_created_service(
          
     
     try:
-         
-        context = {
-            "name": dest.get('first_name', '') + ' ' + dest.get('last_name', ''),
-            "sender_name": sender_name, 
-            "task_name": title, 
-            "date_send": date,
-            "comment": comment, 
-            "company": company 
-        }
-        
-        # Rendu des templates
-        body_content = render_to_string(path, context)
-        text_content = render_to_string(path_txt, context)
-        
-        # Envoi asynchrone de l'email avec les autres en copie cachée
-        email_thread = threading.Thread(
-            target=send_mail_created,
-            args=([dest_email], object_email, text_content, body_content),
-        )
-        email_thread.start()
+        for act in actors: 
+            # Retirer l'email du destinataire actuel de la liste des CC 
+            
+            context = {
+                "name": act.get('first_name', '') + ' ' + act.get('last_name', ''),
+                "sender_name": sender_name, 
+                "task_name": title, 
+                "date_send": date_send,
+                "comment": comment, 
+                "company": company 
+            }
+            
+            # Rendu des templates
+            body_content = render_to_string(path, context)
+            text_content = render_to_string(path_txt, context)
+            
+            # Envoi asynchrone de l'email avec les autres en copie cachée
+            email_thread = threading.Thread(
+                target=send_mail_created,
+                args=([act.get('email')], object_email, text_content, body_content),
+            )
+            email_thread.start()
 
             
         return True

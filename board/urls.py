@@ -11,6 +11,7 @@ urlpatterns = [
     path('meeting/', MeetingReminderView.as_view(), name='welcome'),
     path('instance/', CommitteeCreatedView.as_view(), name='welcome'),
     path('arbitrage/', ArbitrageCreatedView.as_view(), name='welcome'),
+    path('comment/', SendCommentCreatedEmailAPIView.as_view(), name='welcome'),
     
     
     

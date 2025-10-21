@@ -1,8 +1,8 @@
 import os
 import random
 from board.models import InstanceBoard, CommitteeBoard
-from board.serializers import ArbitrageCreatedSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
-from board.service import mail_arbitrage_created_service, mail_committee_created_service, mail_decision_service, mail_meeting_reminder_service
+from board.serializers import ArbitrageCreatedSerializer, CommentCreatedSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
+from board.service import mail_arbitrage_created_service, mail_comment_created_service, mail_committee_created_service, mail_decision_service, mail_meeting_reminder_service
 from board.utils import calculate_next_occurrences, compare_with_now
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
@@ -985,7 +985,7 @@ class CommitteeCreatedView(APIView):
                     # Si le rappel serait dans le passé, l'envoyer immédiatement
                     if reminder_time <= now_utc:
                         reminder_time = now_utc + timedelta(seconds=10)  # Dans 10 secondes
-                  
+                    print("perimeter",  validated_data.get('perimeter', []))
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
@@ -1197,6 +1197,213 @@ class ArbitrageCreatedView(APIView):
                     "status": "error",
                     "error": str(e),
                     "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+
+
+ 
+
+class SendCommentCreatedEmailAPIView(APIView):
+    """
+    API pour envoyer un email de notification de création de commentaire
+    """
+    permission_classes = [IsAuthenticated]
+    
+    """
+    API pour envoyer un email de notification de création de commentaire
+    """
+    permission_classes = [IsAuthenticated]
+    
+    @extend_schema(
+        request=CommentCreatedSerializer,
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'sender_name': 'Jean Dupont',
+                    'actors': [
+                        {
+                            'email': 'marie.martin@example.com',
+                            'first_name': 'Marie',
+                            'last_name': 'Martin'
+                        },
+                        {
+                            'email': 'pierre.durand@example.com',
+                            'first_name': 'Pierre',
+                            'last_name': 'Durand'
+                        }
+                    ],
+                    'value': 'Décision stratégique Q4 2025',
+                    'comment': 'Suite à notre dernière réunion, je propose de revoir la stratégie d\'allocation budgétaire pour le prochain trimestre. Il serait pertinent d\'augmenter l\'investissement dans le digital.',
+                    'date_send': '21 octobre 2025',
+                    'company': 'Klivar',
+                    'lang': 'fr-FR'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Exemple de requête valide (EN)',
+                value={
+                    'sender_name': 'John Smith',
+                    'actors': [
+                        {
+                            'email': 'sarah.jones@example.com',
+                            'first_name': 'Sarah',
+                            'last_name': 'Jones'
+                        }
+                    ],
+                    'value': 'Q4 Strategic Decision',
+                    'comment': 'Following our last meeting, I suggest reviewing the budget allocation strategy for next quarter.',
+                    'date_send': 'October 21, 2025',
+                    'company': 'Klivar',
+                    'lang': 'en-US'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'success': True,
+                    'message': 'Email envoyé avec succès',
+                    'recipients_count': 2
+                },
+                response_only=True,
+                status_codes=['200'],
+            ),
+            OpenApiExample(
+                'Réponse d\'erreur - Validation',
+                value={
+                    'success': False,
+                    'message': 'Données invalides',
+                    'errors': {
+                        'sender_name': ['Ce champ est requis.'],
+                        'actors': ['Ce champ est requis.'],
+                        'comment': ['Ce champ est requis.'],
+                        'value': ['Ce champ est requis.']
+                    }
+                },
+                response_only=True,
+                status_codes=['400'],
+            ),
+            OpenApiExample(
+                'Réponse d\'erreur - Acteurs invalides',
+                value={
+                    'success': False,
+                    'message': 'Données invalides',
+                    'errors': {
+                        'actors': ['Chaque acteur doit avoir un email']
+                    }
+                },
+                response_only=True,
+                status_codes=['400'],
+            ),
+            OpenApiExample(
+                'Réponse d\'erreur - Envoi échoué',
+                value={
+                    'success': False,
+                    'message': 'Erreur lors de l\'envoi de l\'email'
+                },
+                response_only=True,
+                status_codes=['500'],
+            ),
+            OpenApiExample(
+                'Réponse d\'erreur - Exception inattendue',
+                value={
+                    'success': False,
+                    'message': 'Erreur inattendue: Connection timeout'
+                },
+                response_only=True,
+                status_codes=['500'],
+            ),
+        ],
+        description="""
+        Envoie un email de notification à tous les acteurs concernés lorsqu'un nouveau commentaire 
+        est créé sur une décision/tâche.
+        
+        **Fonctionnalités:**
+        - Envoi multilingue (FR/EN)
+        - Notification simultanée à plusieurs destinataires
+        - Templates HTML et texte brut
+        - Envoi asynchrone pour optimiser les performances
+        
+        **Notes:**
+        - Les emails sont envoyés de manière asynchrone via threading
+        - Chaque acteur reçoit un email personnalisé avec son nom
+        - Le champ 'actors' doit contenir au minimum: email, first_name, last_name
+        """,
+        summary="Notification de création de commentaire",
+        tags=["Board"],
+    )
+    def post(self, request):
+        """
+        Envoie un email de notification de création de commentaire
+        """
+        serializer = CommentCreatedSerializer(data=request.data)
+        
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "success": False,
+                    "message": "Données invalides",
+                    "errors": serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        validated_data = serializer.validated_data
+        
+        # Extraction des données validées
+        sender_name = validated_data.get('sender_name')
+        actors = validated_data.get('actors', [])
+        title = validated_data.get('value')
+        comment = validated_data.get('comment')
+        date_send = validated_data.get('date_send', '')
+        company = validated_data.get('company')
+        lang = validated_data.get('lang', 'fr-FR')
+        
+        
+        try:
+            # Appel du service d'envoi d'email
+            success = mail_comment_created_service(
+                date_send=date_send, 
+                title=title,
+                comment=comment,
+                sender_name=sender_name,
+                company=company,
+                actors=actors,
+                lang=lang
+            )
+            
+            if success:
+                return Response(
+                    {
+                        "success": True,
+                        "message": "Email envoyé avec succès",
+                        "recipients_count": len(actors)
+                    },
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {
+                        "success": False,
+                        "message": "Erreur lors de l'envoi de l'email"
+                    },
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+                
+        except Exception as e:
+            return Response(
+                {
+                    "success": False,
+                    "message": f"Erreur inattendue: {str(e)}"
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

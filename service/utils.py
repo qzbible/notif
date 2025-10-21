@@ -156,7 +156,7 @@ def send_mail_created(to_emails, title, text_content, html_content,   company=No
     return success
 
 
-def send_mail_created(to_emails, title, text_content, html_content, cc_emails=None, company=None):
+def send_mail_created(to_emails, title, text_content, html_content, company=None):
     """
     Envoie un email à plusieurs destinataires en utilisant Django's EmailMultiAlternatives.
     

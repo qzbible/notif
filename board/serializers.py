@@ -451,3 +451,48 @@ class CommitteeBoardUpdateSerializer(serializers.Serializer):
         
         return data
 
+
+
+
+class CommentCreatedSerializer(serializers.Serializer):
+    """Serializer pour la notification de création de dossier d'arbitrage"""
+
+    sender_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du destinataire"
+    )
+ 
+    actors = serializers.ListField(
+        child=serializers.JSONField(),
+        required=False,
+        allow_null=True,
+        help_text="Liste des participants au format JSON pour le modèle. Si non fourni, peut être dérivé de 'participants'."
+    )
+      
+    # Informations du comité
+    value = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du comité"
+    )
+
+    date_send = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Date de la réunion du comité"
+    )
+     
+    company = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'entreprise"
+    )
+    
+    lang = serializers.ChoiceField(
+        choices=['fr-FR', 'en-US'],
+        default='fr-FR',
+        help_text="Langue de l'email (fr-FR ou en-US)"
+    )
+    
+     
