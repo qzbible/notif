@@ -513,10 +513,18 @@ def format_recurrence_schedule(config: Dict, lang: str = "fr") -> str:
         return f"Starts on {start_str}"
 
 
-def _format_to_iso(dt: datetime) -> str:
-    """Formate une date en ISO avec Z"""
-    return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
+# def _format_to_iso(dt: datetime) -> str:
+#     """Formate une date en ISO avec Z"""
+#     return dt.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3] + 'Z'
 
+
+# OU version plus simple
+def _format_to_iso(dt: datetime) -> str:
+    """Version simple avec isoformat()"""
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    
+    return dt.astimezone(timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
 def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
     """
     Calcule les N prochaines occurrences d'une récurrence
