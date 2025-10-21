@@ -970,11 +970,11 @@ class CommitteeCreatedView(APIView):
                     now_utc = datetime.now(timezone.utc)
                     print(date_utc)
                     reminder_time = date_utc - timedelta(hours=1)
-                    print(reminder_time)
+                    
                     # Si le rappel serait dans le passé, l'envoyer immédiatement
                     if reminder_time <= now_utc:
                         reminder_time = now_utc + timedelta(seconds=10)  # Dans 10 secondes
-                    
+                    print(reminder_time)
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
