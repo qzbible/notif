@@ -63,20 +63,17 @@ def list_actors_info(actors: List[Dict]) -> Tuple[List[str], str]:
 
 
 def mail_decision_service(
-    name,
+    instance_date,
     committee_name,
     committee_date,
-    decisions_list,
-    dest_email,
+    decisions_list, 
     url_connect,
     instance_name,
     instance_description,
-    company,
-    date_debut,
-    date_fin,
-    lieu_reunion,
-    participants,
+    company,  
+    lieu_reunion, 
     back_host,
+    actors = [],
     lang=None
 ):
     """
@@ -118,34 +115,36 @@ def mail_decision_service(
         object_email = f"Décisions du comité : {committee_name}"
     
     # Contexte pour le template
-    context = {
-        "name": name,
-        "committee_name": committee_name,
-        "committee_date": committee_date,
-        "decisions_list": decisions_list,
-        "url_connect": url_connect,
-        "instance_name": instance_name,
-        "instance_description": instance_description,
-        "date_debut": date_debut,
-        "date_fin": date_fin,
-        "lieu_reunion": lieu_reunion,
-        "participants": participants,
-        "company": company,
-        "back_host": back_host
-    }
-    
+    emails, fullnames = list_actors_info(actors)
     try:
-        # Rendu des templates
-        body_content = render_to_string(path, context)
-        text_content = render_to_string(path_txt, context)
-        
-        # Envoi asynchrone de l'email
-        email_thread = threading.Thread(
-            target=send_mail_created,
-            args=([dest_email], object_email, text_content, body_content, company,)
-        )
-        email_thread.start()
-        
+        for act in actors: 
+            context = {
+                    "name": act.get('first_name', '') + ' ' + act.get('last_name', ''),
+                    "committee_name": committee_name,
+                    "committee_date": committee_date,
+                    "decisions_list": decisions_list,
+                    "url_connect": url_connect,
+                    "instance_name": instance_name,
+                    "instance_description": instance_description,
+                    "instance_date": instance_date,
+                   
+                    "lieu_reunion": lieu_reunion,
+                    "participants": fullnames,
+                    "company": company,
+                    "back_host": back_host
+                }
+
+            # Rendu des templates
+            body_content = render_to_string(path, context)
+            text_content = render_to_string(path_txt, context)
+            
+            # Envoi asynchrone de l'email
+            email_thread = threading.Thread(
+                target=send_mail_created,
+                args=([act.get('email')], object_email, text_content, body_content, company,)
+            )
+            email_thread.start()
+            
         return True
         
     except Exception as e:
@@ -524,27 +523,18 @@ def mail_comment_created_service(
     """
     Service d'envoi d'email pour la création d'un  commentaire
     """ 
- 
-    
     # Déterminer les templates selon la langue
     if lang == "fr-FR":
         path = "board/comment/add-comment-fr.html"
         path_txt = "board/comment/add-comment-fr.txt"
-        
         object_email = f"Nouveau commentaire sur une décision: {title}"
-        
-        
     elif lang == "en-US":
         path = "board/comment/add-comment-en.html"
         path_txt = "board/comment/add-comment-en.txt"
-       
         object_email = f"New comment on a task : {title}" 
-         
-       
     else:
         path = "board/comment/add-comment-fr.html"
         path_txt = "board/comment/add-comment-fr.txt"
-         
         object_email = f"Nouveau commentaire sur une décision:  {title}"
          
     

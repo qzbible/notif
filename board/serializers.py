@@ -4,16 +4,7 @@ from datetime import datetime, timezone
 class DecisionSerializer(serializers.Serializer):
     """Serializer pour la création et l'envoi des décisions du comité"""
     
-    # Informations destinataire
-    dest_email = serializers.EmailField(
-        required=True,
-        help_text="Adresse email du destinataire"
-    )
-    name = serializers.CharField(
-        required=True,
-        max_length=255,
-        help_text="Nom du destinataire"
-    )
+     
     
     # Informations du comité
     committee_name = serializers.CharField(
@@ -46,28 +37,14 @@ class DecisionSerializer(serializers.Serializer):
         help_text="Description de l'instance"
     )
     
-    # Détails de la réunion
-    date_debut = serializers.CharField(
-        required=True,
-        max_length=100,
-        help_text="Date de début (format: DD-MM-YYYY)"
-    )
-    date_fin = serializers.CharField(
-        required=True,
-        max_length=100,
-        help_text="Date de fin (format: DD-MM-YYYY)"
-    )
+    
     lieu_reunion = serializers.CharField(
         required=False,
         allow_blank=True,
         max_length=500,
         help_text="Lieu ou lien de réunion"
     )
-    participants = serializers.CharField(
-        required=False,
-        allow_blank=True,
-        help_text="Liste des participants (séparés par des virgules)"
-    )
+    
     
     # Informations de connexion
     url_connect = serializers.URLField(
@@ -101,6 +78,12 @@ class DecisionSerializer(serializers.Serializer):
         help_text="Langue de l'email (fr-FR ou en-US)"
     )
     
+    actors = serializers.ListField(
+        child=serializers.JSONField(),
+        required=False,
+        allow_null=True,
+        help_text="Liste des participants au format JSON pour le modèle. Si non fourni, peut être dérivé de 'participants'."
+    )
     def validate_decisions_list(self, value):
         """Valider que la liste des décisions n'est pas vide"""
         if not value or len(value) == 0:

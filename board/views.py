@@ -54,9 +54,7 @@ class DecisionView(APIView):
         examples=[
             OpenApiExample(
                 'Exemple de requête valide',
-                value={
-                    'dest_email': 'client@example.com',
-                    'name': 'Ghislain',
+                value={  
                     'committee_name': 'CSE Novembre 2025',
                     'committee_date': '15 novembre 2025',
                     'decisions_list': [
@@ -67,13 +65,17 @@ class DecisionView(APIView):
                     'url_connect': 'https://app.example.com/connect',
                     'instance_name': 'Comité Stratégique des Risques',
                     'instance_description': 'Ce comité a pour objectif d\'examiner les risques critiques...',
-                    'company': 'Klivar',
-                    'date_debut': '07-07-2025',
-                    'date_fin': '25-07-2025',
-                    'lieu_reunion': 'Immeuble A Biyemassi',
-                    'participants': 'Nguessong Suzy, Ambasa Bienvenue, Nodem Borel',
-                    'base_url': 'https://api.example.com/',
+                    'company': 'Klivar', 
+                    'lieu_reunion': 'Immeuble A Biyemassi', 
                     'client_id': 'client_12345',
+                    "actors": [
+                        {
+                        "first_name": " Dupont",
+                        "last_name": "Jean ",
+                        "email": "jean.dupont@exemple.com",
+                        "role": "Président"
+                        } 
+                    ],
                     'lang': 'fr-FR'
                 },
                 request_only=True,
@@ -84,8 +86,7 @@ class DecisionView(APIView):
                     'message': 'Email envoyé avec succès',
                     'status': 'success',
                     'code': 200,
-                    'data': {
-                        'dest_email': 'client@example.com',
+                    'data': { 
                         'committee_name': 'CSE Novembre 2025',
                         'sent_at': '2025-10-15T15:30:00Z'
                     }
@@ -146,20 +147,17 @@ class DecisionView(APIView):
                 url_connect = f"{url_connect}?token={token}"
             
             # Envoi de l'email via le service
-            result = mail_decision_service(
-                name=validated_data.get('name'),
+            result = mail_decision_service( 
                 committee_name=validated_data.get('committee_name'),
                 committee_date=validated_data.get('committee_date'),
-                decisions_list=validated_data.get('decisions_list'),
-                dest_email=validated_data.get('dest_email'),
+                decisions_list=validated_data.get('decisions_list'), 
                 url_connect=url_connect,
                 instance_name=validated_data.get('instance_name'),
                 instance_description=validated_data.get('instance_description', ''),
                 company=validated_data.get('company'),
-                date_debut=validated_data.get('date_debut'),
-                date_fin=validated_data.get('date_fin'),
+                instance_date= "", 
                 lieu_reunion=validated_data.get('lieu_reunion', ''),
-                participants=validated_data.get('participants', ''),
+                 actors= validated_data.get('actors',[] ),
                 back_host= os.environ.get("BACK_HOST_URL", ""),
                 lang=validated_data.get('lang', 'fr-FR')
             ) 
