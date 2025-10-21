@@ -270,7 +270,7 @@ def mail_meeting_reminder_service(
             email_thread.start()
 
             # send elt arb 
-            result = mail_arbitrage_created_service.delay(
+            result = mail_arbitrage_created_service(
                 name=act.get('first_name', '') + ' ' + act.get('last_name', ''),
                 committee_name=title + ' '+date_only+' '+hour,
                 committee_date= date_only+' '+hour,
@@ -294,9 +294,8 @@ def mail_meeting_reminder_service(
     except Exception as e:
         print(f"Erreur lors de l'envoi de l'email de rappel: {str(e)}")
         return False
+ 
 
-
-@shared_task
 def mail_arbitrage_created_service(
     name,
     committee_name,
