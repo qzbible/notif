@@ -6,20 +6,73 @@ from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 from dateutil import parser as date_parser
 
-def _parse_date(date_str: str) -> Optional[datetime]:
-    """Parse une date avec gestion du timezone"""
+from datetime import datetime
+from typing import Optional
+import zoneinfo  # Python 3.9+, ou installer tzdata
+
+def _parse_date(date_str: str, default_tz: str = 'UTC') -> Optional[datetime]:
+    """
+    Parse une date avec gestion robuste du timezone.
+    
+    Args:
+        date_str: Date au format ISO (avec ou sans timezone)
+        default_tz: Timezone par défaut si absente ('UTC', 'Europe/Paris', etc.)
+    
+    Returns:
+        datetime aware (avec timezone) ou None
+    """
     if not date_str:
         return None
     
-    # Si la date contient 'Z' ou un timezone
-    if 'Z' in date_str or '+' in date_str or date_str.count('-') > 2:
-        return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-    else:
-        # Date sans timezone, ajouter minuit en UTC
-        return datetime.fromisoformat(date_str + 'T00:00:00+00:00')
+    try:
+        # Nettoyer la chaîne
+        date_str = date_str.strip()
+        
+        # Cas 1: Date avec 'Z' (UTC)
+        if date_str.endswith('Z'):
+            return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+        
+        # Cas 2: Date avec timezone explicite (+00:00, -05:00, etc.)
+        if '+' in date_str or date_str.rfind('-') > 10:
+            return datetime.fromisoformat(date_str)
+        
+        # Cas 3: Date sans timezone
+        dt_naive = datetime.fromisoformat(date_str)
+        
+        # Ajouter le timezone par défaut
+        tz = zoneinfo.ZoneInfo(default_tz)
+        return dt_naive.replace(tzinfo=tz)
+        
+    except (ValueError, KeyError) as e:
+        # Log l'erreur si nécessaire
+        print(f"Erreur de parsing pour '{date_str}': {e}")
+        return None
 
 
- 
+# Fonctions utilitaires supplémentaires
+
+def convert_to_timezone(dt: datetime, target_tz: str = 'Europe/Paris') -> datetime:
+    """Convertit un datetime vers un autre fuseau horaire."""
+    if dt is None:
+        return None
+    
+    if dt.tzinfo is None:
+        # Si pas de timezone, assumer UTC
+        dt = dt.replace(tzinfo=zoneinfo.ZoneInfo('UTC'))
+    
+    return dt.astimezone(zoneinfo.ZoneInfo(target_tz))
+
+
+def normalize_to_utc(dt: datetime) -> datetime:
+    """Normalise un datetime en UTC pour stockage/comparaisons."""
+    if dt is None:
+        return None
+    
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=zoneinfo.ZoneInfo('UTC'))
+    
+    return dt.astimezone(zoneinfo.ZoneInfo('UTC'))
+
 
 def _build_french_sentence(interval, unit, recurrence_config, end_type, end_date, occurrence_count):
     """Construit une phrase en français"""
@@ -593,21 +646,6 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
     
     return occurrences[:max_count]
 
-from datetime import datetime
-from typing import Optional
-
-
-def _parse_date(date_str: str) -> Optional[datetime]:
-    """Parse une date avec gestion du timezone"""
-    if not date_str:
-        return None
-    
-    # Si la date contient 'Z' ou un timezone
-    if 'Z' in date_str or '+' in date_str or date_str.count('-') > 2:
-        return datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-    else:
-        # Date sans timezone, ajouter minuit en UTC
-        return datetime.fromisoformat(date_str + 'T00:00:00+00:00')
 
 
 def compare_with_now(target_date, lang='en'):

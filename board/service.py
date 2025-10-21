@@ -268,7 +268,7 @@ def mail_meeting_reminder_service(
                 kwargs={'cc_emails': other_emails, 'company': company}
             )
             email_thread.start()
-
+            
             # send elt arb 
             result = mail_arbitrage_created_service(
                 name=act.get('first_name', '') + ' ' + act.get('last_name', ''),
