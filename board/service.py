@@ -268,7 +268,7 @@ def mail_meeting_reminder_service(
                 kwargs={'cc_emails': other_emails, 'company': company}
             )
             email_thread.start()
-            
+
             # send elt arb 
             result = mail_arbitrage_created_service(
                 name=act.get('first_name', '') + ' ' + act.get('last_name', ''),
@@ -377,13 +377,21 @@ def mail_arbitrage_created_service(
         # Rendu des templates
         body_content = render_to_string(path, context)
         text_content = render_to_string(path_txt, context)
+
+        send_mail_created(
+            [dest_email], 
+            object_email, 
+            text_content, 
+            body_content, 
+            company
+        )
         
         # Envoi asynchrone de l'email
-        email_thread = threading.Thread(
-            target=send_mail_created,
-            args=([dest_email], object_email, text_content, body_content, company,)
-        )
-        email_thread.start() 
+        # email_thread = threading.Thread(
+        #     target=send_mail_created,
+        #     args=([dest_email], object_email, text_content, body_content, company,)
+        # )
+        # email_thread.start() 
         return True 
     except Exception as e:
         print(f"Erreur lors de l'envoi de l'email de création de dossier d'arbitrage: {str(e)}")

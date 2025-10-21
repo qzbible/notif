@@ -916,9 +916,21 @@ class CommitteeCreatedView(APIView):
                     is_past, readable = compare_with_now(date, 'fr' if validated_data.get('lang', 'fr-FR') == 'fr-FR' else 'en') #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
                     # if is_past:
                         
-                    #     continue 
-                    print(date)
+                    #     continue  
+
                     date_utc = datetime.fromisoformat(date.replace('Z', '+00:00'))
+                    if date_utc.tzinfo is None:
+                        date_utc = date_utc.replace(tzinfo=timezone.utc)
+                    else:
+                        date_utc = date_utc.astimezone(timezone.utc)
+                    
+                    now_utc = datetime.now(timezone.utc)
+                   
+                    reminder_time = date_utc - timedelta(hours=1) 
+                    
+                    # Si le rappel serait dans le passé, l'envoyer immédiatement
+                    if reminder_time <= now_utc:
+                        reminder_time = now_utc + timedelta(seconds=10)  # Dans 10 secondes
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
@@ -934,18 +946,17 @@ class CommitteeCreatedView(APIView):
                             date,
                             validated_data.get('lang', 'fr-FR')
                         ],
-                        eta=date_utc
+                        eta=reminder_time
                     ) 
                     ins_meet, _ = CommitteeBoard.objects.get_or_create(
                             id_task = task,
                             defaults={
                                     "instance_board": ins_created,
-                                    "date":date_utc,
+                                    "date":date,
                                     }
                     )
                     # send element a arbitrer
 
-             
             else :
                 ins_meet = CommitteeBoard.objects.filter(instance_board=ins_created)
                 for task in ins_meet:
@@ -968,13 +979,13 @@ class CommitteeCreatedView(APIView):
                         date_utc = date_utc.astimezone(timezone.utc)
                     
                     now_utc = datetime.now(timezone.utc)
-                    print(date_utc)
-                    reminder_time = date_utc - timedelta(hours=1)
+                   
+                    reminder_time = date_utc - timedelta(hours=1) 
                     
                     # Si le rappel serait dans le passé, l'envoyer immédiatement
                     if reminder_time <= now_utc:
                         reminder_time = now_utc + timedelta(seconds=10)  # Dans 10 secondes
-                    print(reminder_time)
+                  
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
