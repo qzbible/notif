@@ -917,7 +917,7 @@ class CommitteeCreatedView(APIView):
                     # if is_past:
                         
                     #     continue 
-              
+                    print(date)
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
@@ -959,7 +959,7 @@ class CommitteeCreatedView(APIView):
                     is_past, readable = compare_with_now(date,  'fr' if validated_data.get('lang', 'fr-FR') == 'fr-FR' else 'en') #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
                     # if is_past:
                     #     continue 
-                    
+                    print(date)
                     task = mail_meeting_reminder_service.apply_async(
                         args=[
                             validated_data.get('title', ''),
