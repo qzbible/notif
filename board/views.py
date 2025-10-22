@@ -182,6 +182,7 @@ class DecisionOneView(APIView):
             
             # Récupération de l'URL du backend depuis les variables d'environnement
             back_host = os.environ.get("BACK_HOST_URL", "")
+            
             only_title_list = [ item.get('title') for item in validated_data.get('task_list', []) ]
             # Envoi de l'email via le service
             result = mail_decision_one_service( 

@@ -535,7 +535,7 @@ class DecisionOneSerializer(serializers.Serializer):
         help_text="Date d'échéance de la décision"
     )
     task_list = serializers.ListField(
-        child=serializers.CharField(),
+        child=serializers.JSONField(),
         required=False,
         default=list,
         help_text="Liste des tâches associées à la décision"
