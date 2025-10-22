@@ -522,7 +522,7 @@ def mail_committee_created_service(
             email_thread = threading.Thread(
                 target=send_mail_created,
                 args=([act.get('email')], object_email, text_content, body_content),
-                kwargs={'cc_emails': other_emails, 'company': company}
+                kwargs={ 'company': company}
             )
             email_thread.start()
 
