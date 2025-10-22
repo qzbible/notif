@@ -1620,7 +1620,7 @@ class CommitteeBoardAPIView(APIView):
     """
     GET: Récupérer tous les CommitteeBoard ou un seul par ID
     """
-    
+    permission_classes = [AllowAny]
     def get(self, request, pk=None):
         if pk:
             # Récupérer un seul élément par ID

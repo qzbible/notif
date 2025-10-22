@@ -167,8 +167,7 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
             path_txt,
             context
     )
-    if filename != None:
-        print("filename", filename)
+    if filename != None: 
         x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
         x.start() 
     else:
