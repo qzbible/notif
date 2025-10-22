@@ -634,13 +634,13 @@ def mail_decision_one_service(
     
     # Déterminer les templates selon la langue
     if lang == "en-US":
-        path = "board/decision/create-decision-en.html"
-        path_txt = "board/decision/create-decision-en.txt"
+        path = "board/decision/create-decision-one-en.html"
+        path_txt = "board/decision/create-decision-one-en.txt"
         object_email = f"Committee decisions: {committee_name}"
        
     else:  # Par défaut fr-FR
-        path = "board/decision/create-decision-fr.html"
-        path_txt = "board/decision/create-decision-fr.txt"
+        path = "board/decision/create-decision-one-fr.html"
+        path_txt = "board/decision/create-decision-one-fr.txt"
         object_email = f"Décisions du comité : {committee_name}"
         
     
