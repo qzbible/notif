@@ -1,0 +1,39 @@
+COMMITTEE DECISIONS
+
+Dear {{name}},
+
+Following the {{committee_name}} meeting held on {{committee_date}}, it is now closed.
+
+You are invited to review this decision and ensure follow-up on these tasks.
+Log in: {{url_connect}}
+
+---
+
+DECISION DETAILS:
+
+Title: {{title}}
+
+Description:
+{{description}}
+
+Items to be arbitrated: {{liste_arb_element}}
+
+Original committee instance: {{committee_name}}
+
+Due date: {{decision_date}}
+
+Periodicity: {{periodicity}}
+
+Tasks:
+{% for item in task_list %}
+- {{ item }}
+{% endfor %}
+
+---
+
+Your {{company_name}} team
+
+---
+
+https://www.klivar.fr/
+📩 avotreecoute@klivar.com

@@ -495,3 +495,102 @@ class CommentCreatedSerializer(serializers.Serializer):
                     "Chaque acteur doit avoir un email"
                 )
         return value
+    
+
+
+
+class DecisionOneSerializer(serializers.Serializer):
+    """Serializer pour l'envoi des décisions du comité"""
+    
+    # Informations sur le comité
+    committee_name = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom du comité"
+    )
+    committee_date = serializers.CharField(
+        required=True,
+        help_text="Date de la réunion du comité (format libre)"
+    )
+    
+    # Informations sur la décision
+    title = serializers.CharField(
+        required=True,
+        max_length=500,
+        help_text="Titre de la décision"
+    )
+    description = serializers.CharField(
+        required=True,
+        allow_blank=True,
+        help_text="Description détaillée de la décision (peut contenir du HTML)"
+    )
+    perimeter = serializers.ListField(
+        child=serializers.JSONField(),
+        required=False,
+        allow_null=True,
+        help_text="Liste des participants au format JSON pour le modèle. Si non fourni, peut être dérivé de 'participants'."
+    )
+    decision_date = serializers.CharField(
+        required=True,
+        help_text="Date d'échéance de la décision"
+    )
+    task_list = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        default=list,
+        help_text="Liste des tâches associées à la décision"
+    )
+    
+    # URL et configuration
+    url_connect = serializers.URLField(
+        required=True,
+        help_text="URL de connexion à la plateforme"
+    )
+    
+    # Informations entreprise
+    company = serializers.CharField(
+        required=True,
+        max_length=255,
+        help_text="Nom de l'entreprise"
+    )
+    
+    # Destinataires
+    actors = serializers.ListField(
+        child=serializers.JSONField(),
+        required=False,
+        allow_null=True,
+        help_text="Liste des participants au format JSON pour le modèle. Si non fourni, peut être dérivé de 'participants'."
+    )
+    
+    # Langue
+    lang = serializers.ChoiceField(
+        choices=['fr-FR', 'en-US'],
+        default='fr-FR',
+        help_text="Langue de l'email (fr-FR ou en-US)"
+    )
+    
+    # ID client pour traçabilité
+    client_id = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        help_text="Identifiant du client pour traçabilité"
+    )
+    
+    def validate_actors(self, value):
+        """Valider la structure des acteurs"""
+        if not value:
+            raise serializers.ValidationError("La liste des acteurs ne peut pas être vide")
+        
+        for actor in value:
+            if 'email' not in actor:
+                raise serializers.ValidationError("Chaque acteur doit avoir un email")
+            if 'first_name' not in actor or 'last_name' not in actor:
+                raise serializers.ValidationError("Chaque acteur doit avoir un prénom et un nom")
+        
+        return value
+    
+    def validate_task_list(self, value):
+        """Valider la liste des tâches"""
+        if value and not isinstance(value, list):
+            raise serializers.ValidationError("task_list doit être une liste")
+        return value

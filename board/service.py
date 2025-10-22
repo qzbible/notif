@@ -595,3 +595,92 @@ def mail_comment_created_service(
         print(f"Erreur dans mail_committee_created_service: {str(e)}")
         return False
     
+
+
+def mail_decision_one_service(
+    committee_name,
+    committee_date, 
+    url_connect,
+    company,  
+    back_host,  
+    title,
+    description,
+    perimeter,
+    decision_date,
+    task_list,
+    actors = [],
+    lang=None
+):
+    """
+    Service d'envoi d'email pour les décisions du comité
+    
+    Args:
+        committee_name: Nom du comité
+        committee_date: Date de la réunion du comité 
+        title: Titre de la décision
+        description: Description de la décision
+        liste_arb_element: Éléments à arbitrer
+        decision_date: Date d'échéance
+        task_list: Liste des tâches
+        url_connect: URL de connexion
+        company: Nom de l'entreprise
+        back_host: URL de base du backend 
+        actors: Liste des acteurs destinataires (avec email, first_name, last_name)
+        lang: Langue (fr-FR ou en-US)
+    
+    Returns:
+        bool: True si l'envoi a réussi
+    """ 
+    
+    # Déterminer les templates selon la langue
+    if lang == "en-US":
+        path = "board/decision/create-decision-en.html"
+        path_txt = "board/decision/create-decision-en.txt"
+        object_email = f"Committee decisions: {committee_name}"
+       
+    else:  # Par défaut fr-FR
+        path = "board/decision/create-decision-fr.html"
+        path_txt = "board/decision/create-decision-fr.txt"
+        object_email = f"Décisions du comité : {committee_name}"
+        
+    
+    try:
+        for act in actors: 
+            # Retirer l'email du destinataire actuel de la liste des CC  
+            context = {
+                "name": f"{act.get('first_name', '')} {act.get('last_name', '')}".strip(),
+                "committee_name": committee_name,
+                "committee_date": committee_date,
+                "url_connect": url_connect,
+                "company_name": company,
+                "back_host": back_host,
+                # Informations spécifiques à la décision
+                "title": title,
+                "description": description,
+                "liste_arb_element":  format_perimeter_for_email(perimeter, 'fr' if lang=="fr-FR" else "en"),
+                "decision_date": decision_date,
+                "task_list": task_list
+            }
+
+            # Rendu des templates
+            body_content = render_to_string(path, context)
+            text_content = render_to_string(path_txt, context)
+            
+            # Envoi asynchrone de l'email
+            email_thread = threading.Thread(
+                target=send_mail_created,
+                args=(
+                    [act.get('email')], 
+                    object_email, 
+                    text_content, 
+                    body_content, 
+                    company,
+                )
+            )
+            email_thread.start()
+
+        return True
+       
+    except Exception as e:
+        print(f"Erreur lors de l'envoi de l'email: {str(e)}")
+        return False

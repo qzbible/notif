@@ -2,7 +2,7 @@ import os
 import random
 from board.models import InstanceBoard, CommitteeBoard
 from board.serializers import ArbitrageCreatedSerializer, CommentCreatedSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
-from board.service import mail_arbitrage_created_service, mail_comment_created_service, mail_committee_created_service, mail_decision_service, mail_meeting_reminder_service
+from board.service import mail_arbitrage_created_service, mail_comment_created_service, mail_committee_created_service, mail_decision_one_service, mail_decision_service, mail_meeting_reminder_service
 from board.utils import calculate_next_occurrences, compare_with_now
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
@@ -35,6 +35,187 @@ from django.utils import timezone
 
 from service.utils import get_formatted_date, get_lang_request, send_mail_created
 from rest_framework import serializers
+
+
+
+class DecisionOneView(APIView):
+    """API pour envoyer les décisions du comité par email"""
+    
+    permission_classes = [AllowAny]
+    parser_classes = [JSONParser]
+
+    @extend_schema(
+        request=DecisionSerializer,
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={  
+                    'committee_name': 'CSE Novembre 2025',
+                    'committee_date': '15 novembre 2025',
+                    'title': 'Budget et Formation 2025',
+                    'description': '<p>Suite à la réunion du comité, les décisions suivantes ont été prises concernant le budget et le plan de formation.</p>',
+                    'decision_date': '31 décembre 2025',
+                    'task_list': [
+                        'Finaliser le budget détaillé',
+                        'Valider les formations prioritaires',
+                        'Rédiger la charte télétravail'
+                    ],
+                    'url_connect': 'https://app.example.com/connect',
+                    'company': 'Klivar',
+                    'actors': [
+                        {
+                            'first_name': 'Jean',
+                            'last_name': 'Dupont',
+                            'email': 'jean.dupont@exemple.com',
+                            'role': 'Président'
+                        },
+                        {
+                            'first_name': 'Marie',
+                            'last_name': 'Martin',
+                            'email': 'marie.martin@exemple.com',
+                            'role': 'Secrétaire'
+                        }
+                    ],
+                    'perimeter': [
+                         {
+                        "id": 607,
+                        "label": "Data Breach Risk",
+                        "value": "Data Breach Risk",
+                        "type_value": "risk",
+                        "priority": 2
+                        },
+                    ],
+                    'client_id': 'client_12345',
+                    'lang': 'fr-FR'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Email envoyé avec succès',
+                    'status': 'success',
+                    'code': 200,
+                    'data': { 
+                        'committee_name': 'CSE Novembre 2025',
+                        'title': 'Budget et Formation 2025',
+                        'recipients_count': 2,
+                        'sent_at': '2025-10-15T15:30:00Z'
+                    }
+                },
+                response_only=True,
+                status_codes=['200'],
+            ),
+            OpenApiExample(
+                'Réponse d\'erreur - Validation',
+                value={
+                    'message': 'Erreur de validation des données',
+                    'status': 'error',
+                    'code': 400,
+                    'errors': {
+                        'actors': ['La liste des acteurs ne peut pas être vide'],
+                        'title': ['Ce champ est requis.']
+                    }
+                },
+                response_only=True,
+                status_codes=['400'],
+            ),
+        ],
+        description="Envoie un email contenant une décision du comité aux acteurs spécifiés",
+        summary="Envoi d'une décision du comité",
+        tags=["Board"],
+    )
+    def post(self, request):
+        """
+        Envoie un email avec une décision du comité
+        """
+        try:
+            # Validation des données avec le serializer
+            serializer = DecisionSerializer(data=request.data)
+            
+            if not serializer.is_valid():
+                return Response(
+                    {
+                        "message": "Erreur de validation des données",
+                        "status": "error",
+                        "code": status.HTTP_400_BAD_REQUEST,
+                        "errors": serializer.errors
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Récupération des données validées
+            validated_data = serializer.validated_data
+            
+            # # Récupération du token Bearer (optionnel)
+            # auth_header = request.headers.get('Authorization')
+            # token = ""
+            # if auth_header and auth_header.startswith('Bearer '):
+            #     token = auth_header[7:]
+            
+            # Construction de l'URL de connexion avec token si nécessaire
+            url_connect = validated_data.get('url_connect', '')
+            # if token and url_connect:
+            #     url_connect = f"{url_connect}?token={token}"
+            
+            # Récupération de l'URL du backend depuis les variables d'environnement
+            back_host = os.environ.get("BACK_HOST_URL", "")
+            
+            # Envoi de l'email via le service
+            result = mail_decision_one_service( 
+                committee_name=validated_data.get('committee_name'),
+                committee_date=validated_data.get('committee_date'),
+                title=validated_data.get('title'),
+                description=validated_data.get('description', ''),
+                perimeter=validated_data.get('perimeter', []),
+                decision_date=validated_data.get('decision_date'),
+                task_list=validated_data.get('task_list', []),
+                url_connect=url_connect,
+                company=validated_data.get('company'),
+                back_host=back_host,
+                actors=validated_data.get('actors', []),
+                lang=validated_data.get('lang', 'fr-FR')
+            ) 
+            
+            if result:
+                response_data = {
+                    "message": "Email envoyé avec succès",
+                    "status": "success",
+                    "code": status.HTTP_200_OK,
+                    "data": {
+                        "committee_name": validated_data.get('committee_name'),
+                        "title": validated_data.get('title'),
+                        "recipients_count": len(validated_data.get('actors', [])),
+                        "sent_at": timezone.now().isoformat()
+                    }
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {
+                        "message": "Erreur lors de l'envoi de l'email",
+                        "status": "error",
+                        "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    },
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+                
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Erreur lors du traitement de la requête",
+                    "status": "error",
+                    "error": str(e),
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class DecisionView(APIView):

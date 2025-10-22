@@ -1,0 +1,39 @@
+DÉCISIONS DU COMITÉ
+
+Cher {{name}},
+
+Suite à la réunion du {{committee_name}} tenue le {{committee_date}} est désormais clôturée.
+
+Vous êtes invité à consulter cette décision et à assurer le suivi de ces tâches.
+Connectez-vous : {{url_connect}}
+
+---
+
+DÉTAIL DE DÉCISION :
+
+Titre : {{title}}
+
+Description :
+{{description}}
+
+Élément à arbitrés : {{liste_arb_element}}
+
+Comité d'instance d'origine : {{committee_name}}
+
+Date d'échéance : {{decision_date}}
+
+Périodicité : {{periodicity}}
+
+Tâches :
+{% for item in task_list %}
+- {{ item }}
+{% endfor %}
+
+---
+
+Votre équipe {{company_name}}
+
+---
+
+https://www.klivar.fr/
+📩 avotreecoute@klivar.com
