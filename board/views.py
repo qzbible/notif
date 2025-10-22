@@ -35,7 +35,7 @@ from django.utils import timezone
 
 from service.utils import get_formatted_date, get_lang_request, send_mail_created
 from rest_framework import serializers
-
+from rest_framework.pagination import PageNumberPagination
 
 
 class DecisionOneView(APIView):
@@ -1615,24 +1615,34 @@ class SendCommentCreatedEmailAPIView(APIView):
             )
         
 
+class CommitteeBoardPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 
 class CommitteeBoardAPIView(APIView):
     """
     GET: Récupérer tous les CommitteeBoard ou un seul par ID
     """
     permission_classes = [AllowAny]
+    pagination_class = CommitteeBoardPagination
+    
     def get(self, request, pk=None):
+        queryset = CommitteeBoard.objects.all().select_related('instance_board') 
+        # Filtrer par id_instance 
         if pk:
-            # Récupérer un seul élément par ID
-            instance_filter = InstanceBoard.objects.filter(id_instance=pk)
-            inst = []
-            for instance in instance_filter:
-                inst.extend(CommitteeBoard.objects.filter(instance_board__id=instance.id_instance).order_by('-id'))
+            queryset = queryset.filter(instance_board__id_instance=pk) 
+            # Trier par date (plus récent en premier)
+            queryset = queryset.order_by('-id') 
+            # Paginer les résultats
+            paginator = self.pagination_class()
+            paginated_queryset = paginator.paginate_queryset(queryset, request)
             
-            serializer = CommitteeBoardSerializer(inst, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer = CommitteeBoardSerializer(paginated_queryset, many=True)
+            return paginator.get_paginated_response(serializer.data)
         else:
-            # Récupérer tous les éléments
             committee_boards = CommitteeBoard.objects.all().order_by('-id')
             serializer = CommitteeBoardSerializer(committee_boards, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return paginator.get_paginated_response(serializer.data)
+    
