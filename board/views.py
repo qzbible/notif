@@ -1624,11 +1624,15 @@ class CommitteeBoardAPIView(APIView):
     def get(self, request, pk=None):
         if pk:
             # Récupérer un seul élément par ID
-            committee_board =  CommitteeBoard.objects.filter(instance_board__id=pk)  
-            serializer = CommitteeBoardSerializer(committee_board, many=True)
+            instance_filter = InstanceBoard.objects.filter(id_instance=pk)
+            inst = []
+            for instance in instance_filter:
+                inst.extend(CommitteeBoard.objects.filter(instance_board__id=instance.id_instance).order_by('-id'))
+            
+            serializer = CommitteeBoardSerializer(inst, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             # Récupérer tous les éléments
-            committee_boards = CommitteeBoard.objects.all()
+            committee_boards = CommitteeBoard.objects.all().order_by('-id')
             serializer = CommitteeBoardSerializer(committee_boards, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
