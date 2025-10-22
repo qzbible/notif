@@ -1,7 +1,7 @@
 import os
 import random
 from board.models import InstanceBoard, CommitteeBoard
-from board.serializers import ArbitrageCreatedSerializer, CommentCreatedSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionSerializer, MeetingReminderSerializer
+from board.serializers import ArbitrageCreatedSerializer, CommentCreatedSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionOneSerializer, DecisionSerializer, MeetingReminderSerializer
 from board.service import mail_arbitrage_created_service, mail_comment_created_service, mail_committee_created_service, mail_decision_one_service, mail_decision_service, mail_meeting_reminder_service
 from board.utils import calculate_next_occurrences, compare_with_now
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -45,7 +45,7 @@ class DecisionOneView(APIView):
     parser_classes = [JSONParser]
 
     @extend_schema(
-        request=DecisionSerializer,
+        request=DecisionOneSerializer,
         responses={
             200: OpenApiTypes.OBJECT,
             400: OpenApiTypes.OBJECT,
