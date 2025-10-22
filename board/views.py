@@ -61,10 +61,26 @@ class DecisionOneView(APIView):
                     'title': 'Budget et Formation 2025',
                     'description': '<p>Suite à la réunion du comité, les décisions suivantes ont été prises concernant le budget et le plan de formation.</p>',
                     'decision_date': '31 décembre 2025',
+                   
                     'task_list': [
-                        'Finaliser le budget détaillé',
-                        'Valider les formations prioritaires',
-                        'Rédiger la charte télétravail'
+                         {
+                            "title": "task ort",
+                            "description": "description",
+                            "priority": 0,
+                            "due_date": "2025-10-17T10:38:23.275",
+                            "status": "finished",
+                            "token": " ",
+                            "owner": [
+                                {
+                                    "id": 66,
+                                    "first_name": "loiol",
+                                    "last_name": "BOREL",
+                                    "phone": None,
+                                    "email": "nodemborel78@gmail.com",
+                                    "email_second": None
+                                }
+                            ],
+                         }
                     ],
                     'url_connect': 'https://app.example.com/connect',
                     'company': 'Klivar',
@@ -137,7 +153,7 @@ class DecisionOneView(APIView):
         """
         try:
             # Validation des données avec le serializer
-            serializer = DecisionSerializer(data=request.data)
+            serializer = DecisionOneSerializer(data=request.data)
             
             if not serializer.is_valid():
                 return Response(
@@ -166,7 +182,7 @@ class DecisionOneView(APIView):
             
             # Récupération de l'URL du backend depuis les variables d'environnement
             back_host = os.environ.get("BACK_HOST_URL", "")
-            
+            only_title_list = [ item.get('title') for item in validated_data.get('task_list', []) ]
             # Envoi de l'email via le service
             result = mail_decision_one_service( 
                 committee_name=validated_data.get('committee_name'),
@@ -175,7 +191,7 @@ class DecisionOneView(APIView):
                 description=validated_data.get('description', ''),
                 perimeter=validated_data.get('perimeter', []),
                 decision_date=validated_data.get('decision_date'),
-                task_list=validated_data.get('task_list', []),
+                task_list=only_title_list,
                 url_connect=url_connect,
                 company=validated_data.get('company'),
                 back_host=back_host,
