@@ -1624,8 +1624,8 @@ class CommitteeBoardAPIView(APIView):
     def get(self, request, pk=None):
         if pk:
             # Récupérer un seul élément par ID
-            committee_board = get_object_or_404(CommitteeBoard, pk=pk)
-            serializer = CommitteeBoardSerializer(committee_board)
+            committee_board =  CommitteeBoard.objects.filter(instance_board__id=pk)  
+            serializer = CommitteeBoardSerializer(committee_board, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             # Récupérer tous les éléments
