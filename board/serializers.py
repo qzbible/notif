@@ -1,3 +1,4 @@
+from board.models import CommitteeBoard, InstanceBoard
 from rest_framework import serializers
 
 from datetime import datetime, timezone
@@ -594,3 +595,20 @@ class DecisionOneSerializer(serializers.Serializer):
         if value and not isinstance(value, list):
             raise serializers.ValidationError("task_list doit être une liste")
         return value
+    
+
+
+
+class InstanceBoardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InstanceBoard
+        fields = '__all__'
+
+
+class CommitteeBoardSerializer(serializers.ModelSerializer):
+    instance_board = InstanceBoardSerializer(read_only=True)
+    
+    class Meta:
+        model = CommitteeBoard
+        fields = ['id', 'id_task', 'instance_board', 'date']
+        

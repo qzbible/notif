@@ -1,7 +1,7 @@
 import os
 import random
 from board.models import InstanceBoard, CommitteeBoard
-from board.serializers import ArbitrageCreatedSerializer, CommentCreatedSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionOneSerializer, DecisionSerializer, MeetingReminderSerializer
+from board.serializers import ArbitrageCreatedSerializer, CommentCreatedSerializer, CommitteeBoardSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionOneSerializer, DecisionSerializer, MeetingReminderSerializer
 from board.service import mail_arbitrage_created_service, mail_comment_created_service, mail_committee_created_service, mail_decision_one_service, mail_decision_service, mail_meeting_reminder_service
 from board.utils import calculate_next_occurrences, compare_with_now
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
@@ -1613,3 +1613,22 @@ class SendCommentCreatedEmailAPIView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+
+
+class CommitteeBoardAPIView(APIView):
+    """
+    GET: Récupérer tous les CommitteeBoard ou un seul par ID
+    """
+    
+    def get(self, request, pk=None):
+        if pk:
+            # Récupérer un seul élément par ID
+            committee_board = get_object_or_404(CommitteeBoard, pk=pk)
+            serializer = CommitteeBoardSerializer(committee_board)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            # Récupérer tous les éléments
+            committee_boards = CommitteeBoard.objects.all()
+            serializer = CommitteeBoardSerializer(committee_boards, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)

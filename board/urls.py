@@ -14,6 +14,8 @@ urlpatterns = [
     path('comment/', SendCommentCreatedEmailAPIView.as_view(), name='welcome'),
     path('decision-one/', DecisionOneView.as_view(), name='welcome'),
     # DecisionView
+    path('committee-boards/', CommitteeBoardAPIView.as_view(), name='committee-board-list'),
+    path('committee-boards/<int:pk>/', CommitteeBoardAPIView.as_view(), name='committee-board-detail'),
     
     
     
