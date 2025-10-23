@@ -1642,7 +1642,7 @@ class CommitteeBoardAPIView(APIView):
             serializer = CommitteeBoardSerializer(paginated_queryset, many=True)
             return paginator.get_paginated_response(serializer.data)
         else:
-            committee_boards = CommitteeBoard.objects.all().order_by('-id')
+            committee_boards = CommitteeBoard.objects.all().select_related('instance_board').order_by('-id')
             serializer = CommitteeBoardSerializer(committee_boards, many=True)
             return paginator.get_paginated_response(serializer.data)
     

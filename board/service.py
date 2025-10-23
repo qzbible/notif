@@ -499,8 +499,7 @@ def mail_committee_created_service(
     try:
         for act in actors: 
             # Retirer l'email du destinataire actuel de la liste des CC
-            other_emails = [email for email in emails if email != act.get('email')]
-            
+              
             context = {
                 "name": act.get('first_name', '') + ' ' + act.get('last_name', ''),
                 "committee_name": title,
