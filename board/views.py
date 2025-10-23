@@ -278,7 +278,7 @@ def task_notification(task_list=[], lang="",  client=None)->True:
                         type_task = "TASK_MB",
                         lang = lang,
                     )
-                    print('ici ------------------------------ 2')
+                    print('ici ------------------------------ 2', task.get("created_at"))
                     mail = task_responsable(
                         object= task.get("title", ''),
                         type_task = "TASK_MB",

@@ -185,7 +185,7 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
         new_deadline = start_date 
     else: 
         new_deadline = start_date+"T07:30:00.000Z"
-
+    print('ici ------------------------------ 3', new_deadline)
     if is_valid_date_string(new_deadline):
         start_date = new_deadline.split(" ")[0]
         # Analyser la date ISO 8601
