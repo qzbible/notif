@@ -574,7 +574,8 @@ class MeetingReminderView(APIView):
             
             # Récupération du CommitteeBoard
             try: 
-                committee_meeting = CommitteeBoard.objects.get(instance_board__id=instance_id, date=old_date_parsed)
+                committee_meeting = CommitteeBoard.objects.get(instance_board__id=instance_id, date=old_date)
+                
             except CommitteeBoard.DoesNotExist:
                 return Response(
                     {
@@ -1642,7 +1643,8 @@ class CommitteeBoardAPIView(APIView):
             serializer = CommitteeBoardSerializer(paginated_queryset, many=True)
             return paginator.get_paginated_response(serializer.data)
         else:
-            committee_boards = CommitteeBoard.objects.all().select_related('instance_board').order_by('-id')
+            print("print all")
+            committee_boards = CommitteeBoard.objects.all()
             serializer = CommitteeBoardSerializer(committee_boards, many=True)
             return paginator.get_paginated_response(serializer.data)
     
