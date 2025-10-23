@@ -182,11 +182,11 @@ def _build_french_sentence(interval, unit, recurrence_config, end_type, end_date
     
     # Partie 2 : Durée
     duration = ""
-    if end_type == "never":
+    if end_type.lower() == "never":
         duration = ""
-    elif end_type == "after":
+    elif end_type.lower() == "after":
         duration = f" ({occurrence_count} fois)"
-    elif end_type == "on" and end_date:
+    elif end_type.lower() == "on" and end_date:
         end_date_obj = _parse_date(end_date)
         if end_date_obj:
             duration = f" jusqu'au {end_date_obj.strftime('%d/%m/%Y')}"
@@ -200,13 +200,13 @@ def _build_english_sentence(interval, unit, recurrence_config, end_type, end_dat
     # Partie 1 : Fréquence
     freq = ""
     
-    if unit == "days":
+    if unit.lower() == "days":
         if interval == 1:
             freq = "every day"
         else:
             freq = f"every {interval} days"
     
-    elif unit == "weeks":
+    elif unit.lower() == "weeks":
         weekdays = recurrence_config.get('weekdays', [])
         
         if len(weekdays) == 5 and set(weekdays) == {"monday", "tuesday", "wednesday", "thursday", "friday"}:
@@ -223,7 +223,7 @@ def _build_english_sentence(interval, unit, recurrence_config, end_type, end_dat
         else:
             freq = f"every week" if interval == 1 else f"every {interval} weeks"
     
-    elif unit == "months":
+    elif unit.lower() == "months":
         if 'day_of_month' in recurrence_config:
             day = recurrence_config['day_of_month']
             if day == 1:
@@ -243,7 +243,7 @@ def _build_english_sentence(interval, unit, recurrence_config, end_type, end_dat
         else:
             freq = f"every month" if interval == 1 else f"every {interval} months"
     
-    elif unit == "years":
+    elif unit.lower() == "years":
         months_en = {1: "January", 2: "February", 3: "March", 4: "April", 5: "May", 6: "June",
                     7: "July", 8: "August", 9: "September", 10: "October", 11: "November", 12: "December"}
         
@@ -270,11 +270,11 @@ def _build_english_sentence(interval, unit, recurrence_config, end_type, end_dat
     
     # Partie 2 : Durée
     duration = ""
-    if end_type == "never":
+    if end_type.lower() == "never":
         duration = ""
-    elif end_type == "after":
+    elif end_type.lower() == "after":
         duration = f" ({occurrence_count} times)"
-    elif end_type == "on" and end_date:
+    elif end_type.lower() == "on" and end_date:
         end_date_obj = _parse_date(end_date)
         if end_date_obj:
             duration = f" until {end_date_obj.strftime('%m/%d/%Y')}"
@@ -489,14 +489,14 @@ def format_recurrence_schedule(config: Dict, lang: str = "fr") -> str:
         start_str = _format_datetime_fr(start_date, include_time=True)
         
         if end_type == "never":
-            return f" Débute le {start_str} Se termine : Jamais"
+            return f" Débute le {start_str} se termine jamais"
         
         elif end_type == "after" and occurrence_count:
-            return f"Débute le {start_str} Se termine : Après {occurrence_count} occurrence{'s' if occurrence_count > 1 else ''}"
+            return f"Débute le {start_str} se termine après {occurrence_count} occurrence{'s' if occurrence_count > 1 else ''}"
         
         elif end_type == "on" and end_date:
             end_str = _format_datetime_fr(end_date, include_time=False)
-            return f"Débute le {start_str} Se termine le {end_str}"
+            return f"Débute le {start_str} se termine le {end_str}"
         
         return f"Débute le {start_str}"
     
@@ -504,14 +504,14 @@ def format_recurrence_schedule(config: Dict, lang: str = "fr") -> str:
         start_str = _format_datetime_en(start_date, include_time=True)
         
         if end_type == "never":
-            return f"Starts on {start_str} Ends: Never"
+            return f"Starts on {start_str} ends never"
         
         elif end_type == "after" and occurrence_count:
-            return f"Starts on {start_str} Ends: After {occurrence_count} occurrence{'s' if occurrence_count > 1 else ''}"
+            return f"Starts on {start_str} ends after {occurrence_count} occurrence{'s' if occurrence_count > 1 else ''}"
         
         elif end_type == "on" and end_date:
             end_str = _format_datetime_en(end_date, include_time=False)
-            return f"Starts on {start_str} Ends on {end_str}"
+            return f"Starts on {start_str} ends on {end_str}"
         
         return f"Starts on {start_str}"
 
@@ -528,6 +528,7 @@ def _format_to_iso(dt: datetime) -> str:
         dt = dt.replace(tzinfo=timezone.utc)
     
     return dt.astimezone(timezone.utc).isoformat(timespec='milliseconds').replace('+00:00', 'Z')
+
 def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
     """
     Calcule les N prochaines occurrences d'une récurrence
@@ -541,6 +542,7 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
     """
     start_date = _parse_date(config.get('start_date'))
     if not start_date:
+        print("ici----start_date not found")
         return []
     
     interval = config.get('interval', 1)
@@ -565,15 +567,15 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
         iteration += 1
         
         # Vérifier si on dépasse la date de fin
-        if end_type == "on" and end_date and current_date > end_date:
+        if end_type.lower() == "on" and end_date and current_date > end_date:
             break
         
         # Ajouter l'occurrence selon le type de récurrence
-        if unit == "days":
+        if unit.lower() == "days":
             occurrences.append(_format_to_iso(current_date))
             current_date += timedelta(days=interval)
         
-        elif unit == "weeks":
+        elif unit.lower() == "weeks":
             weekdays = recurrence_config.get('weekdays', [])
             if weekdays:
                 # Mapper les jours de la semaine
@@ -607,7 +609,7 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
                 occurrences.append(_format_to_iso(current_date))
                 current_date += timedelta(weeks=interval)
         
-        elif unit == "months":
+        elif unit.lower() == "months":
             if 'day_of_month' in recurrence_config:
                 day = recurrence_config['day_of_month']
                 
@@ -651,7 +653,7 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
                     year += 1
                 current_date = current_date.replace(year=year, month=month)
         
-        elif unit == "years":
+        elif unit.lower() == "years":
             occurrences.append(_format_to_iso(current_date))
             current_date = current_date.replace(year=current_date.year + interval)
     
@@ -804,97 +806,112 @@ def format_perimeter_for_email(perimeter, lang='fr'):
 
 # Exemple d'utilisation
 if __name__ == "__main__":
-    
-    examples = [
-        {
-            "start_date": "2025-10-16T13:28:06.092Z",
-            "interval": 1,
-            "unit": "days",
-            "recurrence_config": {},
-            "end_type": "never",
-            "end_date": None,
-            "occurrence_count": None
-        },
-        {
-            "start_date": "2025-10-16T13:28:06.092Z",
-            "interval": 3,
-            "unit": "days",
-            "recurrence_config": {},
-            "end_type": "after",
-            "end_date": None,
-            "occurrence_count": 10
-        },
-        {
-            "start_date": "2025-10-16T13:28:06.092Z",
-            "interval": 1,
-            "unit": "weeks",
-            "recurrence_config": {
-                "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday"]
-            },
-            "end_type": "never",
-            "end_date": None,
-            "occurrence_count": None
-        },
-        {
-            "start_date": "2025-10-16T13:28:06.092Z",
-            "interval": 1,
-            "unit": "months",
-            "recurrence_config": {
-                "day_of_month": 1
-            },
-            "end_type": "never",
-            "end_date": None,
-            "occurrence_count": None
-        },
-        {
-            "start_date": "2025-10-16T13:28:06.092Z",
-            "interval": 3,
-            "unit": "months",
-            "recurrence_config": {
-                "day_of_month": 1
-            },
-            "end_type": "on",
-            "end_date": "2027-12-31",
-            "occurrence_count": None
-        },
-        {
-            "start_date": "2025-10-16T13:28:06.092Z",
-            "interval": 1,
-            "unit": "years",
-            "recurrence_config": {
-                "months_of_year": [1],
-                "yearly_day": 1
-            },
-            "end_type": "never",
-            "end_date": None,
-            "occurrence_count": None
-        },
-        {
-            "start_date": "2025-10-16T13:28:06.092Z",
-            "interval": 1,
-            "unit": "weeks",
-            "recurrence_config": {
-                "weekdays": ["saturday", "sunday"]
-            },
-            "end_type": "after",
-            "end_date": None,
-            "occurrence_count": 20
-        }
-    ]
-    
-    print("EXEMPLES DE PHRASES SIMPLES:")
-    print("=" * 70)
-    
-    for i, example in enumerate(examples, 1):
-        print(f"\n{i}. {explain_recurrence_simple(example, 'fr')}")
-        print(f'', format_recurrence_schedule(example, 'fr'))
-    
-    print("\n\n" + "=" * 70)
-    print("ENGLISH EXAMPLES:")
-    print("=" * 70)
-    
-    for i, example in enumerate(examples, 1):
-        print(f"\n{i}. {explain_recurrence_simple(example, 'en')}")
 
-        print(f'', format_recurrence_schedule(example, 'en'))
+    data =  {
+        "interval": 1,
+        "start_date": "2025-10-23T15:12+00:00",
+        "unit": "DAYS",
+        "recurrence_config": {
+        "weekdays": [],
+        "months_of_year": [],
+        "weeks_of_year": []
+        },
+        "end_type": "AFTER",
+        "end_date": None,
+        "occurrence_count": 5
+    }
+    print(calculate_next_occurrences(data, 10))
+    
+    # examples = [
+    #     {
+    #         "start_date": "2025-10-16T13:28:06.092Z",
+    #         "interval": 1,
+    #         "unit": "days",
+    #         "recurrence_config": {},
+    #         "end_type": "never",
+    #         "end_date": None,
+    #         "occurrence_count": None
+    #     },
+    #     {
+    #         "start_date": "2025-10-16T13:28:06.092Z",
+    #         "interval": 3,
+    #         "unit": "days",
+    #         "recurrence_config": {},
+    #         "end_type": "after",
+    #         "end_date": None,
+    #         "occurrence_count": 10
+    #     },
+    #     {
+    #         "start_date": "2025-10-16T13:28:06.092Z",
+    #         "interval": 1,
+    #         "unit": "weeks",
+    #         "recurrence_config": {
+    #             "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday"]
+    #         },
+    #         "end_type": "never",
+    #         "end_date": None,
+    #         "occurrence_count": None
+    #     },
+    #     {
+    #         "start_date": "2025-10-16T13:28:06.092Z",
+    #         "interval": 1,
+    #         "unit": "months",
+    #         "recurrence_config": {
+    #             "day_of_month": 1
+    #         },
+    #         "end_type": "never",
+    #         "end_date": None,
+    #         "occurrence_count": None
+    #     },
+    #     {
+    #         "start_date": "2025-10-16T13:28:06.092Z",
+    #         "interval": 3,
+    #         "unit": "months",
+    #         "recurrence_config": {
+    #             "day_of_month": 1
+    #         },
+    #         "end_type": "on",
+    #         "end_date": "2027-12-31",
+    #         "occurrence_count": None
+    #     },
+    #     {
+    #         "start_date": "2025-10-16T13:28:06.092Z",
+    #         "interval": 1,
+    #         "unit": "years",
+    #         "recurrence_config": {
+    #             "months_of_year": [1],
+    #             "yearly_day": 1
+    #         },
+    #         "end_type": "never",
+    #         "end_date": None,
+    #         "occurrence_count": None
+    #     },
+    #     {
+    #         "start_date": "2025-10-16T13:28:06.092Z",
+    #         "interval": 1,
+    #         "unit": "weeks",
+    #         "recurrence_config": {
+    #             "weekdays": ["saturday", "sunday"]
+    #         },
+    #         "end_type": "after",
+    #         "end_date": None,
+    #         "occurrence_count": 20
+    #     }
+    # ]
+    
+    # print("EXEMPLES DE PHRASES SIMPLES:")
+    # print("=" * 70)
+    
+    # for i, example in enumerate(examples, 1):
+    #     print(f"\n{i}. {explain_recurrence_simple(example, 'fr')}")
+    #     print(f'', format_recurrence_schedule(example, 'fr'))
+    
+    # print("\n\n" + "=" * 70)
+    # print("ENGLISH EXAMPLES:")
+    # print("=" * 70)
+    
+    # for i, example in enumerate(examples, 1):
+    #     print(f"\n{i}. {explain_recurrence_simple(example, 'en')}")
+
+    #     print(f'', format_recurrence_schedule(example, 'en'))
  
