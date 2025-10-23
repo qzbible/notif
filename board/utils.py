@@ -542,7 +542,7 @@ def calculate_next_occurrences(config: Dict, count: int = 5) -> List[str]:
     """
     start_date = _parse_date(config.get('start_date'))
     if not start_date:
-        print("ici----start_date not found")
+  
         return []
     
     interval = config.get('interval', 1)

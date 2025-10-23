@@ -180,7 +180,7 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
     # object and description
     deadline_text = "non défini" 
     filename = None
-  
+    print('ici ------------------------------ 2')
     if verifier_presence_t(start_date):
         new_deadline = start_date 
     else: 
