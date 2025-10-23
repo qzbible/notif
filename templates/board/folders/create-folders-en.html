@@ -264,7 +264,7 @@
     >
       <!-- Header avec logo -->
       <tr>
-        <td align="center"   >
+        <td align="center" >
           <table
             class="logo-container"
             width="144"
@@ -357,7 +357,7 @@
                     letter-spacing: 0.2px;
                   "
                 >
-                Dear Ghislain,
+                Dear {{name}},
                 </p>
                 <p
                   class="body-text"
@@ -386,7 +386,7 @@
                 <!-- Liste des éléments -->
                 <ul style="margin: 0; padding-left: 20px;">
                   <li class="list-item">
-                    <strong> {{nomber_elements}} </strong> items to be reviewed  
+                    <strong> {{nomber_elements}} </strong> item(s) to be reviewed  
                   </li>
                   <li class="list-item">
                     <strong>Types of items :</strong> {{type_arbitration_elements | safe }}
@@ -452,7 +452,7 @@
                       
                       <!-- Description -->
                       <div class="details-description">
-                        {{instance_description}}
+                        {{instance_description | safe}}
                       </div>
                       
                       <!-- Dates (Début et Fin côte à côte) -->
@@ -508,7 +508,7 @@
                     letter-spacing: 0.2px;
                   "
                 >
-                  <strong>Your   {{committee_name}} team</strong>
+                  <strong>Your {{committee_name}} team</strong>
                 </p>
               </td>
             </tr>

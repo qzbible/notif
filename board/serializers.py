@@ -548,11 +548,9 @@ class DecisionOneSerializer(serializers.Serializer):
         help_text="URL de connexion à la plateforme"
     )
     
-    # Informations entreprise
-    company = serializers.CharField(
-        required=True,
-        max_length=255,
-        help_text="Nom de l'entreprise"
+    client = serializers.JSONField(
+        required=False,
+        help_text="Fichier JSON optionnel"
     )
     
     # Destinataires

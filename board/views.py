@@ -4,6 +4,8 @@ from board.models import InstanceBoard, CommitteeBoard
 from board.serializers import ArbitrageCreatedSerializer, CommentCreatedSerializer, CommitteeBoardSerializer, CommitteeBoardUpdateSerializer, CommitteeCreatedSerializer, DecisionOneSerializer, DecisionSerializer, MeetingReminderSerializer
 from board.service import mail_arbitrage_created_service, mail_comment_created_service, mail_committee_created_service, mail_decision_one_service, mail_decision_service, mail_meeting_reminder_service
 from board.utils import calculate_next_occurrences, compare_with_now
+from exigence.models import ExigenceMail
+from exigence.service import task_responsable
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 
@@ -60,8 +62,7 @@ class DecisionOneView(APIView):
                     'committee_date': '15 novembre 2025',
                     'title': 'Budget et Formation 2025',
                     'description': '<p>Suite à la réunion du comité, les décisions suivantes ont été prises concernant le budget et le plan de formation.</p>',
-                    'decision_date': '31 décembre 2025',
-                   
+                    'decision_date': '31 décembre 2025', 
                     'task_list': [
                          {
                             "title": "task ort",
@@ -80,10 +81,17 @@ class DecisionOneView(APIView):
                                     "email_second": None
                                 }
                             ],
+                            "created_by": {
+                                "id": 66,
+                                "first_name": "loiol",
+                                "last_name": "BOREL",
+                                "phone": None,
+                                "email": "nodemborel78@gmail.com",
+                                "email_second": None
+                                },
                          }
                     ],
-                    'url_connect': 'https://app.example.com/connect',
-                    'company': 'Klivar',
+                    'url_connect': 'https://app.example.com/connect', 
                     'actors': [
                         {
                             'first_name': 'Jean',
@@ -107,7 +115,11 @@ class DecisionOneView(APIView):
                         "priority": 2
                         },
                     ],
-                    'client_id': 'client_12345',
+                    "client": {
+                            "id": "CLI-2025",
+                            "denomination": "Entreprise ABC",
+                            "secteur": "Finance"
+                        },
                     'lang': 'fr-FR'
                 },
                 request_only=True,
@@ -185,6 +197,7 @@ class DecisionOneView(APIView):
             
             only_title_list = [ item.get('title') for item in validated_data.get('task_list', []) ]
             # Envoi de l'email via le service
+            client_info = validated_data.get('client', None)
             result = mail_decision_one_service( 
                 committee_name=validated_data.get('committee_name'),
                 committee_date=validated_data.get('committee_date'),
@@ -194,12 +207,13 @@ class DecisionOneView(APIView):
                 decision_date=validated_data.get('decision_date'),
                 task_list=only_title_list,
                 url_connect=url_connect,
-                company=validated_data.get('company'),
+                company= client_info.get('denomination', ''),
                 back_host=back_host,
                 actors=validated_data.get('actors', []),
                 lang=validated_data.get('lang', 'fr-FR')
             ) 
-            
+            # send task 
+            task_notification(validated_data.get('task_list', []), lang=validated_data.get('lang', 'fr-FR'), client=client_info)
             if result:
                 response_data = {
                     "message": "Email envoyé avec succès",
@@ -234,6 +248,56 @@ class DecisionOneView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+def task_notification(task_list=[], lang="",  client=None)->True:
+    """Fonction pour notifier les propriétaires des tâches créées"""
+    try:
+        for task in task_list:
+            owners = task.get('owner', [])
+            for owner in owners:
+                owner_email = owner.get('email')
+                created_by = task.get("created_by", None)
+                if owner_email:
+                    exigence = ExigenceMail.objects.create(
+                        object=task.get("title", ''),
+                        description=task.get("description"),
+                        company=client.get('denomination','') if client else '',
+                        dest_email=owner_email,
+                        sender_name= created_by.get('first_name','') + ' ' + created_by.get('last_name','') if created_by else '',
+                        dest_name= f"{owner.get('first_name','')} {owner.get('last_name','')}",
+                        url= task.get("url"),
+                        method = "",
+                        base_url=os.getenv("BACK_HOST_URL", ""),
+                        jwt_token=task.get("token"),
+                        id_action = task.get("id", ),
+                        id_analysis = task.get("id_analysis"),
+                        id_reporting = task.get("id_reporting"),
+                        id_indicateur = task.get("id_indicateur"),
+                        dealine = task.get("due_date") ,
+                        start_date = task.get("created_at"),
+                        time = 30,
+                        type_task = "TASK_MB",
+                        lang = lang,
+                    )
+                    mail = task_responsable(
+                        object= task.get("title", ''),
+                        type_task = "TASK_MB",
+                        description= task.get("description"),
+                        dest_email= owner_email,
+                        sender_name=  created_by.get('first_name','') + ' ' + created_by.get('last_name','') if created_by else '',
+                        dest_name= f"{owner.get('first_name','')} {owner.get('last_name','')}",
+                        company= client.get('denomination','') if client else '', 
+                        url= task.get("url"),
+                        during= 30, 
+                        start_date= task.get("created_at"),
+                        scope= [],
+                        lang=lang
+                    )
+                    # Logique d'envoi de notification par email au propriétaire
+                    print(f"Notification envoyée à {owner_email} pour la tâche '{task.get('title')}'")
+        return True
+    except Exception as e:
+        print(f"Erreur lors de l'envoi des notifications de tâches: {str(e)}")
+        return False
 
 class DecisionView(APIView):
     """API pour envoyer les décisions du comité par email"""
@@ -634,8 +698,7 @@ class MeetingReminderView(APIView):
                     "new_date": str(new_date),
                     "instance_id": instance_id
                 }
-            }
-            
+            } 
             if failed_tasks:
                 response_data["data"]["failed_tasks"] = failed_tasks
                 response_data["message"] += f" ({len(failed_tasks)} échec(s))"

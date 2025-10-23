@@ -357,7 +357,7 @@
                     letter-spacing: 0.2px;
                   "
                 >
-                  Cher Ghislain,
+                  Cher {{name}},
                 </p>
                 <p
                   class="body-text"
@@ -386,7 +386,7 @@
                 <!-- Liste des éléments -->
                 <ul style="margin: 0; padding-left: 20px;">
                   <li class="list-item">
-                    <strong> {{nomber_elements}} </strong> éléments à arbitrer
+                    <strong> {{nomber_elements}} </strong> élément(s) à arbitrer
                   </li>
                   <li class="list-item">
                     <strong>Types d'éléments :</strong> {{type_arbitration_elements | safe }}
@@ -450,7 +450,7 @@
                       
                       <!-- Description -->
                       <div class="details-description">
-                        {{instance_description}}
+                        {{instance_description | safe}}
                       </div>
                       
                       <!-- Dates (Début et Fin côte à côte) -->
