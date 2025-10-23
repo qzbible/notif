@@ -36,7 +36,7 @@ from django.utils import timezone
 from service.utils import get_formatted_date, get_lang_request, send_mail_created
 from rest_framework import serializers
 from rest_framework.pagination import PageNumberPagination
-
+from django.db import transaction
 
 class DecisionOneView(APIView):
     """API pour envoyer les décisions du comité par email"""
@@ -506,140 +506,153 @@ class MeetingReminderView(APIView):
         Modifie la date d'une réunion et reprogramme la tâche Celery associée
         """
         
-        # Validation des données
+        
+        # Extraction et validation des données
         instance_id = request.data.get('instance_id')
         new_date = request.data.get('new_date')
         old_date = request.data.get('old_date')
         perimeter = request.data.get('perimeter', [])
         
+        # Validation des champs requis
+        required_fields = {
+            'instance_id': instance_id,
+            'new_date': new_date,
+            'old_date': old_date
+        }
         
-        if not instance_id:
-            return Response(
-                {
-                    "message": "Le champ committee_board_id est requis",
-                    "status": "error",
-                    "code": status.HTTP_400_BAD_REQUEST
-                },
-                status=status.HTTP_400_BAD_REQUEST
+        for field_name, field_value in required_fields.items():
+            if not field_value:
+                return Response(
+                    {
+                        "message": f"Le champ {field_name} est requis",
+                        "status": "error",
+                        "code": status.HTTP_400_BAD_REQUEST
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        try:
+            # Récupération des réunions à reprogrammer
+            committee_meetings = CommitteeBoard.objects.select_related(
+                'instance_board'
+            ).filter(
+                instance_board__id_instance=instance_id,
+                date=old_date
             )
-        
-        if not new_date:
-            return Response(
-                {
-                    "message": "Le champ new_date est requis",
-                    "status": "error",
-                    "code": status.HTTP_400_BAD_REQUEST
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        if not old_date:
-            return Response(
-                {
-                    "message": "Le champ old_date est requis",
-                    "status": "error",
-                    "code": status.HTTP_400_BAD_REQUEST
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Conversion de la date
-        # try:
-        #     from dateutil import parser
-        #     new_date_parsed = parser.parse(new_date)
-        #     old_date_parsed = parser.parse(old_date)
-        # except Exception as e:
-        #     return Response(
-        #         {
-        #             "message": "Format de date invalide",
-        #             "status": "error",
-        #             "error": str(e),
-        #             "code": status.HTTP_400_BAD_REQUEST
-        #         },
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
-        
-        # Vérifier si la date est dans le futur
-        # is_past, readable = compare_with_now(new_date_parsed, 'fr')
-        # if is_past:
-        #     return Response(
-        #         {
-        #             "message": "La nouvelle date doit être dans le futur",
-        #             "status": "error",
-        #             "code": status.HTTP_400_BAD_REQUEST,
-        #             "details": f"La date fournie est {readable}"
-        #         },
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
-        
-        # Récupération du CommitteeBoard
-        try: 
-            queryset = CommitteeBoard.objects.all().select_related('instance_board') 
-            queryset = queryset.filter(instance_board__id_instance=instance_id, date=old_date) 
-            for committee_meeting in queryset:
-                
-                old_date = committee_meeting.date
-                old_task_id = committee_meeting.id_task
-                
-                # Récupération de l'instance board
-                instance_board = committee_meeting.instance_board
-                validated_data = {
-                    'title': instance_board.title,
-                    'description': instance_board.description,
-                    'link': instance_board.link,
-                    'url_connect': instance_board.url_connect,
-                    'client': instance_board.client,
-                    'recurrence_config': instance_board.recurrence_config,
-                    'ponctuel_config': instance_board.ponctuel_config,
-                    'actors': instance_board.actors,
-                    'perimeter': perimeter,
-                    'lang': instance_board.lang
-                } 
-                company_object = validated_data.get('client') 
-                # Annulation de l'ancienne tâche
-                try:
-                    current_app.control.revoke(old_task_id, terminate=True)
-                    print(f"Ancienne tâche {old_task_id} annulée avec succès")
-                except Exception as e:
-                    print(f"Impossible d'annuler la tâche {old_task_id}: {str(e)}")
-                
-                # Création de la nouvelle tâche avec la nouvelle date
-                new_task = mail_meeting_reminder_service.apply_async(
-                    args=[
-                        validated_data.get('title', ''),
-                        validated_data.get('description', ''),
-                        validated_data.get('link', ''),
-                        validated_data.get('url_connect', ''),
-                        company_object["denomination"] if company_object else "",
-                        os.environ.get("BACK_HOST_URL", ""),
-                        validated_data.get("recurrence_config",None),
-                        validated_data.get("ponctuel_config", None),
-                        validated_data.get('actors', []),
-                        validated_data.get('perimeter', []),
-                        new_date,
-                        validated_data.get('lang', 'fr-FR')
-                    ],
-                    eta=new_date
-                ) 
-                # Mise à jour du CommitteeBoard avec la nouvelle tâche et la nouvelle date
-                committee_meeting.id_task = new_task.id
-                committee_meeting.date = new_date
-                committee_meeting.save()
-            return Response( {
-                "message": "Réunion reprogrammée avec succès",
+            
+            if not committee_meetings.exists():
+                return Response(
+                    {
+                        "message": "Aucune réunion trouvée pour cette instance et date",
+                        "status": "error",
+                        "code": status.HTTP_404_NOT_FOUND
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            rescheduled_count = 0
+            failed_tasks = []
+            
+            # Transaction atomique pour garantir la cohérence des données
+            with transaction.atomic():
+                for committee_meeting in committee_meetings:
+                    try:
+                        instance_board = committee_meeting.instance_board
+                        old_task_id = committee_meeting.id_task
+                        
+                        # Préparation des données pour la nouvelle tâche
+                        task_data = {
+                            'title': instance_board.title,
+                            'description': instance_board.description,
+                            'link': instance_board.link,
+                            'url_connect': instance_board.url_connect,
+                            'client': instance_board.client,
+                            'recurrence_config': instance_board.recurrence_config,
+                            'ponctuel_config': instance_board.ponctuel_config,
+                            'actors': instance_board.actors,
+                            'perimeter': perimeter,
+                            'lang': instance_board.lang
+                        }
+                        
+                        company_name = ""
+                        if task_data.get('client'):
+                            company_name = task_data['client'].get('denomination', '')
+                        
+                        # Annulation de l'ancienne tâche Celery
+                        if old_task_id:
+                            try:
+                                current_app.control.revoke(old_task_id, terminate=True)
+                                print(f"Tâche Celery {old_task_id} annulée avec succès")
+                            except Exception as e:
+                                print(f"Impossible d'annuler la tâche {old_task_id}: {str(e)}")
+                        
+                        # Création de la nouvelle tâche Celery
+                        new_task = mail_meeting_reminder_service.apply_async(
+                            args=[
+                                task_data.get('title', ''),
+                                task_data.get('description', ''),
+                                task_data.get('link', ''),
+                                task_data.get('url_connect', ''),
+                                company_name,
+                                os.environ.get("BACK_HOST_URL", ""),
+                                task_data.get("recurrence_config", None),
+                                task_data.get("ponctuel_config", None),
+                                task_data.get('actors', []),
+                                task_data.get('perimeter', []),
+                                new_date,
+                                task_data.get('lang', 'fr-FR')
+                            ],
+                            eta=new_date
+                        )
+                        
+                        # Mise à jour de la réunion
+                        committee_meeting.id_task = new_task.id
+                        committee_meeting.date = new_date
+                        committee_meeting.save()
+                        
+                        rescheduled_count += 1
+                        print(
+                            f"Réunion {committee_meeting.id} reprogrammée: "
+                            f"{old_date} -> {new_date}, nouvelle tâche: {new_task.id}"
+                        )
+                        
+                    except Exception as e:
+                        print(f"Erreur lors de la reprogrammation de la réunion {committee_meeting.id}: {str(e)}")
+                        failed_tasks.append({
+                            'meeting_id': committee_meeting.id,
+                            'error': str(e)
+                        })
+            
+            # Préparation de la réponse
+            response_data = {
+                "message": f"{rescheduled_count} réunion(s) reprogrammée(s) avec succès",
                 "status": "success",
                 "code": status.HTTP_200_OK,
-                "data": {}}, status=status.HTTP_200_OK )
-                    
+                "data": {
+                    "rescheduled_count": rescheduled_count,
+                    "old_date": str(old_date),
+                    "new_date": str(new_date),
+                    "instance_id": instance_id
+                }
+            }
+            
+            if failed_tasks:
+                response_data["data"]["failed_tasks"] = failed_tasks
+                response_data["message"] += f" ({len(failed_tasks)} échec(s))"
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+        
         except Exception as e:
+            print(f"Erreur lors de la reprogrammation: {str(e)}", exc_info=True)
             return Response(
                 {
-                    "message": "Réunion non trouvée",
-                    "status": "error " + str(e),
-                    "code": status.HTTP_404_NOT_FOUND
+                    "message": "Erreur lors de la reprogrammation des réunions",
+                    "status": "error",
+                    "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    "details": str(e)
                 },
-                status=status.HTTP_404_NOT_FOUND
-            ) 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
     @extend_schema(
         request=MeetingReminderSerializer,
