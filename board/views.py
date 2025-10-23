@@ -544,33 +544,33 @@ class MeetingReminderView(APIView):
                 )
             
             # Conversion de la date
-            try:
-                from dateutil import parser
-                new_date_parsed = parser.parse(new_date)
-                old_date_parsed = parser.parse(old_date)
-            except Exception as e:
-                return Response(
-                    {
-                        "message": "Format de date invalide",
-                        "status": "error",
-                        "error": str(e),
-                        "code": status.HTTP_400_BAD_REQUEST
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # try:
+            #     from dateutil import parser
+            #     new_date_parsed = parser.parse(new_date)
+            #     old_date_parsed = parser.parse(old_date)
+            # except Exception as e:
+            #     return Response(
+            #         {
+            #             "message": "Format de date invalide",
+            #             "status": "error",
+            #             "error": str(e),
+            #             "code": status.HTTP_400_BAD_REQUEST
+            #         },
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
             
             # Vérifier si la date est dans le futur
-            is_past, readable = compare_with_now(new_date_parsed, 'fr')
-            if is_past:
-                return Response(
-                    {
-                        "message": "La nouvelle date doit être dans le futur",
-                        "status": "error",
-                        "code": status.HTTP_400_BAD_REQUEST,
-                        "details": f"La date fournie est {readable}"
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            # is_past, readable = compare_with_now(new_date_parsed, 'fr')
+            # if is_past:
+            #     return Response(
+            #         {
+            #             "message": "La nouvelle date doit être dans le futur",
+            #             "status": "error",
+            #             "code": status.HTTP_400_BAD_REQUEST,
+            #             "details": f"La date fournie est {readable}"
+            #         },
+            #         status=status.HTTP_400_BAD_REQUEST
+            #     )
             
             # Récupération du CommitteeBoard
             try: 
@@ -627,15 +627,15 @@ class MeetingReminderView(APIView):
                     validated_data.get("ponctuel_config", None),
                     validated_data.get('actors', []),
                     validated_data.get('perimeter', []),
-                    new_date_parsed,
+                    new_date,
                     validated_data.get('lang', 'fr-FR')
                 ],
-                eta=new_date_parsed
+                eta=new_date
             )
             
             # Mise à jour du CommitteeBoard avec la nouvelle tâche et la nouvelle date
             committee_meeting.id_task = new_task.id
-            committee_meeting.date = new_date_parsed
+            committee_meeting.date = new_date
             committee_meeting.save()
             
             response_data = {
@@ -645,7 +645,7 @@ class MeetingReminderView(APIView):
                 "data": {
                     "instant_board": instance_id,
                     "old_date": old_date.isoformat() if old_date else None,
-                    "new_date": new_date_parsed.isoformat(),
+                    "new_date": new_date.isoformat(),
                     "old_task_id": old_task_id,
                     "new_task_id": new_task.id,
                     "committee_title": instance_board.title,
