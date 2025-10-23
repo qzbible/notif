@@ -620,13 +620,16 @@ class MeetingReminderView(APIView):
                         validated_data.get('lang', 'fr-FR')
                     ],
                     eta=new_date
-                )
-                
+                ) 
                 # Mise à jour du CommitteeBoard avec la nouvelle tâche et la nouvelle date
                 committee_meeting.id_task = new_task.id
                 committee_meeting.date = new_date
                 committee_meeting.save()
-            return Response( status=status.HTTP_200_OK )
+            return Response( {
+                "message": "Réunion reprogrammée avec succès",
+                "status": "success",
+                "code": status.HTTP_200_OK,
+                "data": {}}, status=status.HTTP_200_OK )
                     
         except CommitteeBoard.DoesNotExist:
             return Response(
