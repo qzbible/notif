@@ -631,21 +631,16 @@ class MeetingReminderView(APIView):
                 "code": status.HTTP_200_OK,
                 "data": {}}, status=status.HTTP_200_OK )
                     
-        except CommitteeBoard.DoesNotExist:
+        except Exception as e:
             return Response(
                 {
                     "message": "Réunion non trouvée",
-                    "status": "error",
+                    "status": "error " + str(e),
                     "code": status.HTTP_404_NOT_FOUND
                 },
                 status=status.HTTP_404_NOT_FOUND
-            )
+            ) 
         
-            # Sauvegarde de l'ancienne date et id_task
-            
-                
-        
-
     @extend_schema(
         request=MeetingReminderSerializer,
         responses={
