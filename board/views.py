@@ -257,7 +257,7 @@ def task_notification(task_list=[], lang="",  client=None)->True:
                 owner_email = owner.get('email')
                 created_by = task.get("created_by", None)
                 if owner_email:
-                    exigence = ExigenceMail.objects.create(
+                    exigence, _ = ExigenceMail.objects.get_or_create(
                         object=task.get("title", ''),
                         description=task.get("description"),
                         company=client.get('denomination','') if client else '',
@@ -1096,7 +1096,7 @@ class CommitteeCreatedView(APIView):
     )
     def post(self, request):
         """
-        Envoie un email de notification de création de comité
+            Envoie un email de notification de création de comité
         """
         try:
             # InstanceBoard.objects.all().delete()
@@ -1167,22 +1167,21 @@ class CommitteeCreatedView(APIView):
             # creation des elements a arbitrer ....
             
             
-            
+            print("ins_created", ins_created.id_instance, "created", created)
             dates = []
             if validated_data.get('recurrence_config', None) :
                  # on recupere les 5 prochaine date 
-                dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=5)
+                dates = calculate_next_occurrences(validated_data.get('recurrence_config', None), count=100)
             elif validated_data.get('ponctuel_config', None):
                 dates.append(validated_data.get('ponctuel_config', None).get('date'))
+            
+            print("dates", dates)
             if created:
                 for date in dates:
                     # print(date)
                    
                     is_past, readable = compare_with_now(date, 'fr' if validated_data.get('lang', 'fr-FR') == 'fr-FR' else 'en') #False (la date est dans le futur),  "dans 364 jours" (ou selon la date actuelle)
-                    # if is_past:
-                        
-                    #     continue  
-
+                   
                     date_utc = datetime.fromisoformat(date.replace('Z', '+00:00'))
                     if date_utc.tzinfo is None:
                         date_utc = date_utc.replace(tzinfo=timezone.utc)
