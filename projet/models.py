@@ -18,5 +18,5 @@ class AlertIndicatorEmail(models.Model):
     percent_value = models.CharField(max_length=255, null=True, blank=True)
     url_connect = models.CharField(max_length=255, null=True, blank=True)
     task_id = models.CharField(max_length=255, null=True, blank=True)
-    actors = ArrayField(models.JSONField(), null=True, blank=True)
+    # actors = ArrayField(models.JSONField(), null=True, blank=True)
     client = models.JSONField(null=True, blank=True)

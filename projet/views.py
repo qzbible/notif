@@ -234,7 +234,6 @@ class IndicatorAlertView(APIView):
                     'client': {
                         'id': 'contact@client.com',
                         'denomination': 'Société ABC',
-                        
                     }
                 },
                 request_only=True,
@@ -295,87 +294,94 @@ class IndicatorAlertView(APIView):
             
             validated_data = serializer.validated_data
             client = validated_data.get('client', None)
-            print("client data",client )
-            print("actores data",validated_data.get('actors', []) )
+            actors = validated_data.get('actors', [])
+            
+            print("client data:", client)
+            print("actors data:", actors)
 
-            # Créer l'enregistrement dans la base de données
-            alert_instance,  created = AlertIndicatorEmail.objects.get_or_create(
-                id_indicator =  validated_data.get('id_indicator'),
-                id_project =  validated_data.get('id_project'),
-                title=validated_data.get('title'),
-                description=validated_data.get('description'),
-                seuil=validated_data.get('seuil'),
-                date_alert=validated_data.get('date_alert'),
-                reporting_title=validated_data.get('reportion_title'),
-                percent_value=validated_data.get('percent_value'),
-                actors=validated_data.get('actors', []),
-                url_connect=validated_data.get('url_connect'),
-                client=client
+            # ✅ Solution 1 : Utiliser update_or_create (recommandé)
+            alert_instance, created = AlertIndicatorEmail.objects.update_or_create(
+                id_indicator=validated_data.get('id_indicator'),
+                id_project=validated_data.get('id_project'),
+                defaults={
+                    'title': validated_data.get('title'),
+                    'description': validated_data.get('description'),
+                    'seuil': validated_data.get('seuil'),
+                    'date_alert': validated_data.get('date_alert'),
+                    'reporting_title': validated_data.get('reportion_title'),
+                    'percent_value': validated_data.get('percent_value'),
+                    'actors': actors,
+                    'url_connect': validated_data.get('url_connect'),
+                    'client': client
+                }
             )
             
-            # si is allready created remove old task
-            # if created == False :
-            #     if alert_instance.task_id :
-            #         try:
-            #             current_app.control.revoke(alert_instance.task_id, terminate=True) 
-            #             print(f"Tâche {alert_instance.task_id} annulée avec succès")
-            #         except Exception as e:
-            #             print(f"Erreur lors de l'annulation de la tâche {alert_instance.task_id} : {str(e)}")
-                     
-            # if validated_data.get('date_alert', None):
-            #     new_task = mail_alert_seuil_indicator.apply_async(
-            #                 args=[
-            #                     validated_data.get('reportion_title'),
-            #                     validated_data.get('msg'),
-            #                     validated_data.get('title'),
-            #                     validated_data.get('percent_value'),
-            #                     validated_data.get('seuil'),
-            #                     client.get('denomination', 'Klivar') if client else 'Klivar',
-            #                     validated_data.get('date_alert'),
-            #                     validated_data.get('description'),
-            #                     validated_data.get('url_connect'),
-            #                     os.environ.get("BACK_HOST_URL", ""),
-            #                     validated_data.get('lang', 'fr-FR'),
-            #                     validated_data.get('actors', []) 
-            #                 ],
-            #                 eta=validated_data.get('date_alert', None)
-            #             )
-            #     alert_instance.task_id = new_task.id
-            #     alert_instance.save()
-            # else:
-            #     mail_alert_seuil_indicator.apply_async(
-            #                 args=[
-            #                     validated_data.get('reportion_title'),
-            #                     validated_data.get('msg'),
-            #                     validated_data.get('title'),
-            #                     validated_data.get('percent_value'),
-            #                     validated_data.get('seuil'),
-            #                     client.get('denomination', 'Klivar') if client else 'Klivar',
-            #                     validated_data.get('date_alert'),
-            #                     validated_data.get('description'),
-            #                     validated_data.get('url_connect'),
-            #                     os.environ.get("BACK_HOST_URL", ""),
-            #                     validated_data.get('lang', 'fr-FR'),
-            #                     validated_data.get('actors', []) 
-            #                 ]
-            #             )
-            #     alert_instance.task_id = new_task.id
-            #     alert_instance.save()
+            # Si l'alerte existe déjà, annuler l'ancienne tâche
+            if not created and alert_instance.task_id:
+                try: 
+                    current_app.control.revoke(alert_instance.task_id, terminate=True) 
+                    print(f"Tâche {alert_instance.task_id} annulée avec succès")
+                except Exception as e:
+                    print(f"Erreur lors de l'annulation de la tâche {alert_instance.task_id} : {str(e)}")
+            
+            # Planifier la tâche d'envoi d'email
+            if validated_data.get('date_alert', None): 
+                new_task = mail_alert_seuil_indicator.apply_async(
+                    args=[
+                        validated_data.get('reportion_title'),
+                        validated_data.get('msg', 'Alerte indicateur'),
+                        validated_data.get('title'),
+                        validated_data.get('percent_value'),
+                        validated_data.get('seuil'),
+                        client.get('denomination', 'Klivar') if client else 'Klivar',
+                        validated_data.get('date_alert'),
+                        validated_data.get('description'),
+                        validated_data.get('url_connect'),
+                        os.environ.get("BACK_HOST_URL", ""),
+                        validated_data.get('lang', 'fr-FR'),
+                        actors
+                    ],
+                    eta=validated_data.get('date_alert', None)
+                )
+                alert_instance.task_id = new_task.id
+                alert_instance.save()
+            else:
+                
+                new_task = mail_alert_seuil_indicator.apply_async(
+                    args=[
+                        validated_data.get('reportion_title'),
+                        validated_data.get('msg', 'Alerte indicateur'),
+                        validated_data.get('title'),
+                        validated_data.get('percent_value'),
+                        validated_data.get('seuil'),
+                        client.get('denomination', 'Klivar') if client else 'Klivar',
+                        validated_data.get('date_alert'),
+                        validated_data.get('description'),
+                        validated_data.get('url_connect'),
+                        os.environ.get("BACK_HOST_URL", ""),
+                        validated_data.get('lang', 'fr-FR'),
+                        actors
+                    ]
+                )
+                alert_instance.task_id = new_task.id
+                alert_instance.save()
             
             response_data = {
-                "message": "Alerte envoyée avec succès",
+                "message": "Alerte envoyée avec succès" if not created else "Alerte créée avec succès",
                 "status": "success",
                 "code": status.HTTP_201_CREATED,
                 "data": {
                     "alert_id": alert_instance.id,
-                    "emails_sent": len(validated_data.get('actors', [])) ,
-                    "task_id": alert_instance.task_id, 
+                    "emails_sent": len(actors),
+                    "task_id": alert_instance.task_id,
+                    "created": created
                 }
-            }
-            
+            } 
             return Response(response_data, status=status.HTTP_201_CREATED)
             
         except Exception as e:
+            import traceback
+            print(f"Erreur détaillée: {traceback.format_exc()}")
             return Response(
                 {
                     "message": "Erreur lors de l'envoi de l'alerte",
@@ -385,4 +391,3 @@ class IndicatorAlertView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
