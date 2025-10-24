@@ -3,7 +3,7 @@ from django.shortcuts import render
  
 # from mailing.serializers import StartProjectMailSerializer  
 # from mailing.service import mail_notification_end_projet_service, mail_notification_start_projet_service
-from projet.models import ProjetMail
+from projet.models import AlertIndicatorEmail, ProjetMail
 from projet.serializers import IndicatorAlertSerializer, StartProjectMailSerializer
 from projet.service import mail_alert_seuil_indicator, mail_notification_end_projet_service, mail_notification_start_projet_service
 from rest_framework.permissions import AllowAny
@@ -296,7 +296,7 @@ class IndicatorAlertView(APIView):
             validated_data = serializer.validated_data
             
             # Créer l'enregistrement dans la base de données
-            alert_instance,  created = IndicatorAlertSerializer.objects.get_or_create(
+            alert_instance,  created = AlertIndicatorEmail.objects.get_or_create(
                 id_indicator =  validated_data.get('id_indicator'),
                 id_project =  validated_data.get('id_project'),
                 title=validated_data.get('title'),
