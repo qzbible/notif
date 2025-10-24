@@ -114,7 +114,7 @@ def mail_alert_seuil_indicator(  raporting_title, msg, title, percent_value, seu
         path = "deployer/indicator/alert-seuil-percent-fr.html"
         path_txt = "deployer/indicator/alert-seuil-percent-fr.txt"  
         object = f"🚨 🚨 🚨 Alerte - {title} "
-     
+    print(f"x data", company)
     context = {
         "indicator_name":title,  
         "msg":msg,  

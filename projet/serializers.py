@@ -85,6 +85,7 @@ class IndicatorAlertSerializer(serializers.Serializer):
     
     client = serializers.JSONField(
         required=False,
+        allow_null=True,
         help_text="Fichier JSON optionnel"
     )
     
