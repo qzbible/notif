@@ -64,7 +64,8 @@ class DecisionOneView(APIView):
                     'description': '<p>Suite à la réunion du comité, les décisions suivantes ont été prises concernant le budget et le plan de formation.</p>',
                     'decision_date': '31 décembre 2025', 
                     'task_list': [
-                         {
+                         {  
+                             "id":12,
                             "title": "task ort",
                             "description": "description",
                             "priority": 0,
