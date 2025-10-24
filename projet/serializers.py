@@ -96,6 +96,14 @@ class IndicatorAlertSerializer(serializers.Serializer):
         default='fr-FR',
         help_text="Langue de l'email (fr-FR ou en-US)"
     )
+
+    # Informations sur le comité
+    msg = serializers.CharField(
+        required=True,
+        max_length=255,
+        allow_null=True,
+        help_text="title"
+    )
     
     
     

@@ -212,6 +212,7 @@ class IndicatorAlertView(APIView):
                     'title': 'Taux de satisfaction client',
                     'description': 'Indicateur de satisfaction en baisse critique',
                     'seuil': '80%',
+                    'msg': 'L\'indicateur de satisfaction client est passé sous le seuil critique.',
                     'date_alert': '2025-10-16T13:28:06.092Z',
                     'reportion_title': 'Rapport Q3 2025',
                     'percent_value': '65%',
@@ -312,6 +313,7 @@ class IndicatorAlertView(APIView):
                     'percent_value': validated_data.get('percent_value'),
                     'actors': actors,
                     'url_connect': validated_data.get('url_connect'),
+                    'msg': validated_data.get('msg', None),
                     'client': client
                 }
             )
