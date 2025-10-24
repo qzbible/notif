@@ -65,7 +65,7 @@ class DecisionOneView(APIView):
                     'decision_date': '31 décembre 2025', 
                     'task_list': [
                          {  
-                             "id":12,
+                            "id":12,
                             "title": "task ort",
                             "description": "description",
                             "priority": 0,
@@ -291,7 +291,7 @@ def task_notification(task_list=[], lang="",  client=None)->True:
                         company= client.get('denomination','') if client else '', 
                         url= task.get("url", None),
                         during= 30, 
-                        start_date= task.get("created_at"),
+                        start_date= task.get("due_date"),
                         scope= [],
                         lang=lang
                     )
