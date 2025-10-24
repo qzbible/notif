@@ -57,7 +57,7 @@ class IndicatorAlertSerializer(serializers.Serializer):
         help_text="Date d'échéance de la décision"
     )
     date_alert = serializers.CharField(
-        required=True,
+        required=False,
         help_text="Date d'échéance de la décision"
     )
     reportion_title = serializers.CharField(
