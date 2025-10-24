@@ -9,4 +9,6 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path('api/projet-start-audit/', NotificationStartProjetView.as_view(), name='create-email-task'),
     path('api/projet-end-audit/', NotificationEndProjetView.as_view(), name='create-email-task'),
+
+    path('alerts/indicator/', IndicatorAlertView.as_view(), name='indicator-alert'),
 ]

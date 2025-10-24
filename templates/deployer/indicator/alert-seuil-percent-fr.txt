@@ -1,0 +1,43 @@
+ALERTE - INDICATEUR SOUS LE SEUIL
+
+Cher(e) {{recipient_name}},
+
+Ceci est une notification automatique envoyée pour vous informer que l'indicateur {{indicator_name}} est passé en dessous de son seuil défini.
+
+Veuillez analyser la situation et prendre les mesures correctives nécessaires.
+
+--------------------------------------------------
+MESSAGE D'ALERTE
+--------------------------------------------------
+{{msg}}
+
+Pour accéder à votre tableau de bord, connectez-vous ici : {{url_connect}}
+
+--------------------------------------------------
+DÉTAIL DE L'INDICATEUR
+--------------------------------------------------
+
+Nom de l'indicateur : {{indicator_name}}
+
+Description :
+{{instance_description}}
+
+Rapport associé : {{raporting_name}}
+
+Valeur actuelle : {{percent_value}}
+
+Seuil attendu : {{seuil}}
+
+Date de détection : {{date_alert}}
+
+--------------------------------------------------
+
+Cordialement,
+Votre équipe {{company_name}}
+
+--------------------------------------------------
+https://www.klivar.fr/
+📩 avotreecoute@klivar.com
+--------------------------------------------------
+
+Cet email est généré automatiquement, merci de ne pas y répondre directement.

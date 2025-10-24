@@ -97,3 +97,47 @@ def mail_notification_end_projet_service(  name, dest_email, title,  company,  d
 
 
  
+
+
+@shared_task
+def mail_alert_seuil_indicator(  raporting_title, msg, title, percent_value, seuil, company, date_alert,  description, url_connect, back_host=None, lang=None, actors =[] ):
+    # object and description
+    if lang == "fr-FR" :
+        path = "deployer/indicator/alert-seuil-percent-fr.html" 
+        path_txt = "deployer/indicator/alert-seuil-percent-fr.txt" 
+        object = f"🚨 🚨 🚨 Alerte - {title} "
+    elif lang == "en-US":
+        path = "deployer/indicator/alert-seuil-percent-en.html" 
+        path_txt = "deployer/indicator/alert-seuil-percent-en.txt" 
+        object = f"🚨 🚨 🚨 Alert - {title} "
+    else:
+        path = "deployer/indicator/alert-seuil-percent-fr.html"
+        path_txt = "deployer/indicator/alert-seuil-percent-fr.txt"  
+        object = f"🚨 🚨 🚨 Alerte - {title} "
+     
+    context = {
+        "indicator_name":title,  
+        "msg":msg,  
+        "seuil":seuil,   
+        "date_alert": format_date_string_short(date_alert if date_alert else datetime.now(), lang),
+        "raporting_name":raporting_title,
+        "description":description,
+        "company":company,
+        "percent_value":percent_value,
+        "url_connect":url_connect, 
+        "back_host" :  back_host
+    }
+    emails = [ actor.get('email') for actor in actors if actor.get('email') ] 
+    body_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+    x = threading.Thread(target= send_mail_created, args=(emails, object, text_content, body_content, company,))
+    x.start() 
+    
+    return True
+

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <style>
+      /* Reset */
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        background-color: #f8f8fc;
+        width: 100% !important;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+
+      table {
+        border-collapse: collapse;
+        mso-table-lspace: 0pt;
+        mso-table-rspace: 0pt;
+      }
+
+      img {
+        border: 0;
+        height: auto;
+        line-height: 100%;
+        outline: none;
+        text-decoration: none;
+        -ms-interpolation-mode: bicubic;
+        max-width: 100%;
+      }
+
+      .hero-bg {
+        background: linear-gradient(135deg, #7a1cac, #4f0a84);
+      }
+
+      .cta-button {
+        background: linear-gradient(135deg, #7a1cac, #4f0a84);
+        color: white !important;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        display: inline-block;
+        margin: 8px 4px;
+      }
+
+      a[x-apple-data-detectors] {
+        color: inherit !important;
+        text-decoration: inherit !important;
+      }
+
+      #MessageViewBody a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      p {
+        line-height: inherit;
+      }
+
+      .desktop_hide,
+      .desktop_hide table {
+        mso-hide: all;
+        display: none;
+        max-height: 0px;
+        overflow: hidden;
+      }
+
+      .image_block img + div {
+        display: none;
+      }
+
+      sup,
+      sub {
+        font-size: 75%;
+        line-height: 0;
+      }
+
+      .protected-image {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-user-drag: none;
+        -webkit-touch-callout: none;
+        -webkit-context-menu: none;
+        pointer-events: none;
+        position: relative;
+      }
+      
+      /* Classes pour le tableau des détails */
+      .details-table {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        width: 100%;
+        background-color: white;
+        overflow: hidden;
+      }
+      
+      .details-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 15px 20px;
+      }
+      
+      .details-header-text {
+        color: #4c0c84;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0;
+      }
+      
+      .details-content {
+        padding: 20px;
+      }
+      
+      .details-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 0 8px 0;
+      }
+      
+      .details-description {
+        font-size: 12px;
+        color: #666;
+        margin: 0 0 20px 0;
+        line-height: 1.6;
+      }
+      
+      .info-row {
+        margin-bottom: 12px;
+      }
+      
+      .info-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #333;
+        padding-right: 10px;
+        vertical-align: top;
+      }
+      
+      .info-value {
+        font-size: 12px;
+        color: #666;
+        vertical-align: top;
+      }
+
+      .list-item {
+        font-size: 12px;
+        color: #353739;
+        margin: 0 0 8px 0;
+        line-height: 1.5;
+        padding-left: 5px;
+      }
+
+      /* Responsive Styles */
+      @media screen and (max-width: 700px) {
+        .main-table {
+          width: 100% !important;
+          min-width: 320px !important;
+        }
+
+        .mobile_hide {
+          display: none !important;
+          min-height: 0 !important;
+          max-height: 0 !important;
+          max-width: 0 !important;
+          overflow: hidden !important;
+          font-size: 0px !important;
+        }
+
+        .desktop_hide,
+        .desktop_hide table {
+          display: table !important;
+          max-height: none !important;
+        }
+
+        .content-padding {
+          padding: 30px 20px !important;
+        }
+
+        .logo-container {
+          width: 120px !important;
+          height: 48px !important;
+        }
+
+        body {
+          padding: 10px !important;
+        }
+
+        .main-container {
+          margin: 0 !important;
+          border-radius: 4px !important;
+        }
+
+        .footer-padding {
+          padding: 15px 10px !important;
+        }
+        
+        .details-content {
+          padding: 15px !important;
+        }
+        
+        .details-header {
+          padding: 12px 15px !important;
+        }
+      }
+
+      @media screen and (max-width: 480px) {
+        .content-padding {
+          padding: 25px 15px !important;
+        }
+
+        .alert-text {
+          font-size: 16px !important;
+          text-align: center;
+        }
+
+        .body-text {
+          font-size: 11px !important;
+          line-height: 1.6 !important;
+        }
+
+        .logo-container {
+          width: 100px !important;
+          height: 40px !important;
+        }
+        
+        .details-header-text {
+          font-size: 14px !important;
+        }
+        
+        .details-title {
+          font-size: 13px !important;
+        }
+        
+        .details-description, .list-item {
+          font-size: 11px !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body style="background-color: #f8f8fc; margin: 0; padding: 20px">
+    <!-- Container principal -->
+    <table
+      class="main-table main-container"
+      width="640"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      align="center"
+      style="background-color: #f8f8fc; max-width: 640px"
+    >
+      <!-- Header avec logo -->
+      <tr>
+        <td align="center"   >
+          <table
+            class="logo-container"
+            width="144"
+            height="56"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            style="border-radius: 4px"
+          >
+            <tr>
+              <td
+                align="center"
+                valign="middle"
+                class="logo-text"
+                style="color: white; font-weight: bold; font-size: 18px"
+              >
+                <img
+                  src="{{back_host}}media/icons/cropped-Logo-Klivar-1.png"
+                  class="protected-image"
+                  oncontextmenu="return false;"
+                  ondragstart="return false;"
+                  onselectstart="return false;"
+                  alt="Klivar Logo"
+                />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Contenu principal -->
+      <tr>
+        <td
+          class="content-padding"
+          style="
+            background-color: white;
+            border-radius: 8px;
+            padding: 40px;
+          "
+        >
+          <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <!-- Image d'illustration -->
+            <tr>
+              <td
+                align="center"
+                valign="middle"
+                class="logo-text"
+                style="color: white; padding-bottom: 20px;"
+              >
+              <!-- <img
+              src="{{back_host}}media/icons/projet-lance.png"
+              class="protected-image"
+              oncontextmenu="return false;"
+              ondragstart="return false;"
+              onselectstart="return false;"
+              alt="projet-lance"
+            /> -->
+            <!-- Conteneur avec overlay pour bloquer le clic droit et le téléchargement -->
+            <div style="position: relative; display: inline-block; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;">
+              <img
+                src="{{back_host}}media/icons/projet-lance.png"
+                class="protected-image"
+                oncontextmenu="return false;"
+                ondragstart="return false;"
+                onselectstart="return false;"
+                onmousedown="return false;"
+                alt="projet-lance"
+                style="
+                  pointer-events: none;
+                  user-select: none;
+                  -webkit-user-select: none;
+                  -moz-user-select: none;
+                  -ms-user-select: none;
+                  -webkit-user-drag: none;
+                  -webkit-touch-callout: none;
+                "
+              />
+              <!-- Overlay transparent pour bloquer toute interaction -->
+              <div style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: transparent;
+                z-index: 10;
+                cursor: default;
+              "></div>
+            </div>
+       
+              </td>
+            </tr>
+            
+            <!-- Titre -->
+            <tr>
+              <td style="padding-bottom: 10px">
+                <h1
+                  class="alert-text"
+                  style="
+                    font-size: 18px;
+                    font-weight: 700;
+                    color: #000;
+                    margin: 0;
+                    line-height: 1.8;
+                    text-align: center;
+                  "
+                >
+                 Alert - Indicateur sous le seuil
+                </h1>
+              </td>
+            </tr>
+            
+            <!-- Message d'accueil -->
+            <tr>
+              <td style="padding-bottom: 20px">
+                 
+                <p
+                  class="body-text"
+                  style="
+                    font-size: 12px;
+                    color: #353739;
+                    margin: 0 0 20px 0;
+                    line-height: 1.5;
+                    letter-spacing: 0.2px;
+                  "
+                >
+                Ceci est une notification automatique envoyée pour vous informer que l'indicateur <strong>  {{indicator_name}} </strong>    est passé en dessous de son seuil défini. </br>
+                Veuillez analyser la situation et prendre les mesures correctives nécessaires.
+                </p> 
+                <div class="comment-box" style="background-color: #f8f9fa; border: 1px solid #d1d5db; border-radius: 10px; padding: 15px; margin: 10px 0;">
+                    <p style="margin: 0 0 8px 0; color: #6b7280; font-size: 13px; font-weight: 600;">
+                        Message d'alerte
+                    </p>
+                    <p style="margin: 0; color: #1f2937; font-size: 14px; line-height: 1.6;">
+                         {{msg | safe }}
+                    </p>
+                </div>
+                <p
+                  class="body-text"
+                  style="
+                    font-size: 12px;
+                    color: #7a1cac;
+                    margin: 0;
+                    line-height: 1.5;
+                    letter-spacing: 0.2px;
+                    font-weight: 500;
+                  "
+                >
+                <a href="{{url_connect}}" >
+                    Connectez vous
+                </a>
+                 
+                </p>
+              </td>
+            </tr>
+
+
+             
+
+            <!-- Tableau des détails -->
+            <tr>
+              <td style="padding-bottom: 20px">
+                <table 
+                  class="details-table" 
+                  width="100%" 
+                  cellpadding="0" 
+                  cellspacing="0" 
+                  border="0"
+                >
+                  <!-- En-tête -->
+                  <tr>
+                    <td class="details-header">
+                      <h3 class="details-header-text">
+                        Détail de l'indicateur :
+                      </h3>
+                    </td>
+                  </tr>
+                  
+                  <!-- Contenu -->
+                  <tr>
+                    <td class="details-content">
+                      <!-- Titre du comité -->
+                      <p class="details-title">{{indicator_name}}</p>
+                      
+                      <!-- Description -->
+                      <div class="details-description">
+                        {{instance_description | safe}}
+                      </div>
+                      
+                      
+                      
+                      <!-- Lieu / Lien de réunion -->
+                      <div class="info-row">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                          <tr>
+                            <td class="info-label" colspan="2" style="padding-bottom: 2px;">
+                              <strong> Rapport associé  :</strong> {{raporting_name}}
+                            </td>
+                          </tr>
+                           
+                        </table>
+                      </div>
+                      
+                      <!-- Participants -->
+                      <div class="info-row">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                          <tr>
+                            <td class="info-label" colspan="2" style="padding-bottom: 2px;">
+                              <strong>Valeur actuelle :</strong> {{percent_value}}
+                            </td>
+                          </tr>
+                          
+                        </table>
+                      </div>
+
+                        <!-- Participants -->
+                        <div class="info-row">
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                <td class="info-label" colspan="2" style="padding-bottom: 2px;">
+                                  <strong>Seuil attendu :</strong> {{seuil}}
+                                </td>
+                              </tr>
+                              
+                            </table>
+                          </div>
+
+                      <div class="info-row">
+                        <table class="info-table" cellpadding="0" cellspacing="0" border="0">
+                          
+                          <tr>
+                            <td class="info-label" colspan="0" style="padding-bottom: 2px;">
+                              <strong>Date de détection :</strong> {{date_alert}}
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                      
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Signature -->
+            <tr>
+              <td style="padding-top: 10px">
+                <p
+                  class="body-text"
+                  style="
+                    font-size: 12px;
+                    color: #353739;
+                    margin: 0;
+                    line-height: 1.8;
+                    letter-spacing: 0.2px;
+                  "
+                >
+                  <strong>Votre équipe {{company_name}}</strong>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      <!-- Footer -->
+      <tr>
+        <td align="center" class="footer-padding" style="padding: 20px">
+          <table cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td align="center" style="padding-bottom: 4px">
+                <p style="font-size: 12px; color: #9d9d9d; margin: 0">
+                  https://www.klivar.fr/
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td align="center">
+                <p style="font-size: 14px; color: #9d9d9d; margin: 0">
+                  📩 avotreecoute@klivar.com
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

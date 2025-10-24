@@ -1,0 +1,43 @@
+ALERT - INDICATOR BELOW THRESHOLD
+
+Dear {{recipient_name}},
+
+This is an automatic notification sent to inform you that the indicator {{indicator_name}} has fallen below its defined threshold.
+
+Please analyze the situation and take the necessary corrective measures.
+
+--------------------------------------------------
+ALERT MESSAGE
+--------------------------------------------------
+{{msg}}
+
+To access your dashboard, log in here: {{url_connect}}
+
+--------------------------------------------------
+INDICATOR DETAILS
+--------------------------------------------------
+
+Indicator Name: {{indicator_name}}
+
+Description:
+{{instance_description}}
+
+Associated Report: {{raporting_name}}
+
+Current Value: {{percent_value}}
+
+Expected Threshold: {{seuil}}
+
+Detection Date: {{date_alert}}
+
+--------------------------------------------------
+
+Best regards,
+Your {{company_name}} team
+
+--------------------------------------------------
+https://www.klivar.fr/
+📩 avotreecoute@klivar.com
+--------------------------------------------------
+
+This email is automatically generated, please do not reply directly.
