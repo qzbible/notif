@@ -71,6 +71,7 @@ class DecisionOneView(APIView):
                             "due_date": "2025-10-17T10:38:23.275",
                             "status": "finished",
                             "token": " ",
+                            "url": " ",
                             "owner": [
                                 {
                                     "id": 66,
@@ -264,7 +265,7 @@ def task_notification(task_list=[], lang="",  client=None)->True:
                         dest_email=owner_email,
                         sender_name= created_by.get('first_name','') + ' ' + created_by.get('last_name','') if created_by else '',
                         dest_name= f"{owner.get('first_name','')} {owner.get('last_name','')}",
-                        url= task.get("url"),
+                        url= task.get("url", None),
                         method = "",
                         base_url=os.getenv("BACK_HOST_URL", ""),
                         jwt_token=task.get("token"),
@@ -278,7 +279,7 @@ def task_notification(task_list=[], lang="",  client=None)->True:
                         type_task = "TASK_MB",
                         lang = lang,
                     )
-                    print('ici ------------------------------ 2', task.get("created_at"))
+ 
                     mail = task_responsable(
                         object= task.get("title", ''),
                         type_task = "TASK_MB",
@@ -287,14 +288,13 @@ def task_notification(task_list=[], lang="",  client=None)->True:
                         sender_name=  created_by.get('first_name','') + ' ' + created_by.get('last_name','') if created_by else '',
                         dest_name= f"{owner.get('first_name','')} {owner.get('last_name','')}",
                         company= client.get('denomination','') if client else '', 
-                        url= task.get("url"),
+                        url= task.get("url", None),
                         during= 30, 
                         start_date= task.get("created_at"),
                         scope= [],
                         lang=lang
                     )
                     # Logique d'envoi de notification par email au propriétaire
-                    print(f"Notification envoyée à {owner_email} pour la tâche '{task.get('title')}'")
         return True
     except Exception as e:
         print(f"Erreur lors de l'envoi des notifications de tâches: {str(e)}")
