@@ -1,29 +1,19 @@
 import random
 from exigence.models import ExigenceMail, auth_code
-from exigence.serializers import AcceptSerializer, ErrorResponseSerializer, ExigenceResponseSerializer, ExigenceSheduleSerializer, ExigenceUpdateSheduleSerializer, TaskSerializer
+from exigence.serializers import AcceptSerializer, ErrorResponseSerializer, ExigenceResponseSerializer, ExigenceSheduleSerializer, ExigenceUpdateSheduleSerializer
 from exigence.service import accept_anwser, exigence_approver, exigence_notification, exigence_responsable, rejet_anwser, task_responsable
 from exigence.serializers import ExigenceSerializer
 # from exigence.utils import send_mail_created
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
-from django.shortcuts import get_object_or_404
 
-from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import status
  
-from rest_framework.permissions import IsAuthenticated
-from collections import OrderedDict
  
-import json
  
 from rest_framework.views import APIView
-import uuid
 from datetime import datetime, timedelta
-from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
-import shutil
+from drf_spectacular.utils import extend_schema, OpenApiExample
  
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 from drf_spectacular.types import OpenApiTypes
 from rest_framework.permissions import AllowAny
 from rest_framework.decorators import api_view
@@ -307,6 +297,7 @@ class ExigenceApprobatorView(APIView):
                     'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                     'scope': ['Périmètre 1', 'Périmètre 2'],
                     'id_action':"10",
+                    'id_project':"10",
                     'id_answer':"10",
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
@@ -350,6 +341,7 @@ class ExigenceApprobatorView(APIView):
                 base_url=data.get("base_url"),
                 jwt_token=data.get("jwt_token"),
                 id_action = data.get("id_action", None), 
+                id_project = data.get("id_project", None), 
                 dealine = data.get("dealine", None),
                 start_date = data.get("start_date", None),
                 time = data.get("time", None),
@@ -433,6 +425,7 @@ class ExigenceNotificationView(APIView):
                     'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
                     'scope': ['Périmètre 1', 'Périmètre 2'],
                     'id_action':"10",
+                    'id_project':"10",
                     'id_answer':"10",
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
@@ -476,6 +469,7 @@ class ExigenceNotificationView(APIView):
                 base_url=data.get("base_url"),
                 jwt_token=data.get("jwt_token"),
                 id_action = data.get("id_action"),
+                id_project = data.get("id_project"),
                 is_notification = True,
                 dealine = data.get("dealine"),
                 start_date = data.get("start_date"),

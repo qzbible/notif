@@ -73,6 +73,7 @@ class ExigenceMail(models.Model):
     is_send =  models.BooleanField(default=False)
     is_answer =  models.BooleanField(default=False)
     id_action = models.CharField(max_length=255, null=True, blank=True)
+    id_project = models.CharField(max_length=255, null=True, blank=True)
     id_analysis = models.CharField(max_length=255, null=True, blank=True)
     id_indicateur = models.CharField(max_length=255, null=True, blank=True)
     id_reporting = models.CharField(max_length=255, null=True, blank=True)
@@ -111,6 +112,24 @@ class ExigenceMail(models.Model):
     def __str__(self):
         return f"{self.object} - {self.company}"
 
+class FollowUp(models.Model):
+    task =  models.ForeignKey(ExigenceMail, on_delete=models.CASCADE, related_name='follow_ups')
+    unit = models.CharField(max_length=255, null=True, blank=True)  
+    value =  models.IntegerField(default=0)
+    type =  models.CharField(max_length=255, null=True, blank=True) #before/after
+    id_project = models.CharField(max_length=255, null=True, blank=True)
+
+
+
+class ActorFollow(models.Model):
+    role = models.TextField(null=True, blank=True) #responsable/approver/notification
+    id_user = models.CharField(max_length=255, null=True, blank=True)
+    full_name = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True) 
+    follow_up = models.ForeignKey(FollowUp, on_delete=models.CASCADE, related_name="actor_follow_up", null=True)
+
+
+
 
 class auth_code(models.Model):
     code = models.CharField(max_length=255, null=True, blank=True)
@@ -119,3 +138,4 @@ class auth_code(models.Model):
     
     def __str__(self):
         return self.code
+    
