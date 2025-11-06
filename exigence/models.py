@@ -125,7 +125,7 @@ class FollowUp(models.Model):
     id_action = models.BigIntegerField(null=True, blank=True)
     id_client = models.BigIntegerField(null=True, blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
-    
+    jwt_token = models.TextField(null=True, blank=True)
 
 
 

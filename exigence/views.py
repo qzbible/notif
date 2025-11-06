@@ -1158,7 +1158,8 @@ class FollowUpView(APIView):
                         'type': 'after',
                         'id_project': 20,
                         'id_action': 20,
-                        'id_client': 20,
+                        'id_client': 20, 
+                        'jwt_token': "lksncknsocijwqeqw",  
                         'deadline': '2025-02-12T22:23:52.900Z',
                         'actors': [
                             {
@@ -1225,6 +1226,7 @@ class FollowUpView(APIView):
                         "value": item_data["value"],
                         "type": item_data["type"],
                         "deadline": item_data["deadline"],
+                        "jwt_token": item_data["jwt_token"],
                     }
                 )
                 
@@ -1256,7 +1258,8 @@ class FollowUpView(APIView):
                             actor_data["email"],
                             actor_data["full_name"],
                             os.environ.get("DEPLOYER_SERVICE_NAME", ""),
-                            follow_up_instance.pk 
+                            follow_up_instance.pk,
+                            item_data["jwt_token"]
                         ],
                         eta=eta_datetime
                     )

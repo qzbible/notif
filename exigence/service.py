@@ -15,7 +15,7 @@ from django.conf import settings
 
 from service.utils import format_date_string_short, send_mail_created, send_mail_with_ics 
 from celery import shared_task
-from typing import Tuple
+from typing import Tuple, Optional, Dict
 
 import requests
 import logging
@@ -496,9 +496,9 @@ def rejet_anwser( object, email,  type_task, description, title, dest_name, comp
 
 
 @shared_task
-def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_name, back_url, id_follow_up ):
+def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_name, back_url, id_follow_up, token ):
     try:
-        status_code, is_answer = check_response(id_action=id_action, id_project=id_project, url=back_url)
+        status_code, is_answer = check_response(id_action=id_action, id_project=id_project, url=back_url, token=token)
         if status_code == 200:
             if is_answer == False :
                 print("⏳ Pas encore de réponse.") 
@@ -599,50 +599,92 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
         print(f"error -- > {str(e)}")
  
  
+ 
+
+logger = logging.getLogger(__name__)
+
 
 def check_response(
     id_action: int, 
     id_project: int, 
     url: str,
+    token: Optional[str] = None,
     timeout: int = 10,
-    headers: dict = None
+    headers: Optional[Dict[str, str]] = None
 ) -> Tuple[bool, int]:
     """
+    Vérifie si une réponse existe pour une action/projet donné.
+    
+    Args:
+        id_action: ID de l'action
+        id_project: ID du projet
+        url: URL de base de l'API
+        token: Token JWT pour l'authentification (optionnel)
+        timeout: Délai d'attente en secondes
+        headers: Headers HTTP supplémentaires (optionnel)
+    
     Returns:
         Tuple[bool, int]: (is_answer, status_code)
+            - is_answer: True si une réponse existe, False sinon
+            - status_code: Code HTTP de la réponse (0 si erreur réseau)
     """
     
     # Validation des paramètres
     if not all([id_action, id_project, url]):
-        logger.error("Paramètres manquants")
+        logger.error("Paramètres manquants: id_action, id_project ou url")
         return False, 0
     
     # Nettoyer l'URL et construire le chemin
     url = url.rstrip('/')
     path = f"{url}/api/v1/task_answer/is-answer/{id_action}/{id_project}"
     
+    # Préparer les headers
+    request_headers = headers.copy() if headers else {}
+    
+    # Ajouter le token JWT si fourni
+    if token:
+        request_headers['Authorization'] = f'Bearer {token}'
+        logger.debug("Token JWT ajouté aux headers")
+    
+    # Ajouter les headers par défaut
+    request_headers.setdefault('Content-Type', 'application/json')
+    request_headers.setdefault('Accept', 'application/json')
+    
     try:
-        logger.info(f"Vérification: action={id_action}, project={id_project}")
+        logger.info(f"Vérification: action={id_action}, project={id_project}, url={path}")
         
         # Effectuer la requête avec timeout
         response = requests.get(
             path,
             timeout=timeout,
-            headers=headers or {}
+            headers=request_headers
         )
         
         status_code = response.status_code
         
         # Vérifier le statut
         if status_code == 200:
-            data = response.json()
-            is_answer = data.get('is_answer', False)
+            try:
+                data = response.json()
+                is_answer = data.get('is_answer', False)
+                
+                logger.info(f"Réponse: is_answer={is_answer}, status={status_code}")
+                return bool(is_answer), status_code
             
-            logger.info(f"Réponse: is_answer={is_answer}, status={status_code}")
-            return bool(is_answer), status_code
+            except ValueError as e:
+                logger.error(f"Erreur parsing JSON: {str(e)}")
+                return False, status_code
+        
+        elif status_code == 401:
+            logger.error("Erreur d'authentification (401): Token invalide ou expiré")
+            return False, status_code
+        
+        elif status_code == 403:
+            logger.error("Accès refusé (403): Permissions insuffisantes")
+            return False, status_code
         
         elif status_code == 404:
-            logger.warning(f"Ressource non trouvée (404)")
+            logger.warning("Ressource non trouvée (404)")
             return False, status_code
         
         else:
@@ -650,15 +692,15 @@ def check_response(
             return False, status_code
     
     except requests.exceptions.Timeout:
-        logger.error(f"Timeout dépassé ({timeout}s)")
+        logger.error(f"Timeout dépassé ({timeout}s) pour {path}")
         return False, 0
     
-    except requests.exceptions.ConnectionError:
-        logger.error("Erreur de connexion")
+    except requests.exceptions.ConnectionError as e:
+        logger.error(f"Erreur de connexion à {path}: {str(e)}")
         return False, 0
     
     except requests.exceptions.RequestException as e:
-        logger.error(f"Erreur requête: {str(e)}")
+        logger.error(f"Erreur requête HTTP: {str(e)}")
         return False, 0
     
     except Exception as e:
