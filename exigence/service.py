@@ -501,12 +501,14 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
         status_code, is_answer = check_response(id_action=id_action, id_project=id_project, url=back_url, user_id=user_id, token=token)
         if status_code == 200:
             if is_answer == False :
+                logger.info(f"⏳ Pas encore de réponse.")
                 print("⏳ Pas encore de réponse.") 
                 print("Envoyer un rappel au responsable.")
                 # get data to  ExigenceMail 
                 ins_exigence = ExigenceMail.objects.filter( id_project=id_project, id_action=id_action, id_client=id_client).first()
                 if ins_exigence:
-                    if role == "reponsable":
+                    logger.info(f"⏳ Pas encore de réponse. {role} - {dest_email} ")
+                    if role == "responsable":
                         exigence_responsable.delay(
                             object= ins_exigence.object,
                             type_task=ins_exigence.type_task,
@@ -591,7 +593,9 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
 
         elif status_code == 404:
             print("⚠️ Ressource non trouvée")
+            logger.info(f"❌ Erreur: Code {status_code}")
         else:
+            logger.info(f"❌ Erreur: Code {status_code}")
             print(f"❌ Erreur: Code {status_code}")
 
         return True
