@@ -28,13 +28,13 @@ import re
 from urllib.parse import urlparse
 import requests
  
-
+ 
 def get_lang_request(request):
     accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
     # Déterminer la langue à utiliser
-    if 'fr-FR' in accept_language:
+    if 'fr' in accept_language:
         selected_lang = 'fr-FR'
-    elif 'en-US' in accept_language:
+    elif 'en' in accept_language:
         selected_lang = 'en-US'
     else:
         # Langue par défaut
@@ -42,7 +42,7 @@ def get_lang_request(request):
     return selected_lang
 
 
- 
+
 def send_mail(to_emails, title, text_content, html_content, company):
     """Docstring for send_mail."""
     from_email = settings.EMAIL_HOST_USER
@@ -70,33 +70,7 @@ def send_mail(to_emails, title, text_content, html_content, company):
         msg.send()
     return True
 
-# def send_mail_created(to_emails, title, text_content, html_content, company=None):
-#     """Docstring for send_mail."""
-#     from_email = settings.EMAIL_HOST_USER
-#     for to_email in to_emails: 
-#         if company :
-#             msg = EmailMultiAlternatives(
-#                 title,
-#                 text_content,
-#                 company+' Via Klivar <' + from_email + '>',
-#                 [to_email],
-#                 reply_to=None,
-#             )
-#         else:
-#             msg = EmailMultiAlternatives(
-#                 title,
-#                 text_content,
-#                 'Klivar <' + from_email + '>',
-#                 [to_email],
-#                 reply_to=None,
-#             )
-#         if html_content:
-#             msg.attach_alternative(html_content, 'text/html')
-
-#         msg.send()
-#     return True
-
-
+ 
 def send_mail_created(to_emails, title, text_content, html_content,   company=None):
     """
     Envoie un email à plusieurs destinataires en utilisant Django's EmailMultiAlternatives.
@@ -274,56 +248,6 @@ def send_mail_file(to_emails, title, text_content, html_content, files, company)
     return True
 
 
-# def send_mail_with_ics(to_emails, title, text_content, html_content, filename, company):
-#     """Docstring for send_mail."""
-
-#     from_email = settings.EMAIL_HOST_USER
-
-#     for to_email in to_emails:
-
-#         # Create a multipart message and set headers
-#         msg = MIMEMultipart()
-#         # message = EmailMultiAlternatives()
-#         msg["From"] = company + ' Via Klivar <' + from_email + '>'
-#         msg["To"] = to_email
-#         msg["Subject"] = title
-#         if html_content:
-#             # msg.attach_alternative(html_content, 'text/html')
-#             msg.attach(MIMEText(html_content, "html"))
-#             msg.attach(MIMEText("", "plain"))
-#             if os.path.exists(filename):
-#                 with open(filename, "rb") as attachment:
-#                     # Add file as application/octet-stream
-#                     # Email client can usually download this automatically as attachment
-#                     part = MIMEBase("application", "octet-stream")
-#                     part.set_payload(attachment.read())
-#                 # Encode file in ASCII characters to send by email
-#                 encoders.encode_base64(part)
-
-#                 # Add header as key/value pair to attachment part
-#                 file_name = filename.rsplit('/', 1)[-1]
-#                 part.add_header(
-#                     "Content-Disposition",
-#                     f"attachment; filename= {file_name}",
-#                 )
-
-#                 msg.attach(part)
-
-#                 text = msg.as_string()
-#                 # Log in to server using secure context and send email
-#                 context = ssl.create_default_context()
-#                 # server smtp and port
-#                 EMAIL_HOST = settings.EMAIL_HOST
-#                 EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
-#                 with smtplib.SMTP_SSL(EMAIL_HOST, context=context) as server:
-#                     server.login(from_email, EMAIL_HOST_PASSWORD)
-#                     server.sendmail(from_email, to_email, text)
-#             else:
-#                 return False
-#     os.remove(filename)
-#     return True
-
-
 def send_mail_with_ics(to_emails, title, text_content, html_content, filename, company):
     """
     Envoie un email avec une pièce jointe ICS (calendrier) à plusieurs destinataires.
@@ -416,78 +340,6 @@ def send_mail_with_ics(to_emails, title, text_content, html_content, filename, c
         os.remove(filename)
     
     return success
-
-
-# def send_mail_with_ics_file(to_emails, title, files, html_content, filename, company):
-#     """Docstring for send_mail."""
-
-#     from_email = settings.EMAIL_HOST_USER
-
-#     for to_email in to_emails:
-
-#         # Create a multipart message and set headers
-#         msg = MIMEMultipart()
-#         # message = EmailMultiAlternatives()
-#         msg["From"] = company + ' Via Klivar <' + from_email + '>'
-#         msg["To"] = to_email
-#         msg["Subject"] = title
-
-#         if html_content:
-#             # msg.attach_alternative(html_content, 'text/html')
-#             msg.attach(MIMEText(html_content, "html"))
-#             msg.attach(MIMEText("", "plain")) 
-#             if files:
-#                 for file in files:
-#                     with open(file, "rb") as attachment:
-#                         # Add file as application/octet-stream
-#                         # Email client can usually download this automatically as attachment
-#                         part = MIMEBase("application", "octet-stream")
-#                         part.set_payload(attachment.read())
-#                     # Encode file in ASCII characters to send by email
-#                     encoders.encode_base64(part)
-#                     # Add header as key/value pair to attachment part
-#                     """part.add_header(
-#                         "Content-Disposition",
-#                         f"attachment; file= {file}",
-#                     )"""
-#                     part.add_header('content-disposition',
-#                                     'attachment', filename=file.split('/')[-1])
-#                     msg.attach(part)
-#                     text = msg.as_string()
-
-#                     # print(msg)
-
-#             if os.path.exists(filename):
-#                 with open(filename, "rb") as attachment:
-#                     # Add file as application/octet-stream
-#                     # Email client can usually download this automatically as attachment
-#                     part = MIMEBase("application", "octet-stream")
-#                     part.set_payload(attachment.read())
-#                 # Encode file in ASCII characters to send by email
-#                 encoders.encode_base64(part)
-
-#                 # Add header as key/value pair to attachment part
-#                 file_name = filename.rsplit('/', 1)[-1]
-#                 part.add_header(
-#                     "Content-Disposition",
-#                     f"attachment; filename= {file_name}",
-#                 )
-
-#                 msg.attach(part)
-
-#                 text = msg.as_string()
-#                 # Log in to server using secure context and send email
-#                 context = ssl.create_default_context()
-#                 # server smtp and port
-#                 EMAIL_HOST = settings.EMAIL_HOST
-#                 EMAIL_HOST_PASSWORD = settings.EMAIL_HOST_PASSWORD
-#                 with smtplib.SMTP_SSL(EMAIL_HOST, context=context) as server:
-#                     server.login(from_email, EMAIL_HOST_PASSWORD)
-#                     server.sendmail(from_email, to_email, text)
-#             else:
-#                 return False
-#     os.remove(filename)
-#     return True
 
 
 def send_mail_with_ics_file(to_emails, title, files, html_content, filename, company, text_content=None):
@@ -888,8 +740,6 @@ def add_calendar_with_multiple_date(events):
     return filename
 
  
-
-
 def send_mail_with_files(to_emails, title, files, html_content, company, text_content=None):
     """
     Envoie un email avec des fichiers téléchargés depuis des URLs et d'autres pièces jointes optionnelles.
@@ -1099,8 +949,6 @@ def send_mail_with_files(to_emails, title, files, html_content, company, text_co
     return success
 
 
-
-
 from datetime import datetime
 
 # ===== MÉTHODE SIMPLE (recommandée) =====
@@ -1130,8 +978,6 @@ def get_formatted_date(language='fr'):
         am_pm = 'AM' if now.hour < 12 else 'PM'
         return f"{day_name}, {month_name} {now.day}, {now.year} at {hour_12}:{now.minute:02d} {am_pm}"
     
-
-
 
 def format_date_string_short(date_string, language='fr'):
     """
@@ -1177,17 +1023,3 @@ def format_date_string_short(date_string, language='fr'):
     except ValueError:
         return date_string
 
-
-
- 
-def get_lang_request(request):
-    accept_language = request.META.get('HTTP_ACCEPT_LANGUAGE', '')
-    # Déterminer la langue à utiliser
-    if 'fr' in accept_language:
-        selected_lang = 'fr-FR'
-    elif 'en' in accept_language:
-        selected_lang = 'en-US'
-    else:
-        # Langue par défaut
-        selected_lang = 'fr-FR'
-    return selected_lang

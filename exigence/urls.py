@@ -8,6 +8,7 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     
+    path('api/follow-up/', FollowUpView.as_view(), name='create-email-task'),
     path('api/responsable/', ExigenceResponsableView.as_view(), name='create-email-task'),
    
     path('api/approver/', ExigenceApprobatorView.as_view(), name='create-email-task'),

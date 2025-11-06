@@ -1,7 +1,7 @@
 import random
-from exigence.models import ExigenceMail, auth_code
+from exigence.models import ActorFollow, ExigenceMail, FollowUp, auth_code
 from exigence.serializers import AcceptSerializer, ErrorResponseSerializer, ExigenceResponseSerializer, ExigenceSheduleSerializer, ExigenceUpdateSheduleSerializer
-from exigence.service import accept_anwser, exigence_approver, exigence_notification, exigence_responsable, rejet_anwser, task_responsable
+from exigence.service import accept_anwser, exigence_approver, exigence_notification, exigence_responsable, follow_up_task, rejet_anwser, task_responsable
 from exigence.serializers import ExigenceSerializer
 # from exigence.utils import send_mail_created
 
@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status
  
  
- 
+import os
 from rest_framework.views import APIView
 from datetime import datetime, timedelta
 from drf_spectacular.utils import extend_schema, OpenApiExample
@@ -25,6 +25,12 @@ from service.utils import get_formatted_date, get_lang_request, send_mail_create
 from celery import current_app
 from dateutil.parser import parse as dateutil_parse
 import pytz
+from django.utils.dateparse import parse_datetime
+
+ 
+from dateutil.relativedelta import relativedelta
+ 
+
 
 def get_current_date_iso():
     now_utc = datetime.now(pytz.UTC)
@@ -1126,3 +1132,204 @@ class RejetExigenceView(APIView):
         except Exception as e:
             return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
         
+
+
+
+def calcul_date(deadline, unit, value, type):
+    """
+    Calcule une nouvelle date basée sur une date initiale et un décalage temporel.
+    
+    Args:
+        deadline (datetime): Date de départ (ex: '2025-10-09T17:48:40.924133')
+        unit (str): Unité de temps ('minutes', 'hours', 'days', 'weeks', 'months')
+        value (int): Valeur à ajouter ou soustraire
+        type (str): Type d'opération ('after' ou 'before')
+    
+    Returns:
+        datetime: Date calculée
+    """
+    # Convertir deadline en datetime si c'est une string
+    if isinstance(deadline, str):
+        from django.utils.dateparse import parse_datetime
+        deadline = parse_datetime(deadline)
+    
+    # Si deadline est None, utiliser maintenant
+    if deadline is None:
+        deadline = timezone.now()
+    
+    # Calculer le delta selon l'unité
+    if unit == "minutes":
+        delta = timedelta(minutes=value)
+    elif unit == "hours":
+        delta = timedelta(hours=value)
+    elif unit == "days":
+        delta = timedelta(days=value)
+    elif unit == "weeks":
+        delta = timedelta(weeks=value)
+    elif unit == "months":
+        # Utiliser relativedelta pour les mois (gère mieux les variations)
+        delta = relativedelta(months=value)
+    else:
+        return None  # Unité non reconnue
+    
+    # Appliquer le delta selon le type
+    if type == "after":
+        result_date = deadline + delta
+    elif type == "before":
+        result_date = deadline - delta
+    else:
+        return None # Type non reconnu
+    
+    return result_date
+
+
+def get_eta_datetime(deadline_str):
+    """
+    Convertit une datetime string du front en datetime timezone-aware pour Celery.
+    
+    Args:
+        deadline_str (str): DateTime ISO format du front (ex: "2025-10-09T17:48:40.924133")
+    
+    Returns:
+        datetime: DateTime timezone-aware prêt pour Celery eta
+    """
+    # Parser la datetime string
+    eta_datetime = parse_datetime(deadline_str)
+    if eta_datetime is None:
+        raise ValueError(f"Format de date invalide: {deadline_str}")
+    # Si la datetime n'est pas timezone-aware, ajouter le timezone
+    if timezone.is_naive(eta_datetime):
+        # Utiliser le timezone par défaut de Django (settings.TIME_ZONE)
+        eta_datetime = timezone.make_aware(eta_datetime)
+    return eta_datetime
+
+class FollowUpView(APIView):
+    permission_classes = [AllowAny]
+    
+    @extend_schema( 
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value=[
+                    {
+                    'unit': 'minutes',
+                    'value': 20,
+                    'type': 'after',
+                    'id_project': 20,
+                    'id_action': 20,
+                    'id_client': 20,
+                    'deadline': '2025-02-12T22:23:52.900Z',
+                     'actors':[
+                         {
+                             'role':'RESPONSABLE',
+                             'id_user': 10,
+                             'full_name': 'John Doe',
+                             'email':'samyfabiol@gmail.com'
+                         }
+                     ] 
+                }],
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        description="Crée une exigence et envoie une notification par email",
+        summary="Créer une exigence",
+        tags=["Exigences"],
+    )
+    def post(self, request):
+        data = request.data
+        for item in data:
+            try:
+                follow_up_instance,  _ = FollowUp.objects.get_or_create( 
+                    id_project=item.get("id_project"),
+                    id_action=item.get("id_action"),
+                    id_client=item.get("id_client"),
+                    defaults={
+                        "unit": item.get("unit"),
+                        "value": item.get("value"),
+                        "type": item.get("type"),
+                        "deadline": item.get("deadline"),
+                    }
+                )
+                actors_data = item.get("actors", [])
+                for actor_data in actors_data:
+                    ins_acto, _ = ActorFollow.objects.get_or_create(
+                        follow_up=follow_up_instance,
+                        id_user=actor_data.get("id_user"),
+                        defaults={
+                            "role": actor_data.get("role"),
+                            "full_name": actor_data.get("full_name"),
+                            "email": actor_data.get("email"),
+                        }
+                    )
+                    # programmation mail 
+                    eta_datetime = calcul_date(
+                        deadline=item.get("deadline"),
+                        unit=item.get("unit"),
+                        value=item.get("value"),
+                        type=item.get("type")
+                    )
+                    # 1. Parser et convertir la deadline en timezone-aware
+                    eta_datetime = parse_datetime(eta_datetime)
+                    
+                    if eta_datetime is None:
+                        return Response(
+                            {"error": "Format de date invalide"}, 
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                    
+                    # 2. Rendre timezone-aware si nécessaire
+                    if timezone.is_naive(eta_datetime):
+                        eta_datetime = timezone.make_aware(eta_datetime)
+                    
+                    # 3. Vérifier que la date est dans le futur
+                    if eta_datetime <= timezone.now():
+                        return Response(
+                            {"error": "La date doit être dans le futur"}, 
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+                    task_revoke = follow_up_task.apply_async(
+                                        args=[
+                                            item.get("id_project"), 
+                                            item.get("id_action"),
+                                            actor_data.get("role"),
+                                            item.get("id_client"),
+                                            actor_data.get("email"),
+                                            actor_data.get("full_name"),
+                                            os.environ.get("DEPLOYER_SERVICE_NAME", ""),
+                                            follow_up_instance.pk 
+                                        ],
+                                        eta=eta_datetime
+                                    )
+                    
+                    ins_acto.task_id = task_revoke.id
+                    ins_acto.save()
+            except Exception as e:
+                return Response(
+                    {
+                        "message": "Une erreur est survenue lors du traitement de la demande",
+                        "status": "error",
+                        "error": str(e),
+                    },
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        return Response(
+            {
+                "message": "Follow Up créée avec succès",
+                "status": "success",
+                "code": 201,
+                
+            },
+            status=status.HTTP_201_CREATED
+        )
+         
+ 

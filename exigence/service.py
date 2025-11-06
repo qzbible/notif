@@ -6,6 +6,7 @@ import threading
 from django.template.loader import render_to_string
  
 from datetime import datetime, timedelta
+from exigence.models import ActorFollow, ExigenceMail
 from icalendar import Calendar, Event, vCalAddress, vText
 import os
 import uuid
@@ -14,6 +15,13 @@ from django.conf import settings
 
 from service.utils import format_date_string_short, send_mail_created, send_mail_with_ics 
 from celery import shared_task
+from typing import Tuple
+
+import requests
+import logging
+from celery import current_app
+
+logger = logging.getLogger(__name__)
  
 #  Exigence data start 2025-06-16
 
@@ -402,7 +410,6 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
     )
     # send_mail_created([dest_email], object, text_content, html_content, company)
     if filename != None:
-        print("filename", filename)
         x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
         x.start() 
     else:
@@ -487,4 +494,173 @@ def rejet_anwser( object, email,  type_task, description, title, dest_name, comp
     return True
  
 
+
+@shared_task
+def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_name, back_url, id_follow_up ):
+    try:
+        status_code, is_answer = check_response(id_action=id_action, id_project=id_project, url=back_url)
+        if status_code == 200:
+            if is_answer == False :
+                print("⏳ Pas encore de réponse.") 
+                print("Envoyer un rappel au responsable.")
+                # get data to  ExigenceMail 
+                ins_exigence = ExigenceMail.objects.filter( id_project=id_project, id_action=id_action, id_client=id_client).first()
+                if ins_exigence:
+                    if role == "reponsable":
+                        exigence_responsable.delay(
+                            object= ins_exigence.object,
+                            type_task=ins_exigence.type_task,
+                            description=ins_exigence.description,
+                            dest_email=dest_email,
+                            sender_name= ins_exigence.sender_name,
+                            dest_name= full_name,
+                            company=ins_exigence.company,
+                            url=ins_exigence.url,
+                            scope=ins_exigence.scope,
+                            time=ins_exigence.time,
+                            deadline=ins_exigence.dealine,
+                            start_date=str(ins_exigence.start_date),
+                            back_url=back_url,
+                            lang=ins_exigence.lang
+                        )
+                    elif role == "approver":
+                        exigence_approver(
+                            object= ins_exigence.object,
+                            type_task=ins_exigence.type_task,
+                            description=ins_exigence.description,
+                            dest_email=ins_exigence.dest_email,
+                            sender_name= ins_exigence.sender_name,
+                            dest_name= ins_exigence.dest_name,
+                            company=ins_exigence.company,
+                            url=ins_exigence.url,
+                            scope=ins_exigence.scope,
+                            time=ins_exigence.time,
+                            deadline=ins_exigence.dealine,
+                            start_date=str(ins_exigence.start_date),
+                            back_url=back_url,
+                            lang=ins_exigence.lang
+                        )
+                    elif role == "consulter":
+                        exigence_notification.delay(
+                            object= ins_exigence.object,
+                            type_task=ins_exigence.type_task,
+                            description=ins_exigence.description,
+                            dest_email=ins_exigence.dest_email,
+                            sender_name= ins_exigence.sender_name,
+                            dest_name= ins_exigence.dest_name,
+                            company=ins_exigence.company,
+                            url=ins_exigence.url,
+                            scope=ins_exigence.scope,
+                            time=ins_exigence.time,
+                            deadline=ins_exigence.dealine,
+                            start_date=str(ins_exigence.start_date),
+                            back_url=back_url,
+                            lang=ins_exigence.lang
+                        )
+                    elif role == "informer" :
+                        exigence_notification.delay(
+                            object= ins_exigence.object,
+                            type_task=ins_exigence.type_task,
+                            description=ins_exigence.description,
+                            dest_email=ins_exigence.dest_email,
+                            sender_name= ins_exigence.sender_name,
+                            dest_name= ins_exigence.dest_name,
+                            company=ins_exigence.company,
+                            url=ins_exigence.url,
+                            scope=ins_exigence.scope,
+                            time=ins_exigence.time,
+                            deadline=ins_exigence.dealine,
+                            start_date=str(ins_exigence.start_date),
+                            back_url=back_url,
+                            lang=ins_exigence.lang
+                        )
+
+            else:
+                print("✅ Réponse déjà fournie.")
+                # supprimer le follow up date 
+                actor_follow_up = ActorFollow.objects.filter( id_follow_up=id_follow_up )
+                for af in actor_follow_up:
+                    try:
+                        current_app.control.revoke(af.task_id, terminate=True)
+                        print(f"Tâche {af.task_id} annulée avec succès")
+                    except Exception as e:
+                        print(f"Impossible d'annuler la tâche {af.task_id}: {str(e)}")
+
+            if is_answer == True :
+                print("✅ Réponse trouvée, mais délai dépassé.")
+
+        elif status_code == 404:
+            print("⚠️ Ressource non trouvée")
+        else:
+            print(f"❌ Erreur: Code {status_code}")
+
+        return True
+    except Exception as e:
+        print(f"error -- > {str(e)}")
  
+ 
+
+def check_response(
+    id_action: int, 
+    id_project: int, 
+    url: str,
+    timeout: int = 10,
+    headers: dict = None
+) -> Tuple[bool, int]:
+    """
+    Returns:
+        Tuple[bool, int]: (is_answer, status_code)
+    """
+    
+    # Validation des paramètres
+    if not all([id_action, id_project, url]):
+        logger.error("Paramètres manquants")
+        return False, 0
+    
+    # Nettoyer l'URL et construire le chemin
+    url = url.rstrip('/')
+    path = f"{url}/api/v1/task_answer/is-answer/{id_action}/{id_project}"
+    
+    try:
+        logger.info(f"Vérification: action={id_action}, project={id_project}")
+        
+        # Effectuer la requête avec timeout
+        response = requests.get(
+            path,
+            timeout=timeout,
+            headers=headers or {}
+        )
+        
+        status_code = response.status_code
+        
+        # Vérifier le statut
+        if status_code == 200:
+            data = response.json()
+            is_answer = data.get('is_answer', False)
+            
+            logger.info(f"Réponse: is_answer={is_answer}, status={status_code}")
+            return bool(is_answer), status_code
+        
+        elif status_code == 404:
+            logger.warning(f"Ressource non trouvée (404)")
+            return False, status_code
+        
+        else:
+            logger.warning(f"Statut inattendu: {status_code}")
+            return False, status_code
+    
+    except requests.exceptions.Timeout:
+        logger.error(f"Timeout dépassé ({timeout}s)")
+        return False, 0
+    
+    except requests.exceptions.ConnectionError:
+        logger.error("Erreur de connexion")
+        return False, 0
+    
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Erreur requête: {str(e)}")
+        return False, 0
+    
+    except Exception as e:
+        logger.exception(f"Erreur inattendue: {str(e)}")
+        return False, 0

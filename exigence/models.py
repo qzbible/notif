@@ -104,6 +104,9 @@ class ExigenceMail(models.Model):
     sent_at = models.DateTimeField(null=True, blank=True)
     task_id = models.CharField(max_length=255, null=True, blank=True)
     
+    id_client = models.BigIntegerField(null=True, blank=True)
+
+
     class Meta:
         verbose_name = "Exigence"
         verbose_name_plural = "Exigences"
@@ -112,21 +115,27 @@ class ExigenceMail(models.Model):
     def __str__(self):
         return f"{self.object} - {self.company}"
 
-class FollowUp(models.Model):
-    task =  models.ForeignKey(ExigenceMail, on_delete=models.CASCADE, related_name='follow_ups')
+
+
+class FollowUp(models.Model): 
     unit = models.CharField(max_length=255, null=True, blank=True)  
     value =  models.IntegerField(default=0)
     type =  models.CharField(max_length=255, null=True, blank=True) #before/after
-    id_project = models.CharField(max_length=255, null=True, blank=True)
+    id_project = models.BigIntegerField(null=True, blank=True)
+    id_action = models.BigIntegerField(null=True, blank=True)
+    id_client = models.BigIntegerField(null=True, blank=True)
+    deadline = models.DateTimeField(null=True, blank=True)
+    
 
 
 
 class ActorFollow(models.Model):
     role = models.TextField(null=True, blank=True) #responsable/approver/notification
-    id_user = models.CharField(max_length=255, null=True, blank=True)
+    id_user = models.BigIntegerField(null=True, blank=True)
     full_name = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(null=True, blank=True) 
     follow_up = models.ForeignKey(FollowUp, on_delete=models.CASCADE, related_name="actor_follow_up", null=True)
+    task_id = models.CharField(max_length=255, null=True, blank=True)
 
 
 
