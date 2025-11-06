@@ -498,7 +498,7 @@ def rejet_anwser( object, email,  type_task, description, title, dest_name, comp
 @shared_task
 def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_name, back_url, id_follow_up, user_id, token ):
     try:
-        status_code, is_answer = check_response(id_action=id_action, id_project=id_project, url=back_url, user_id=user_id, token=token)
+        is_answer, status_code = check_response(id_action=id_action, id_project=id_project, url=back_url, user_id=user_id, token=token)
         logger.info(f"Vérification de la réponse pour le suivi: action={id_action}, project={id_project}, client={id_client}, status={status_code}, is_answer={is_answer}")
         if status_code == 200:
             if is_answer == False :
