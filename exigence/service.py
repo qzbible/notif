@@ -496,9 +496,9 @@ def rejet_anwser( object, email,  type_task, description, title, dest_name, comp
 
 
 @shared_task
-def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_name, back_url, id_follow_up, token ):
+def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_name, back_url, id_follow_up, user_id, token ):
     try:
-        status_code, is_answer = check_response(id_action=id_action, id_project=id_project, url=back_url, token=token)
+        status_code, is_answer = check_response(id_action=id_action, id_project=id_project, url=back_url, user_id=user_id, token=token)
         if status_code == 200:
             if is_answer == False :
                 print("⏳ Pas encore de réponse.") 
@@ -608,6 +608,7 @@ def check_response(
     id_action: int, 
     id_project: int, 
     url: str,
+    user_id: Optional[int] = None,
     token: Optional[str] = None,
     timeout: int = 10,
     headers: Optional[Dict[str, str]] = None
@@ -636,7 +637,7 @@ def check_response(
     
     # Nettoyer l'URL et construire le chemin
     url = url.rstrip('/')
-    path = f"{url}/api/v1/task_answer/is-answer/{id_action}/{id_project}"
+    path = f"{url}/api/v1/task_answer/is-answer/{id_action}/{id_project}/{user_id}"
     
     # Préparer les headers
     request_headers = headers.copy() if headers else {}

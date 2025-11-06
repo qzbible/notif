@@ -1259,6 +1259,7 @@ class FollowUpView(APIView):
                             actor_data["full_name"],
                             os.environ.get("DEPLOYER_SERVICE_NAME", ""),
                             follow_up_instance.pk,
+                            actor_data["id_user"],
                             item_data["jwt_token"]
                         ],
                         eta=eta_datetime
