@@ -1151,7 +1151,7 @@ class FollowUpView(APIView):
         examples=[
             OpenApiExample(
                 'Exemple de requête valide',
-                value=[
+                value=
                     {
                         'unit': 'minutes',
                         'value': 20,
@@ -1169,7 +1169,7 @@ class FollowUpView(APIView):
                             }
                         ] 
                     }
-                ],
+                ,
                 request_only=True,
             ),
             OpenApiExample(
