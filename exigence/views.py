@@ -108,6 +108,7 @@ class ExigenceResponsableView(APIView):
                     'id_action':"10",
                     'id_analysis':"10",
                     'id_reporting':"10",
+                    'id_client':"10",
                     'id_indicateur':"10",
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
@@ -181,6 +182,7 @@ class ExigenceResponsableView(APIView):
                 start_date = validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
                 time = validated_data.get("time"),
                 type_task = validated_data.get("type_task"),
+                id_client = validated_data.get("id_client"),
                 lang = lang,
             )
             
@@ -305,6 +307,7 @@ class ExigenceApprobatorView(APIView):
                     'id_action':"10",
                     'id_project':"10",
                     'id_answer':"10",
+                    'id_client':"10",
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20",
@@ -353,6 +356,7 @@ class ExigenceApprobatorView(APIView):
                 time = data.get("time", None),
                 type_task = data.get("type_task", None),
                 id_answer = data.get("id_answer", None),
+                id_client = data.get("id_client", None),
                 lang = lang,
                 is_notification=False,
                 is_approver=True, 
@@ -432,6 +436,7 @@ class ExigenceNotificationView(APIView):
                     'scope': ['Périmètre 1', 'Périmètre 2'],
                     'id_action':"10",
                     'id_project':"10",
+                    'id_client':"10",
                     'id_answer':"10",
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
@@ -481,6 +486,7 @@ class ExigenceNotificationView(APIView):
                 start_date = data.get("start_date"),
                 time = data.get("time"),
                 type_task = data.get("type_task"),
+                id_client = data.get("id_client"),
                 lang = lang,
             )
             

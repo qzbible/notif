@@ -87,6 +87,11 @@ class ExigenceSerializer(serializers.Serializer):
         allow_null=True, 
         help_text="Id de l'indicateur"
     )
+    id_client =  serializers.CharField(
+        required=False,
+        allow_null=True, 
+        help_text="Id de l'indicateur"
+    )
     dealine = serializers.CharField(
         required=False,
         allow_null=True, 
