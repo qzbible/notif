@@ -1,7 +1,7 @@
 import random
 from exigence.models import ActorFollow, ExigenceMail, FollowUp, auth_code
 from exigence.serializers import AcceptSerializer, ErrorResponseSerializer, ExigenceResponseSerializer, ExigenceSheduleSerializer, ExigenceUpdateSheduleSerializer, FollowUpSerializer
-from exigence.service import accept_anwser, exigence_approver, exigence_notification, exigence_responsable, follow_up_task, rejet_anwser, task_responsable
+from exigence.service import accept_anwser, exigence_approver, exigence_notification, exigence_responsable, follow_up_task, notification_approuver, notification_consulting, notification_informer, rejet_anwser, task_responsable
 from exigence.serializers import ExigenceSerializer
 # from exigence.utils import send_mail_created
 
@@ -115,6 +115,7 @@ class ExigenceResponsableView(APIView):
                     'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20",
                     "type_task" : "EXIGENCE",
+                    "role" : "Responsable", # Responsable, Consulted, Informed, Approver
                     "lang":"en-US"
                     
                 },
@@ -154,13 +155,13 @@ class ExigenceResponsableView(APIView):
             if validated_data.get("type_task") == "EXIGENCE":
             # Envoi de l'email
                 if validated_data.get("lang") != "fr-FR":
-                    type_task="Requirement"
+                    type_task="[Requirement]"
                 else :
-                    type_task="Exigence"
+                    type_task="[Exigence]"
             elif validated_data.get("type_task") == "ACTION":
-                type_task = "Action corrective"
+                type_task = "[Action corrective]"
                 if validated_data.get("lang") != "fr-FR":
-                    type_task="Corrective action"
+                    type_task="[Corrective action]"
 
             lang = get_lang_request(request)
             # Sauvegarde des données dans le modèle
@@ -185,6 +186,7 @@ class ExigenceResponsableView(APIView):
                 type_task = validated_data.get("type_task"),
                 id_client = validated_data.get("id_client"),
                 id_project = validated_data.get("id_project"),
+                role = validated_data.get("role"),
                 lang = lang,
             )
             
@@ -192,71 +194,30 @@ class ExigenceResponsableView(APIView):
             if "scope" in validated_data and validated_data.get("scope"):
                 exigence.scope = validated_data.get("scope")
                 exigence.save()
-             
-            if validated_data.get("type_task") == "EXIGENCE":
- 
-                eta_datetime = parse_date_to_730(validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso())
-                if eta_datetime is None:
-                    task = exigence_responsable.apply_async(
-                        args=[
-                            validated_data.get("object"),
-                            type_task,
-                            validated_data.get("description"),
-                            validated_data.get("dest_email"),
-                            validated_data.get("sender_name"),
-                            validated_data.get("dest_name"),
-                            validated_data.get("company"), 
-                            validated_data.get("url"),
-                            validated_data.get("scope", []),
-                            validated_data.get("time"),
-                            validated_data.get("dealine") if validated_data.get("dealine") else add_days(get_current_date_iso()),
-                            validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
-                            None,
-                            lang
-                        ],
-                        # eta=parse_date_to_730(validated_data.get("start_date"))
-                    )
-                else:
-                    task = exigence_responsable.apply_async(
-                        args=[
-                            validated_data.get("object"),
-                            type_task,
-                            validated_data.get("description"),
-                            validated_data.get("dest_email"),
-                            validated_data.get("sender_name"),
-                            validated_data.get("dest_name"),
-                            validated_data.get("company"), 
-                            validated_data.get("url"),
-                            validated_data.get("scope", []),
-                            validated_data.get("time"),
-                            validated_data.get("dealine") if validated_data.get("dealine") else add_days(get_current_date_iso()),
-                            validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
-                            None,
-                            lang
-                        ],
-                        eta=parse_date_to_730(validated_data.get("start_date"))
-                    )
-                # Sauvegarder l'ID de la tâche
-                exigence.task_id = task.id
-                exigence.save()
-            elif validated_data.get("type_task") == "ACTION":
-                type_task = "Action corrective"
-                if validated_data.get("lang") != "fr-FR":
-                    type_task="Corrective action"
-                mail = task_responsable(
-                    object= validated_data.get("object"),
-                    type_task = type_task,
-                    description= validated_data.get("description"),
-                    dest_email=validated_data.get("dest_email"),
-                    sender_name=validated_data.get("sender_name"),
-                    dest_name= validated_data.get("dest_name"),
-                    company= validated_data.get("company"), 
-                    url= validated_data.get("url"),
-                    during= validated_data.get("time"), 
-                    start_date= validated_data.get("start_date"),
-                    scope= validated_data.get("scope", []),
-                    lang=lang
-                )
+              
+            task = exigence_responsable.apply_async(
+                args=[
+                    type_task + " "+validated_data.get("object"),
+                    validated_data.get("object"),
+                    type_task,
+                    validated_data.get("description"),
+                    validated_data.get("dest_email"),
+                    validated_data.get("sender_name"),
+                    validated_data.get("dest_name"),
+                    validated_data.get("company"), 
+                    validated_data.get("url"),
+                    validated_data.get("scope", []),
+                    validated_data.get("time"),
+                    validated_data.get("dealine") if validated_data.get("dealine") else add_days(get_current_date_iso()),
+                    validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
+                    None,
+                    lang
+                ],
+                # eta=parse_date_to_730(validated_data.get("start_date"))
+            ) 
+            # Sauvegarder l'ID de la tâche
+            exigence.task_id = task.id
+            exigence.save() 
             # Envoi de l'email 
             return Response(
                 {
@@ -310,7 +271,7 @@ class ExigenceApprobatorView(APIView):
                     'id_project':"10",
                     'id_answer':"10",
                     'id_client':"10",
-                     
+                     'role':"Approver", # Responsable, Consulted, Informed, Approver
                     'dealine': '12/02/2025',
                     'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20",
@@ -335,8 +296,7 @@ class ExigenceApprobatorView(APIView):
         tags=["Exigences"],
     )
     def post(self, request): 
-        data= request.data
-       
+        data= request.data 
         # Création de la tâche Celery
         try:
             lang = get_lang_request(request)
@@ -360,7 +320,7 @@ class ExigenceApprobatorView(APIView):
                 type_task = data.get("type_task", None),
                 id_answer = data.get("id_answer", None),
                 id_client = data.get("id_client", None),
-           
+                role = data.get("role", None),
                 lang = lang,
                 is_notification=False,
                 is_approver=True, 
@@ -368,45 +328,22 @@ class ExigenceApprobatorView(APIView):
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in data and data.get("scope"):
                 exigence.scope = data.get("scope")
-                exigence.save()
-            
-             
-            if data.get("type_task") == "EXIGENCE":
-                type_task = "Exigence"
-                if data.get("lang") != "fr-FR":
-                    type_task="Requirement"
-            
-                mail = exigence_approver(
-                    object= data.get("object"),
-                    type_task = type_task,
-                    description= data.get("description"),
-                    dest_email=data.get("dest_email"),
-                    sender_name=data.get("sender_name"),
-                    dest_name= data.get("dest_name"),
-                    company= data.get("company"), 
-                    url= data.get("url"),
-                    time= data.get("time"),
-                    deadline= data.get("dealine"),
-                    start_date= data.get("start_date"),
-                    scope= data.get("scope", []),
-                    lang=lang
-                )
-            elif data.get("type_task") == "CORRECT_ACTION":
-                type_task = "Action corrective"
-                # mail = task_responsable(
-                #     object= validated_data.get("object"),
-                #     type_task = type_task,
-                #     description= validated_data.get("description"),
-                #     dest_email=validated_data.get("dest_email"),
-                #     sender_name=validated_data.get("sender_name"),
-                #     dest_name= validated_data.get("dest_name"),
-                #     company= validated_data.get("company"), 
-                #     url= validated_data.get("url"),
-                #     during= validated_data.get("time"), 
-                #     start_date= validated_data.get("start_date"),
-                #     scope= validated_data.get("scope", [])
-                # )
-            
+                exigence.save() 
+            exigence_approver(
+                object= data.get("object"),
+                type_task = data.get("type_task", None),
+                description= data.get("description"),
+                dest_email=data.get("dest_email"),
+                sender_name=data.get("sender_name"),
+                dest_name= data.get("dest_name"),
+                company= data.get("company"), 
+                url= data.get("url"),
+                time= data.get("time"),
+                deadline= data.get("dealine"),
+                start_date= data.get("start_date"),
+                scope= data.get("scope", []),
+                lang=lang
+            ) 
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:
             print('error', str(e))
@@ -446,6 +383,7 @@ class ExigenceNotificationView(APIView):
                     'start_date' : "2025-02-12T22:23:52.900Z",
                     'time' : "20",
                     "type_task" : "EXIGENCE",
+                    'role':"Informed", # Responsable, Consulted, Informed, Approver
                     "lang":"en-US"
                 },
                 request_only=True,
@@ -491,6 +429,7 @@ class ExigenceNotificationView(APIView):
                 time = data.get("time"),
                 type_task = data.get("type_task"),
                 id_client = data.get("id_client"),
+                role = data.get("role"),
                 lang = lang,
             )
             
@@ -498,42 +437,24 @@ class ExigenceNotificationView(APIView):
             if "scope" in data and data.get("scope"):
                 exigence.scope = data.get("scope")
                 exigence.save()
-            
              
-            if data.get("type_task") == "EXIGENCE":
-                type_task = "Exigence"
-                if data.get("lang") != "fr-FR":
-                    type_task="Requirement"
-                mail = exigence_notification(
-                    object= data.get("object"),
-                    type_task = type_task,
-                    description= data.get("description"),
-                    dest_email=data.get("dest_email"),
-                    sender_name=data.get("sender_name"),
-                    dest_name= data.get("dest_name"),
-                    company= data.get("company"), 
-                    url= data.get("url"),
-                    time= data.get("time"),
-                    deadline= data.get("dealine"),
-                    start_date= data.get("start_date"),
-                    scope= data.get("scope", []),
-                    lang=lang
-                )
-            elif data.get("type_task") == "CORRECT_ACTION":
-                type_task = "Action"
-                # mail = task_responsable(
-                #     object= validated_data.get("object"),
-                #     type_task = type_task,
-                #     description= validated_data.get("description"),
-                #     dest_email=validated_data.get("dest_email"),
-                #     sender_name=validated_data.get("sender_name"),
-                #     dest_name= validated_data.get("dest_name"),
-                #     company= validated_data.get("company"), 
-                #     url= validated_data.get("url"),
-                #     during= validated_data.get("time"), 
-                #     start_date= validated_data.get("start_date"),
-                #     scope= validated_data.get("scope", [])
-                # )
+            mail = exigence_notification(
+                object= data.get("object"),
+                type_task = data.get("type_task"),
+                description= data.get("description"),
+                dest_email=data.get("dest_email"),
+                sender_name=data.get("sender_name"),
+                dest_name= data.get("dest_name"),
+                company= data.get("company"), 
+                url= data.get("url"),
+                time= data.get("time"),
+                deadline= data.get("dealine"),
+                start_date= data.get("start_date"),
+                scope= data.get("scope", []),
+                role = data.get("role"),
+                lang=lang
+            )
+             
             
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:
@@ -954,47 +875,26 @@ class UpdateExigeneTaskView(APIView):
             label = " [ Période de rapport mise à jour ]"
             if task.lang != "fr-FR":
                 label = " [ Updated reporting period ]"
-            eta_datetime = parse_date_to_730(new_date)
-            if eta_datetime is None:
-                task_revoke = exigence_responsable.apply_async(
-                    args=[
-                        task.object + label, 
-                        task.type_task,
-                        task.description,
-                        task.dest_email,
-                        task.sender_name,
-                        task.dest_name,
-                        task.company,
-                        task.url,
-                        task.scope,
-                        task.time,
-                        task.dealine,
-                        task.start_date,
-                        None,
-                        get_lang_request(request)
-                    ],
-                    # eta=parse_date_to_730(validated_data.get("start_date"))
-                )
-            else:
-                task_revoke = exigence_responsable.apply_async(
-                    args=[
-                        task.object + label, 
-                        task.type_task,
-                        task.description,
-                        task.dest_email,
-                        task.sender_name,
-                        task.dest_name,
-                        task.company,
-                        task.url,
-                        task.scope,
-                        task.time,
-                        task.dealine,
-                        task.start_date,
-                        None,
-                        get_lang_request(request)
-                    ],
-                    eta=eta_datetime
-                )
+             
+            task_revoke = exigence_responsable.apply_async(
+                args=[
+                    task.object + label, 
+                    task.type_task,
+                    task.description,
+                    task.dest_email,
+                    task.sender_name,
+                    task.dest_name,
+                    task.company,
+                    task.url,
+                    task.scope,
+                    task.time,
+                    task.dealine,
+                    task.start_date,
+                    None,
+                    get_lang_request(request)
+                ],
+                # eta=parse_date_to_730(validated_data.get("start_date"))
+            ) 
             # Sauvegarder l'ID de la tâche
             task.task_id = task_revoke.id
             task.save()
@@ -1027,6 +927,17 @@ class AcceptExigenceView(APIView):
                     'dest_name': 'Marie Martin', 
                     'base_url': 'https://api.example.com', 
                     "type_task" : "EXIGENCE",
+                    "action_id":22,
+                    "reporting_id":22,
+                    "analysis_id":22,
+                    "project_id":22,
+
+                    "consulted" : [
+                        {
+                            'email':"samyfabiol@gmail.com",
+                            "full_name":"John Doe"
+                        }
+                    ],
                     "lang":"en-US"
                 },
                 request_only=True,
@@ -1048,17 +959,18 @@ class AcceptExigenceView(APIView):
     )
     def post(self, request):
         data = request.data
-        # Création de la tâche Celery
-        print(f"Approve or rejet a task ----> {data}")
-        
+          
         try:
             if data.get("type_task") == "EXIGENCE":
             # Envoi de l'email
                 if data.get("lang") != "fr-FR":
-                    type_task="Requirement"
+                    type_task="[Requirement]"
                 else : 
-                    type_task="Exigence"
-            
+                    type_task="[Exigence]" 
+            elif data.get("type_task") == "ACTION":
+                type_task = "[Corrective action]"
+                if data.get("lang") != "fr-FR":
+                    type_task="[Corrective action]"
             accept_anwser(
                 data.get("object", ""),
                 data.get("email", ""),
@@ -1069,7 +981,40 @@ class AcceptExigenceView(APIView):
                 data.get("company", ""),
                 data.get("back_url", None),
                 get_lang_request(request)
-            ) 
+            )
+            # Notify Consulted and Informed users
+            consulted_users = data.get("consulted", [])
+            ins_exigence = ExigenceMail.objects.filter(
+                id_action=data.get("action_id"),
+                id_reporting=data.get("reporting_id"),
+                id_analysis=data.get("analysis_id"),
+                id_project=data.get("project_id"),
+                type_task="EXIGENCE"
+            ).first()
+            action = ""
+            if 'fr' in get_lang_request(request):
+                action = "a accepté"
+            else:
+                action = "has accepted"
+
+            if ins_exigence:
+                for user in consulted_users:
+                    exigence_notification(
+                    object= type_task + " " + data.get("object") + " " + action,
+                    type_task = data.get("type_task"),
+                    description= data.get("description"),
+                    dest_email= user.get("email"),
+                    sender_name= ins_exigence.sender_name,
+                    dest_name= user.get("full_name"),
+                    company= data.get("company"), 
+                    url= ins_exigence.url,
+                    time= ins_exigence.time,
+                    deadline= ins_exigence.dealine,
+                    start_date= ins_exigence.start_date,
+                    scope= ins_exigence.scope,
+                    role = "Consulted",
+                    lang=data.get("lang")
+                )
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:
             return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
@@ -1098,6 +1043,17 @@ class RejetExigenceView(APIView):
                     'dest_name': 'Marie Martin', 
                     'base_url': 'https://api.example.com', 
                     "type_task" : "EXIGENCE",
+                    "action_id":22,
+                    "reporting_id":22,
+                    "analysis_id":22,
+                    "project_id":22,
+
+                    "consulted" : [
+                        {
+                            'email':"samyfabiol@gmail.com",
+                            "full_name":"John Doe"
+                        }
+                    ],
                     "lang":"en-US"
                 },
                 request_only=True,
@@ -1127,6 +1083,11 @@ class RejetExigenceView(APIView):
                     type_task="Requirement"
                 else : 
                     type_task="Exigence"
+            elif data.get("type_task") == "ACTION":
+                type_task = "[Corrective action]"
+                if data.get("lang") != "fr-FR":
+                    type_task="[Corrective action]"
+
             rejet_anwser(
                 data.get("object", ""),
                 data.get("email", ""),
@@ -1138,6 +1099,39 @@ class RejetExigenceView(APIView):
                 data.get("back_url", None),
                 get_lang_request(request)
             ) 
+             # Notify Consulted and Informed users
+            consulted_users = data.get("consulted", [])
+            ins_exigence = ExigenceMail.objects.filter(
+                id_action=data.get("action_id"),
+                id_reporting=data.get("reporting_id"),
+                id_analysis=data.get("analysis_id"),
+                id_project=data.get("project_id"),
+                type_task="EXIGENCE"
+            ).first()
+            action = ""
+            if 'fr' in get_lang_request(request):
+                action = " a été rejeté"
+            else:
+                action = " has rejected"
+
+            if ins_exigence:
+                for user in consulted_users:
+                    exigence_notification(
+                    object= type_task + " " + data.get("object") + " " + action,
+                    type_task = data.get("type_task"),
+                    description= data.get("description"),
+                    dest_email= user.get("email"),
+                    sender_name= ins_exigence.sender_name,
+                    dest_name= user.get("full_name"),
+                    company= data.get("company"), 
+                    url= ins_exigence.url,
+                    time= ins_exigence.time,
+                    deadline= ins_exigence.dealine,
+                    start_date= ins_exigence.start_date,
+                    scope= ins_exigence.scope,
+                    role = "Consulted",
+                    lang=data.get("lang")
+                )
             return Response( status=status.HTTP_201_CREATED )
         except Exception as e:
             return Response( status=status.HTTP_500_INTERNAL_SERVER_ERROR )
@@ -1163,7 +1157,7 @@ class FollowUpView(APIView):
                         'deadline': '2025-02-12T22:23:52.900Z',
                         'actors': [
                             {
-                                'role': 'RESPONSABLE',
+                                'role': 'Responsable',
                                 'id_user': 10,
                                 'full_name': 'John Doe',
                                 'email': 'samyfabiol@gmail.com'
@@ -1312,3 +1306,388 @@ class FollowUpView(APIView):
             },
             status=status.HTTP_201_CREATED
         )
+    
+
+
+
+# Vue API
+class ExigenceNotiRoleApproveView(APIView):
+    permission_classes = [AllowAny]
+    
+    @extend_schema(
+        request=ExigenceSerializer,
+        responses={
+            201: ExigenceResponseSerializer,
+            400: ErrorResponseSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'object': 'Demande d\'exigence',
+                    'description': 'Description détaillée de l\'exigence',
+                    'company': 'Ziyouma',
+                    'dest_email': 'destinataire@example.com',
+                    'sender_name': 'Jean Dupont',
+                    'dest_name': 'Marie Martin',
+                    'url': 'https://example.com/exigence/123',
+                    'method': 'POST',
+                    'base_url': 'https://api.example.com',
+                    'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                    'scope': ['Périmètre 1', 'Périmètre 2'],
+                    'id_action':"10",
+                    'id_analysis':"10",
+                    'id_reporting':"10",
+                    'id_client':"10",
+                    'id_indicateur':"10", 
+                    'id_project':"10",
+                    'dealine': '12/02/2025',
+                    'start_date' : "2025-02-12T22:23:52.900Z",
+                    'time' : "20",
+                    "type_task" : "EXIGENCE",
+                    "role" : "Responsable", # Responsable, Consulted, Informed, Approver
+                    "lang":"en-US"
+                    
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        description="Crée une exigence et envoie une notification par email",
+        summary="Créer une exigence",
+        tags=["Exigences"],
+    )
+    def post(self, request):
+        serializer = ExigenceSerializer(data=request.data)
+        data = request.data
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "message": "Erreur de validation des données",
+                    "errors": serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Récupération des données validées
+        validated_data = serializer.validated_data  
+        # 2025-04-03T22:23:52.900Z
+        try:
+
+            if validated_data.get("type_task") == "EXIGENCE":
+            # Envoi de l'email
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="[Requirement]"
+                else :
+                    type_task="[Exigence]"
+            elif validated_data.get("type_task") == "ACTION":
+                type_task = "[Action corrective]"
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="[Corrective action]"
+
+            lang = get_lang_request(request) 
+            notification_approuver(
+               type_task + " "+validated_data.get("object"),
+                    type_task,
+                    validated_data.get("description"),
+                    validated_data.get("dest_email"),
+                    validated_data.get("sender_name"),
+                    validated_data.get("dest_name"),
+                    validated_data.get("company"), 
+                    validated_data.get("url"),
+                    validated_data.get("scope", []),
+                    validated_data.get("time"),
+                    validated_data.get("dealine") if validated_data.get("dealine") else add_days(get_current_date_iso()),
+                    validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
+                    None,
+                    lang
+            ) 
+            
+            return Response(
+                {
+                    "message": "Exigence créée avec succès",
+                    "status": "success",
+                    "code": 201,
+                 
+                },
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            # Log l'erreur pour le débogage
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Erreur lors de la création de l'exigence: {str(e)}")
+            
+            return Response(
+                {
+                    "message": "Une erreur est survenue lors du traitement de la demande",
+                    "status": "error"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+
+
+# Vue API
+class ExigenceNotiRoleConsultantView(APIView):
+    permission_classes = [AllowAny]
+    
+    @extend_schema(
+        request=ExigenceSerializer,
+        responses={
+            201: ExigenceResponseSerializer,
+            400: ErrorResponseSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'object': 'Demande d\'exigence',
+                    'description': 'Description détaillée de l\'exigence',
+                    'company': 'Ziyouma',
+                    'dest_email': 'destinataire@example.com',
+                    'sender_name': 'Jean Dupont',
+                    'dest_name': 'Marie Martin',
+                    'url': 'https://example.com/exigence/123',
+                    'method': 'POST',
+                    'base_url': 'https://api.example.com',
+                    'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                    'scope': ['Périmètre 1', 'Périmètre 2'],
+                    'id_action':"10",
+                    'id_analysis':"10",
+                    'id_reporting':"10",
+                    'id_client':"10",
+                    'id_indicateur':"10", 
+                    'id_project':"10",
+                    'dealine': '12/02/2025',
+                    'start_date' : "2025-02-12T22:23:52.900Z",
+                    'time' : "20",
+                    "type_task" : "EXIGENCE",
+                    "role" : "Responsable", # Responsable, Consulted, Informed, Approver
+                    "lang":"en-US"
+                    
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        description="Crée une exigence et envoie une notification par email",
+        summary="Créer une exigence",
+        tags=["Exigences"],
+    )
+    def post(self, request):
+        serializer = ExigenceSerializer(data=request.data)
+        data = request.data
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "message": "Erreur de validation des données",
+                    "errors": serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Récupération des données validées
+        validated_data = serializer.validated_data  
+        # 2025-04-03T22:23:52.900Z
+        try:
+
+            if validated_data.get("type_task") == "EXIGENCE":
+            # Envoi de l'email
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="[Requirement]"
+                else :
+                    type_task="[Exigence]"
+            elif validated_data.get("type_task") == "ACTION":
+                type_task = "[Action corrective]"
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="[Corrective action]"
+
+            lang = get_lang_request(request) 
+            notification_consulting(
+               type_task + " "+validated_data.get("object"),
+                    type_task,
+                    validated_data.get("description"),
+                    validated_data.get("dest_email"),
+                    validated_data.get("sender_name"),
+                    validated_data.get("dest_name"),
+                    validated_data.get("company"), 
+                    validated_data.get("url"),
+                    validated_data.get("scope", []),
+                    validated_data.get("time"),
+                    validated_data.get("dealine") if validated_data.get("dealine") else add_days(get_current_date_iso()),
+                    validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
+                    None,
+                    lang
+            ) 
+            
+            return Response(
+                {
+                    "message": "Exigence créée avec succès",
+                    "status": "success",
+                    "code": 201,
+                 
+                },
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            # Log l'erreur pour le débogage
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Erreur lors de la création de l'exigence: {str(e)}")
+            
+            return Response(
+                {
+                    "message": "Une erreur est survenue lors du traitement de la demande",
+                    "status": "error"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+
+
+# Vue API
+class ExigenceNotiRoleInformerView(APIView):
+    permission_classes = [AllowAny]
+    
+    @extend_schema(
+        request=ExigenceSerializer,
+        responses={
+            201: ExigenceResponseSerializer,
+            400: ErrorResponseSerializer,
+            401: OpenApiTypes.OBJECT,
+            500: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de requête valide',
+                value={
+                    'object': 'Demande d\'exigence',
+                    'description': 'Description détaillée de l\'exigence',
+                    'company': 'Ziyouma',
+                    'dest_email': 'destinataire@example.com',
+                    'sender_name': 'Jean Dupont',
+                    'dest_name': 'Marie Martin',
+                    'url': 'https://example.com/exigence/123',
+                    'method': 'POST',
+                    'base_url': 'https://api.example.com',
+                    'jwt_token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+                    'scope': ['Périmètre 1', 'Périmètre 2'],
+                    'id_action':"10",
+                    'id_analysis':"10",
+                    'id_reporting':"10",
+                    'id_client':"10",
+                    'id_indicateur':"10", 
+                    'id_project':"10",
+                    'dealine': '12/02/2025',
+                    'start_date' : "2025-02-12T22:23:52.900Z",
+                    'time' : "20",
+                    "type_task" : "EXIGENCE",
+                    "role" : "Responsable", # Responsable, Consulted, Informed, Approver
+                    "lang":"en-US"
+                    
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Exigence créée avec succès',
+                    'status': 'success',
+                    'code': 201
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        description="Crée une exigence et envoie une notification par email",
+        summary="Créer une exigence",
+        tags=["Exigences"],
+    )
+    def post(self, request):
+        serializer = ExigenceSerializer(data=request.data)
+        data = request.data
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "message": "Erreur de validation des données",
+                    "errors": serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Récupération des données validées
+        validated_data = serializer.validated_data  
+        # 2025-04-03T22:23:52.900Z
+        try:
+
+            if validated_data.get("type_task") == "EXIGENCE":
+            # Envoi de l'email
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="[Requirement]"
+                else :
+                    type_task="[Exigence]"
+            elif validated_data.get("type_task") == "ACTION":
+                type_task = "[Action corrective]"
+                if validated_data.get("lang") != "fr-FR":
+                    type_task="[Corrective action]"
+
+            lang = get_lang_request(request) 
+            notification_informer(
+               type_task + " "+validated_data.get("object"),
+                    type_task,
+                    validated_data.get("description"),
+                    validated_data.get("dest_email"),
+                    validated_data.get("sender_name"),
+                    validated_data.get("dest_name"),
+                    validated_data.get("company"), 
+                    validated_data.get("url"),
+                    validated_data.get("scope", []),
+                    validated_data.get("time"),
+                    validated_data.get("dealine") if validated_data.get("dealine") else add_days(get_current_date_iso()),
+                    validated_data.get("start_date") if validated_data.get("start_date") else get_current_date_iso(),
+                    None,
+                    lang
+            ) 
+            
+            return Response(
+                {
+                    "message": "Exigence créée avec succès",
+                    "status": "success",
+                    "code": 201,
+                 
+                },
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            # Log l'erreur pour le débogage
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Erreur lors de la création de l'exigence: {str(e)}")
+            
+            return Response(
+                {
+                    "message": "Une erreur est survenue lors du traitement de la demande",
+                    "status": "error"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

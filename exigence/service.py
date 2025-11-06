@@ -110,7 +110,7 @@ def verifier_presence_t(chaine):
     return 'T' in chaine
 
 @shared_task
-def exigence_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None, lang=None ):
+def exigence_responsable( object, title, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None, lang=None ):
     # object and description
 
     deadline_text = "non défini" 
@@ -147,17 +147,17 @@ def exigence_responsable( object, type_task, description, dest_email, sender_nam
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         
     if lang == "fr-FR" :
-        path = "deployer/evaluation/responsable-exigence-fr.html" 
+        path = "deployer/evaluation/responsable/responsable-exigence-fr.html" 
     elif lang == "en-US":
-        path = "deployer/evaluation/responsable-exigence-en.html" 
+        path = "deployer/evaluation/responsable/responsable-exigence-en.html" 
     else:
-        path = "deployer/evaluation/responsable-exigence-fr.html" 
+        path = "deployer/evaluation/responsable/responsable-exigence-fr.html" 
 
-    path_txt = "deployer/evaluation/responsable-exigence.txt" 
+    path_txt = "deployer/evaluation/responsable/responsable-exigence.txt" 
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
-        "title": object, 
+        "title": title, 
         "url": url,
         "description":description,
         "time": time,
@@ -291,14 +291,14 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
         
    
     if lang == "fr-FR" :
-        path = "deployer/evaluation/exigence-approbation-fr.html" 
+        path = "deployer/evaluation/approuver/exigence-approbation-fr.html" 
     elif lang == "en-US":
-        path = "deployer/evaluation/exigence-approbation-en.html" 
+        path = "deployer/evaluation/approuver/exigence-approbation-en.html" 
     else:
-        path = "deployer/evaluation/exigence-approbation-fr.html" 
+        path = "deployer/evaluation/approuver/exigence-approbation-fr.html" 
 
     # path = "notification/evaluation/exigence-approbation.html" 
-    path_txt = "deployer/evaluation/exigence-approbation.txt" 
+    path_txt = "deployer/evaluation/approuver/exigence-approbation.txt" 
     # print("execution")
     context = {
         "sender_name":sender_name, 
@@ -311,7 +311,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
         "deadline": format_date_string_short(deadline_text,lang ),
         "company": company,
         "type_task": type_task,
-        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+        "back_url" : os.environ.get("BACK_HOST_URL", "")
     }
  
     body_content = render_to_string(
@@ -336,7 +336,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
     return True
 
 
-def exigence_notification( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None, lang=None ):
+def exigence_notification( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], role="Informed", time="", deadline="", start_date="",  back_url=None, lang=None ):
     # object and description
 
     deadline_text = "non défini" 
@@ -374,17 +374,24 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
             filename = add_calendar(
                 object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         
-
-
-    if lang == "fr-FR" :
-        path = "deployer/evaluation/exigence-notification-fr.html" 
-    elif lang == "en-US":
-        path = "deployer/evaluation/exigence-notification-en.html" 
-    else:
-        path = "deployer/evaluation/exigence-notification-fr.html" 
-
-    # path = "notification/evaluation/exigence-notification.html" 
-    path_txt = "deployer/evaluation/exigence-notification.txt" 
+    if role == "Informed": 
+        if lang == "fr-FR" :
+            path = "deployer/evaluation/informer/exigence-informed-fr.html" 
+        elif lang == "en-US":
+            path = "deployer/evaluation/exigence-informed-en.html" 
+        else:
+            path = "deployer/evaluation/exigence-informed-fr.html" 
+        path_txt = "deployer/evaluation/exigence-informed.txt" 
+    elif role == "Consulted":
+        if lang == "fr-FR" :
+            path = "deployer/evaluation/consulter/exigence-consulted-fr.html" 
+        elif lang == "en-US":
+            path = "deployer/evaluation/consulter/exigence-consulted-en.html" 
+        else:
+            path = "deployer/evaluation/consulter/exigence-consulted-fr.html" 
+        path_txt = "deployer/evaluation/consulter/exigence-consulted.txt"
+    else :
+        return False
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
@@ -423,13 +430,16 @@ def accept_anwser( object, email,  type_task, description, title, dest_name, com
     try:
         # object and description 
         if lang == "fr-FR" :
-            path = "deployer/evaluation/accept_answer-fr.html" 
+            path = "deployer/evaluation/approuver/answer/accept/accept_answer-fr.html" 
+            path_txt = "deployer/evaluation/approuver/answer/accept/accept_answer-fr.txt" 
         elif lang == "en-US":
-            path = "deployer/evaluation/accept_answer-en.html" 
+            path = "deployer/evaluation/approuver/answer/accept/accept_answer-en.html" 
+            path_txt = "deployer/evaluation/approuver/answer/accept/accept_answer-en.txt" 
         else:
-            path = "deployer/evaluation/accept_answer-fr.html"  
+            path = "deployer/evaluation/approuver/answer/accept/accept_answer-fr.html"  
+            path_txt = "deployer/evaluation/approuver/answer/accept/accept_answer-fr.txt"  
 
-        path_txt = "deployer/evaluation/exigence-notification.txt" 
+        
         context = {
             "name": dest_name,
             "title": title,  
@@ -453,6 +463,7 @@ def accept_anwser( object, email,  type_task, description, title, dest_name, com
             html_content,
             company
         )     
+        
         return True
     except Exception as e:
         print(f"error -- > {str(e)}")
@@ -461,13 +472,16 @@ def accept_anwser( object, email,  type_task, description, title, dest_name, com
 def rejet_anwser( object, email,  type_task, description, title, dest_name, company, back_url=None, lang=None ):
     # object and description 
     if lang == "fr-FR" :
-        path = "deployer/evaluation/rejet_answer-fr.html" 
+        path = "deployer/evaluation/approuver/answer/rejet/rejet_answer-fr.html" 
+        path_txt = "deployer/evaluation/approuver/answer/rejet/rejet_answer-fr.txt" 
     elif lang == "en-US":
-        path = "deployer/evaluation/rejet_answer-en.html" 
+        path = "deployer/evaluation/approuver/answer/rejet/rejet_answer-en.html" 
+        path_txt = "deployer/evaluation/approuver/answer/rejet/rejet_answer-en.txt" 
     else:
-        path = "deployer/evaluation/rejet_answer-fr.html"  
+        path = "deployer/evaluation/approuver/answer/rejet/rejet_answer-fr.html"  
+        path_txt = "deployer/evaluation/approuver/answer/rejet/rejet_answer-fr.txt"  
         
-    path_txt = "deployer/evaluation/exigence-notification.txt" 
+      
     context = { 
         "name": dest_name,
         "title": title,  
@@ -498,18 +512,15 @@ def rejet_anwser( object, email,  type_task, description, title, dest_name, comp
 @shared_task
 def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_name, back_url, id_follow_up, user_id, token ):
     try:
-        is_answer, status_code = check_response(id_action=id_action, id_project=id_project, url=back_url, user_id=user_id, token=token)
-        logger.info(f"Vérification de la réponse pour le suivi: action={id_action}, project={id_project}, client={id_client}, status={status_code}, is_answer={is_answer}")
+        is_answer, status_code = check_response(id_action=id_action, id_project=id_project, url=back_url, user_id=user_id, token=token) 
         if status_code == 200:
             if is_answer == False :
-                logger.info(f"⏳ Pas encore de réponse.")
-                print("⏳ Pas encore de réponse.") 
-                print("Envoyer un rappel au responsable.")
+                logger.info(f"⏳ Pas encore de réponse.") 
                 # get data to  ExigenceMail 
                 ins_exigence = ExigenceMail.objects.filter( id_project=id_project, id_action=id_action, id_client=id_client).first()
                 if ins_exigence:
                     logger.info(f"⏳ Pas encore de réponse. {role} - {dest_email} ")
-                    if role == "responsable":
+                    if role == "Responsable":
                         exigence_responsable.delay(
                             object= ins_exigence.object,
                             type_task=ins_exigence.type_task,
@@ -526,14 +537,14 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                             back_url=back_url,
                             lang=ins_exigence.lang
                         )
-                    elif role == "approver":
-                        exigence_approver(
+                    elif role == "Consulted": 
+                        exigence_notification(
                             object= ins_exigence.object,
                             type_task=ins_exigence.type_task,
                             description=ins_exigence.description,
-                            dest_email=ins_exigence.dest_email,
+                            dest_email=dest_email,
                             sender_name= ins_exigence.sender_name,
-                            dest_name= ins_exigence.dest_name,
+                            dest_name= full_name,
                             company=ins_exigence.company,
                             url=ins_exigence.url,
                             scope=ins_exigence.scope,
@@ -541,16 +552,17 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                             deadline=ins_exigence.dealine,
                             start_date=str(ins_exigence.start_date),
                             back_url=back_url,
-                            lang=ins_exigence.lang
+                            lang=ins_exigence.lang,
+                            role=role
                         )
-                    elif role == "consulter":
-                        exigence_notification.delay(
+                    elif role == "Informed":
+                        exigence_notification(
                             object= ins_exigence.object,
                             type_task=ins_exigence.type_task,
                             description=ins_exigence.description,
-                            dest_email=ins_exigence.dest_email,
+                            dest_email=dest_email,
                             sender_name= ins_exigence.sender_name,
-                            dest_name= ins_exigence.dest_name,
+                            dest_name= full_name,
                             company=ins_exigence.company,
                             url=ins_exigence.url,
                             scope=ins_exigence.scope,
@@ -558,10 +570,11 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                             deadline=ins_exigence.dealine,
                             start_date=str(ins_exigence.start_date),
                             back_url=back_url,
-                            lang=ins_exigence.lang
+                            lang=ins_exigence.lang,
+                            role=role
                         )
-                    elif role == "informer" :
-                        exigence_notification.delay(
+                    elif role == "Approver" :
+                         exigence_approver(
                             object= ins_exigence.object,
                             type_task=ins_exigence.type_task,
                             description=ins_exigence.description,
@@ -602,7 +615,6 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
         return True
     except Exception as e:
         print(f"error -- > {str(e)}")
- 
  
  
 
@@ -712,3 +724,263 @@ def check_response(
     except Exception as e:
         logger.exception(f"Erreur inattendue: {str(e)}")
         return False, 0
+    
+
+
+def notification_approuver( object, title, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None, lang=None ):
+    
+    try: 
+        deadline_text = "non défini" 
+        if lang == "fr-FR" :
+            deadline_text = "non défini"
+        elif lang == "en-US":
+            deadline_text = "not defined"
+        
+        if verifier_presence_t(deadline):
+            new_deadline = deadline 
+        else: 
+            new_deadline = deadline+"T07:30:00.000Z"
+
+        new_start_date = start_date+"T07:30:00.000Z"
+        if is_valid_date_string(new_deadline):
+            parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
+            deadline_text = parsed_date.strftime("%Y-%m-%d")
+        
+        filename = None
+        if is_valid_date_string(new_start_date):
+            start_date = new_start_date.split(" ")[0]
+            # Analyser la date ISO 8601
+            parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+            # Reformater au format souhaité
+            formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+            date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
+            date_end = date_begin + timedelta(minutes=int(time))
+            # configuration iCalendar
+            if company != None: 
+                filename = add_calendar(
+                        object, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+            else:
+                filename = add_calendar(
+                    object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        # object and description 
+        if lang == "fr-FR" :
+            path = "deployer/evaluation/approuver/exigence-notification-approbateur-1-fr.html" 
+            path_txt = "deployer/evaluation/approuver/exigence-notification-approbateur-1-fr.txt" 
+        elif lang == "en-US":
+            path = "deployer/evaluation/approuver/exigence-notification-approbateur-1-en.html" 
+            path_txt = "deployer/evaluation/approuver/exigence-notification-approbateur-1-en.txt"  
+        else:
+            path = "deployer/evaluation/approuver/exigence-notification-approbateur-1-fr.html" 
+            path_txt = "deployer/evaluation/approuver/exigence-notification-approbateur-1-fr.txt"  
+
+        
+        context = {
+                "sender_name":sender_name, 
+                "name": dest_name,
+                "title": title, 
+                "url": url,
+                "description":description,
+                "time": time,
+                "scope": scope,
+                "deadline": format_date_string_short(deadline_text,lang ),
+                "company": company,
+                "type_task": type_task,
+                "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+        }
+        
+        text_content = render_to_string(
+                path_txt,
+                context
+        )
+        body_content = render_to_string(
+        path,
+        context
+        )
+        text_content = render_to_string(
+                path_txt,
+                context
+        )
+        if filename != None: 
+            x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
+            x.start() 
+        else:
+            x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+            x.start() 
+        return True
+    except Exception as e:
+        print(f"error -- > {str(e)}")
+ 
+
+
+
+
+def notification_consulting( object, title, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None, lang=None ):
+    
+    try: 
+        deadline_text = "non défini" 
+        if lang == "fr-FR" :
+            deadline_text = "non défini"
+        elif lang == "en-US":
+            deadline_text = "not defined"
+        
+        if verifier_presence_t(deadline):
+            new_deadline = deadline 
+        else: 
+            new_deadline = deadline+"T07:30:00.000Z"
+
+        new_start_date = start_date+"T07:30:00.000Z"
+        if is_valid_date_string(new_deadline):
+            parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
+            deadline_text = parsed_date.strftime("%Y-%m-%d")
+        
+        filename = None
+        if is_valid_date_string(new_start_date):
+            start_date = new_start_date.split(" ")[0]
+            # Analyser la date ISO 8601
+            parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+            # Reformater au format souhaité
+            formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+            date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
+            date_end = date_begin + timedelta(minutes=int(time))
+            # configuration iCalendar
+            if company != None: 
+                filename = add_calendar(
+                        object, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+            else:
+                filename = add_calendar(
+                    object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        # object and description 
+        if lang == "fr-FR" :
+            path = "deployer/evaluation/consulter/exigence-notification-consultant-1-fr.html" 
+            path_txt = "deployer/evaluation/consulter/exigence-notification-consultant-1-fr.txt" 
+        elif lang == "en-US":
+            path = "deployer/evaluation/consulter/exigence-notification-consultant-1-en.html" 
+            path_txt = "deployer/evaluation/consulter/exigence-notification-consultant-1-en.txt"  
+        else:
+            path = "deployer/evaluation/consulter/exigence-notification-consultant-1-fr.html" 
+            path_txt = "deployer/evaluation/consulter/exigence-notification-consultant-1-fr.txt"  
+
+        
+        context = {
+                "sender_name":sender_name, 
+                "name": dest_name,
+                "title": title, 
+                "url": url,
+                "description":description,
+                "time": time,
+                "scope": scope,
+                "deadline": format_date_string_short(deadline_text,lang ),
+                "company": company,
+                "type_task": type_task,
+                "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+        }
+        
+        text_content = render_to_string(
+                path_txt,
+                context
+        )
+        body_content = render_to_string(
+        path,
+        context
+        )
+        text_content = render_to_string(
+                path_txt,
+                context
+        )
+        if filename != None: 
+            x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
+            x.start() 
+        else:
+            x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+            x.start() 
+        return True
+    except Exception as e:
+        print(f"error -- > {str(e)}")
+ 
+
+
+
+
+def notification_informer( object, title, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], time="", deadline="", start_date="", back_url=None, lang=None ):
+    
+    try: 
+        deadline_text = "non défini" 
+        if lang == "fr-FR" :
+            deadline_text = "non défini"
+        elif lang == "en-US":
+            deadline_text = "not defined"
+        
+        if verifier_presence_t(deadline):
+            new_deadline = deadline 
+        else: 
+            new_deadline = deadline+"T07:30:00.000Z"
+
+        new_start_date = start_date+"T07:30:00.000Z"
+        if is_valid_date_string(new_deadline):
+            parsed_date = datetime.strptime(new_deadline, "%Y-%m-%dT%H:%M:%S.%fZ")
+            deadline_text = parsed_date.strftime("%Y-%m-%d")
+        
+        filename = None
+        if is_valid_date_string(new_start_date):
+            start_date = new_start_date.split(" ")[0]
+            # Analyser la date ISO 8601
+            parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+            # Reformater au format souhaité
+            formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+            date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
+            date_end = date_begin + timedelta(minutes=int(time))
+            # configuration iCalendar
+            if company != None: 
+                filename = add_calendar(
+                        object, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+            else:
+                filename = add_calendar(
+                    object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        # object and description 
+        if lang == "fr-FR" :
+            path = "deployer/evaluation/informer/exigence-notification-informer-1-fr.html" 
+            path_txt = "deployer/evaluation/informer/exigence-notification-informer-1-fr.txt" 
+        elif lang == "en-US":
+            path = "deployer/evaluation/informer/exigence-notification-informer-1-en.html" 
+            path_txt = "deployer/evaluation/informer/exigence-notification-informer-1-en.txt"  
+        else:
+            path = "deployer/evaluation/informer/exigence-notification-informer-1-fr.html" 
+            path_txt = "deployer/evaluation/informer/exigence-notification-informer-1-fr.txt"  
+
+        
+        context = {
+                "sender_name":sender_name, 
+                "name": dest_name,
+                "title": title, 
+                "url": url,
+                "description":description,
+                "time": time,
+                "scope": scope,
+                "deadline": format_date_string_short(deadline_text,lang ),
+                "company": company,
+                "type_task": type_task,
+                "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+        }
+        
+        text_content = render_to_string(
+                path_txt,
+                context
+        )
+        body_content = render_to_string(
+        path,
+        context
+        )
+        text_content = render_to_string(
+                path_txt,
+                context
+        )
+        if filename != None: 
+            x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
+            x.start() 
+        else:
+            x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+            x.start() 
+        return True
+    except Exception as e:
+        print(f"error -- > {str(e)}")
+ 

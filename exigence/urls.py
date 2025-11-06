@@ -10,6 +10,9 @@ urlpatterns = [
     
     path('api/follow-up/', FollowUpView.as_view(), name='create-email-task'),
     path('api/responsable/', ExigenceResponsableView.as_view(), name='create-email-task'),
+    path('api/notif-approver-role/', ExigenceNotiRoleApproveView.as_view(), name='create-email-task'),
+    path('api/notif-consulted-role/', ExigenceNotiRoleConsultantView.as_view(), name='create-email-task'),
+    path('api/notif-informes-role/', ExigenceNotiRoleInformerView.as_view(), name='create-email-task'),
    
     path('api/approver/', ExigenceApprobatorView.as_view(), name='create-email-task'),
     path('api/notification/', ExigenceNotificationView.as_view(), name='create-email-task'),

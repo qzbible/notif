@@ -103,6 +103,8 @@ class ExigenceMail(models.Model):
     sent = models.BooleanField(default=False)
     sent_at = models.DateTimeField(null=True, blank=True)
     task_id = models.CharField(max_length=255, null=True, blank=True)
+    role = models.CharField(max_length=255, null=True, blank=True)
+    
     
     id_client = models.BigIntegerField(null=True, blank=True)
 

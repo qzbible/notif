@@ -115,6 +115,10 @@ class ExigenceSerializer(serializers.Serializer):
         required=False,
         help_text="time de l'exigence"
     )
+    role = serializers.CharField(
+        required=False,
+        help_text="role de l'acteurs"
+    )
 
  
 
@@ -189,6 +193,33 @@ class AcceptSerializer(serializers.Serializer):
          allow_blank=True,
         help_text="Nom du destinataire"
     )
+    consulted = serializers.ListField(
+        child=serializers.JSONField(),
+        required=False,
+        allow_null=True,
+        help_text="Liste des participants au format JSON pour le modèle. Si non fourni, peut être dérivé de 'participants'."
+    )
+
+    action_id = serializers.IntegerField(
+        required=False,
+        min_value=1,
+        help_text="Nombre d'éléments à arbitrer"
+    )
+    reporting_id = serializers.IntegerField(
+        required=False,
+        min_value=1,
+        help_text="Nombre d'éléments à arbitrer"
+    )
+    analysis_id = serializers.IntegerField(
+        required=False,
+        min_value=1,
+        help_text="Nombre d'éléments à arbitrer"
+    )
+    project_id = serializers.IntegerField(
+        required=False,
+        min_value=1,
+        help_text="Nombre d'éléments à arbitrer"
+    )
 
 # Serializer pour les acteurs
 class ActorFollowSerializer(serializers.Serializer):
@@ -211,6 +242,8 @@ class ActorFollowSerializer(serializers.Serializer):
         required=True,
         help_text="Email de l'acteur"
     )
+
+    
 
 
 # Serializer principal pour FollowUp
