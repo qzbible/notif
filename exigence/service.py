@@ -541,7 +541,7 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                             time=ins_exigence.time,
                             deadline=ins_exigence.dealine,
                             start_date=str(ins_exigence.start_date),
-                            back_url=back_url,
+                            back_url=os.environ.get("BACK_HOST_URL", "") if back_url == None else back_url,
                             lang=ins_exigence.lang
                         )
                     elif role == "Consulted": 
@@ -558,7 +558,7 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                             time=ins_exigence.time,
                             deadline=ins_exigence.dealine,
                             start_date=str(ins_exigence.start_date),
-                            back_url=back_url,
+                            back_url=os.environ.get("BACK_HOST_URL", "") if back_url == None else back_url,
                             lang=ins_exigence.lang,
                             role=role
                         )
@@ -576,7 +576,7 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                             time=ins_exigence.time,
                             deadline=ins_exigence.dealine,
                             start_date=str(ins_exigence.start_date),
-                            back_url=back_url,
+                            back_url=os.environ.get("BACK_HOST_URL", "") if back_url == None else back_url,
                             lang=ins_exigence.lang,
                             role=role
                         )
@@ -594,7 +594,7 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                             time=ins_exigence.time,
                             deadline=ins_exigence.dealine,
                             start_date=str(ins_exigence.start_date),
-                            back_url=back_url,
+                            back_url=os.environ.get("BACK_HOST_URL", "") if back_url == None else back_url,
                             lang=ins_exigence.lang
                         )
 
