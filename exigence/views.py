@@ -1143,14 +1143,7 @@ class FollowUpView(APIView):
     @extend_schema( 
         request=FollowUpSerializer(many=True),
         examples=[
-            OpenApiExample(
-                'Récupération de follow-ups',
-                value={ 
-                    'id_project': 20,
-                    'id_action': 20,
-                },
-                request_only=True,
-            ),
+             
             OpenApiExample(
                 'Exemple de requête valide',
                 value=
