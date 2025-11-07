@@ -127,7 +127,7 @@ class FollowUp(models.Model):
     id_action = models.BigIntegerField(null=True, blank=True)
     id_client = models.BigIntegerField(null=True, blank=True)
     deadline = models.DateTimeField(null=True, blank=True)
-    jwt_token = models.TextField(null=True, blank=True)
+    
 
 
 
@@ -138,7 +138,7 @@ class ActorFollow(models.Model):
     email = models.EmailField(null=True, blank=True) 
     follow_up = models.ForeignKey(FollowUp, on_delete=models.CASCADE, related_name="actor_follow_up", null=True)
     task_id = models.CharField(max_length=255, null=True, blank=True)
-
+    jwt_token = models.TextField(null=True, blank=True)
 
 
 

@@ -1153,13 +1153,14 @@ class FollowUpView(APIView):
                         'id_project': 20,
                         'id_action': 20,
                         'id_client': 20, 
-                        'jwt_token': "lksncknsocijwqeqw",  
+                      
                         'deadline': '2025-02-12T22:23:52.900Z',
                         'actors': [
                             {
                                 'role': 'Responsable',
                                 'id_user': 10,
                                 'full_name': 'John Doe',
+                                "token" : "jhqguyq_kjsiuq jsiuiqs",
                                 'email': 'samyfabiol@gmail.com'
                             }
                         ] 
@@ -1219,8 +1220,8 @@ class FollowUpView(APIView):
                         "unit": item_data["unit"],
                         "value": item_data["value"],
                         "type": item_data["type"],
-                        "deadline": item_data["deadline"],
-                        "jwt_token": item_data["jwt_token"],
+                        "deadline": item_data["deadline"]
+                       
                     }
                 )
                 
@@ -1239,6 +1240,7 @@ class FollowUpView(APIView):
                             "role": actor_data["role"],
                             "full_name": actor_data["full_name"],
                             "email": actor_data["email"],
+                             "jwt_token": item_data["jwt_token"],
                         }
                     )
                     

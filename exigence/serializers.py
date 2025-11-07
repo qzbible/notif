@@ -243,6 +243,12 @@ class ActorFollowSerializer(serializers.Serializer):
         help_text="Email de l'acteur"
     )
 
+    jwt_token = serializers.CharField(
+        required=True,
+        allow_null=True, 
+        help_text="Token user config exigence"
+    )
+
     
 
 
@@ -291,11 +297,7 @@ class FollowUpSerializer(serializers.Serializer):
         required=True,
         help_text="Liste des acteurs concernés"
     )
-    jwt_token = serializers.CharField(
-        required=True,
-        allow_null=True, 
-        help_text="Token user config exigence"
-    )
+    
     def validate_actors(self, value):
         """Valider qu'il y a au moins un acteur"""
         if not value:
