@@ -251,7 +251,7 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
     return True
 
 
-def exigence_approver( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None, lang=None ):
+def exigence_approver( object, title, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None, lang=None ):
     # object and description
 
     deadline_text = "non défini" 
@@ -303,7 +303,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
-        "title": object, 
+        "title": title, 
         "url": url,
         "description":description,
         "time": time,
@@ -336,7 +336,7 @@ def exigence_approver( object, type_task, description, dest_email, sender_name, 
     return True
 
 
-def exigence_notification( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], role="Informed", time="", deadline="", start_date="",  back_url=None, lang=None ):
+def exigence_notification( object, title, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], role="Informed", time="", deadline="", start_date="",  back_url=None, lang=None ):
     # object and description
 
     deadline_text = "non défini" 
@@ -395,7 +395,7 @@ def exigence_notification( object, type_task, description, dest_email, sender_na
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
-        "title": object, 
+        "title": title, 
         "url": url,
         "description":description,
         "time": time,
@@ -515,20 +515,18 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
         is_answer, status_code = check_response(id_action=id_action, id_project=id_project, url=back_url, user_id=user_id, token=token) 
         if status_code == 200:
             if is_answer == False :
-                logger.info(f"⏳ Pas encore de réponse.") 
-                # get data to  ExigenceMail 
-                logger.info(f"id_project {id_project} ")
-                logger.info(f"id_action {id_action} ")
-                logger.info(f"id_client {id_client} ")
-
+                  
                 ins_exigence = ExigenceMail.objects.filter( id_project=id_project, id_action=id_action, id_client=id_client).first()
-                logger.info(f"ins_exigence {ins_exigence} ")
-                logger.info(f"⏳ Pas encore de réponse. {role} - {dest_email} ")
-                if ins_exigence:
-                   
+                prefix_object = ""
+                if 'fr' in ins_exigence.lang:
+                    prefix_object = "[Rappel] "
+                elif 'en' in ins_exigence.lang:
+                    prefix_object = "[Reminder] "
+
+                if ins_exigence: 
                     if role == "Responsable":
                         exigence_responsable.delay(
-                            object= ins_exigence.object,
+                            object= prefix_object + ins_exigence.object,
                             title= ins_exigence.object,
                             type_task=ins_exigence.type_task,
                             description=ins_exigence.description,
@@ -546,7 +544,8 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                         )
                     elif role == "Consulted": 
                         exigence_notification(
-                            object= ins_exigence.object,
+                            object=  prefix_object + ins_exigence.object,
+                            title= ins_exigence.object,
                             type_task=ins_exigence.type_task,
                             description=ins_exigence.description,
                             dest_email=dest_email,
@@ -564,7 +563,8 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                         )
                     elif role == "Informed":
                         exigence_notification(
-                            object= ins_exigence.object,
+                            object= prefix_object+ ins_exigence.object,
+                            title= ins_exigence.object,
                             type_task=ins_exigence.type_task,
                             description=ins_exigence.description,
                             dest_email=dest_email,
@@ -582,7 +582,8 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                         )
                     elif role == "Approver" :
                          exigence_approver(
-                            object= ins_exigence.object,
+                            object= prefix_object+ ins_exigence.object,
+                            title= ins_exigence.object,
                             type_task=ins_exigence.type_task,
                             description=ins_exigence.description,
                             dest_email=ins_exigence.dest_email,

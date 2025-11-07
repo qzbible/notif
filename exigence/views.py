@@ -194,7 +194,7 @@ class ExigenceResponsableView(APIView):
             print("   ID Client:", exigence.id_client)
             print("   ID Projet:", exigence.id_project)
             print("   ID Action:", exigence.id_action)
-            
+
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in validated_data and validated_data.get("scope"):
                 exigence.scope = validated_data.get("scope")
@@ -336,6 +336,7 @@ class ExigenceApprobatorView(APIView):
                 exigence.save() 
             exigence_approver(
                 object= data.get("object"),
+                title= data.get("object"),
                 type_task = data.get("type_task", None),
                 description= data.get("description"),
                 dest_email=data.get("dest_email"),
@@ -445,6 +446,7 @@ class ExigenceNotificationView(APIView):
              
             mail = exigence_notification(
                 object= data.get("object"),
+                title= data.get("object"),
                 type_task = data.get("type_task"),
                 description= data.get("description"),
                 dest_email=data.get("dest_email"),
@@ -1006,6 +1008,7 @@ class AcceptExigenceView(APIView):
                 for user in consulted_users:
                     exigence_notification(
                     object= type_task + " " + data.get("object") + " " + action,
+                    title= data.get("object") ,
                     type_task = data.get("type_task"),
                     description= data.get("description"),
                     dest_email= user.get("email"),
@@ -1123,6 +1126,7 @@ class RejetExigenceView(APIView):
                 for user in consulted_users:
                     exigence_notification(
                     object= type_task + " " + data.get("object") + " " + action,
+                    title= data.get("object") ,
                     type_task = data.get("type_task"),
                     description= data.get("description"),
                     dest_email= user.get("email"),
