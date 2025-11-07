@@ -189,6 +189,11 @@ class ExigenceResponsableView(APIView):
                 role = validated_data.get("role"),
                 lang = lang,
             )
+            print("✅ Exigence créée avec ID:", exigence.id)
+            # print id client, id projet id action id analysis id indicateur id reporting
+            print("   ID Client:", exigence.id_client)
+            print("   ID Projet:", exigence.id_project)
+            print("   ID Action:", exigence.id_action)
             
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in validated_data and validated_data.get("scope"):
