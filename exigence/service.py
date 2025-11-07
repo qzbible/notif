@@ -519,8 +519,9 @@ def follow_up_task( id_project, id_action,role,  id_client,  dest_email, full_na
                 # get data to  ExigenceMail 
                 ins_exigence = ExigenceMail.objects.filter( id_project=id_project, id_action=id_action, id_client=id_client).first()
                 logger.info(f"ins_exigence {ins_exigence} ")
+                logger.info(f"⏳ Pas encore de réponse. {role} - {dest_email} ")
                 if ins_exigence:
-                    logger.info(f"⏳ Pas encore de réponse. {role} - {dest_email} ")
+                   
                     if role == "Responsable":
                         exigence_responsable.delay(
                             object= ins_exigence.object,
