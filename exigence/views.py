@@ -1144,6 +1144,14 @@ class FollowUpView(APIView):
         request=FollowUpSerializer(many=True),
         examples=[
             OpenApiExample(
+                'Récupération de follow-ups',
+                value={ 
+                    'id_project': 20,
+                    'id_action': 20,
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
                 'Exemple de requête valide',
                 value=
                     {
@@ -1194,7 +1202,12 @@ class FollowUpView(APIView):
         tags=["Exigences"],
     )
     def post(self, request):
+        id_project = request.query_params.get('id_project', None)
+        id_action = request.query_params.get('id_action', None)
         # Valider toutes les données en une fois
+        # 
+        if id_project and id_action:
+            delete_follow_up(id_project,  id_action  )
         serializer = FollowUpSerializer(data=request.data, many=True)
         
         if not serializer.is_valid():
@@ -1281,11 +1294,8 @@ class FollowUpView(APIView):
                 # Si une erreur survient, annuler toutes les tâches déjà créées
                 for follow_up_data in created_follow_ups:
                     for actor in follow_up_data.get("actors", []):
-                        if actor.get("task_id"):
-                            follow_up_task.app.control.revoke(
-                                actor["task_id"], 
-                                terminate=True
-                            )
+                        if actor.get("task_id"): 
+                            current_app.control.revoke(actor["task_id"], terminate=True)
                 
                 return Response(
                     {
@@ -1310,6 +1320,22 @@ class FollowUpView(APIView):
         )
     
 
+def delete_follow_up(id_project,  id_action  ):
+    inst_filter = FollowUp.objects.filter(
+        id_project=id_project,
+        id_action=id_action
+    )
+    for inst in inst_filter:
+        actors = ActorFollow.objects.filter(follow_up=inst)
+        for actor in actors:
+            try:
+                current_app.control.revoke(actor.task_id, terminate=True)
+              
+            except Exception as e:
+                print(f"Impossible d'annuler la tâche {actor.task_id}: {str(e)}")
+            actor.delete()
+        inst.delete()
+    return True
 
 
 # Vue API
