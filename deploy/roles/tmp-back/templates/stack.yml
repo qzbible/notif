@@ -112,12 +112,12 @@ services:
       test: []
       disable: true
 
-  # kafka-consumer:
-  #   <<: *api
-  #   command: /start-kafka
-  #   healthcheck: # TODO: needs to be implemented
-  #     test: []
-  #     disable: true
+  kafka-consumer:
+    <<: *api
+    command: /start-kafka
+    healthcheck: # TODO: needs to be implemented
+      test: []
+      disable: true
 
 
  # Ajoutez simplement ce bloc dans votre fichier docker-stack.yml existant
