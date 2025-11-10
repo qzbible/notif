@@ -258,7 +258,7 @@ class ExigenceResponsableView(APIView):
                     "code": 201,
                     "id": exigence.id
                 },
-                status=status.HTTP_201_CREATED, headers=headers
+                status=status.HTTP_201_CREATED, 
             )
         except Exception as e:
             # Log l'erreur pour le débogage
