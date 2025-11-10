@@ -112,14 +112,6 @@ services:
       test: []
       disable: true
 
-  kafka-consumer:
-    <<: *api
-    command: /start-kafka
-    healthcheck: # TODO: needs to be implemented
-      test: []
-      disable: true
-
-
  # Ajoutez simplement ce bloc dans votre fichier docker-stack.yml existant
 # après le service "api" et avant "redis"
 
@@ -153,6 +145,12 @@ services:
         constraints:
           - node.role == manager
 
+  kafka-consumer:
+    <<: *api
+    command: /start-kafka
+    healthcheck: # TODO: needs to be implemented
+      test: []
+      disable: true
 
 volumes:
   static_volume:
