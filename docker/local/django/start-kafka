@@ -4,7 +4,13 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-# Attendre que PostgreSQL soit prêt
+echo "=== Starting Kafka Consumer Service ==="
+
+# ============================================
+# 1. Attendre que PostgreSQL soit prêt
+# ============================================
+echo "⏳ Checking PostgreSQL availability..."
+
 python << END
 import sys
 import time
@@ -30,6 +36,94 @@ while True:
     time.sleep(1)
 END
 
->&2 echo 'PostgreSQL is available'
+echo "✅ PostgreSQL is available"
 
-python3 manage.py run_kafka_consumer --topic=all
+# ============================================
+# 2. Attendre que Kafka soit prêt
+# ============================================
+echo "⏳ Checking Kafka availability..."
+
+python << END
+import sys
+import time
+import socket
+from kafka import KafkaProducer
+from kafka.errors import NoBrokersAvailable
+
+# Configuration
+kafka_servers = "${KAFKA_BOOTSTRAP_SERVERS}".split(',')
+kafka_enabled = "${KAFKA_ENABLED:-true}".lower() in ['true', '1', 'yes']
+max_wait_time = 60  # secondes
+check_interval = 5  # secondes
+
+if not kafka_enabled:
+    sys.stderr.write("ℹ️  Kafka is disabled (KAFKA_ENABLED=false). Skipping Kafka consumer.\n")
+    sys.exit(0)
+
+start = time.time()
+kafka_available = False
+
+sys.stderr.write(f"Attempting to connect to Kafka at: {kafka_servers}\n")
+
+while True:
+    elapsed = time.time() - start
+    
+    if elapsed > max_wait_time:
+        sys.stderr.write(f"\n❌ Kafka not available after {max_wait_time}s. Consumer will not start.\n")
+        sys.stderr.write("   Possible causes:\n")
+        sys.stderr.write("   - Kafka broker is down\n")
+        sys.stderr.write("   - Network connectivity issues\n")
+        sys.stderr.write("   - Wrong KAFKA_BOOTSTRAP_SERVERS configuration\n")
+        sys.stderr.write(f"   - Current config: {kafka_servers}\n")
+        sys.exit(1)
+    
+    try:
+        # Test 1: Network connectivity (socket)
+        for server in kafka_servers:
+            if ':' in server:
+                host, port = server.rsplit(':', 1)
+                port = int(port)
+            else:
+                host = server
+                port = 9092
+            
+            try:
+                socket.create_connection((host, port), timeout=3)
+                sys.stderr.write(f"  ✅ Network connectivity OK for {host}:{port}\n")
+            except (socket.timeout, socket.error) as e:
+                sys.stderr.write(f"  ⏳ Cannot reach {host}:{port} - {e}\n")
+                raise
+        
+        # Test 2: Kafka broker connectivity
+        sys.stderr.write("  🔄 Testing Kafka broker...\n")
+        producer = KafkaProducer(
+            bootstrap_servers=kafka_servers,
+            api_version_auto_timeout_ms=5000,
+            request_timeout_ms=5000,
+        )
+        producer.close()
+        
+        kafka_available = True
+        sys.stderr.write("  ✅ Kafka broker is available\n")
+        break
+        
+    except NoBrokersAvailable:
+        sys.stderr.write(f"  ⏳ Kafka brokers not ready yet (elapsed: {int(elapsed)}s)...\n")
+    except Exception as error:
+        sys.stderr.write(f"  ⏳ Waiting for Kafka (elapsed: {int(elapsed)}s): {error}\n")
+    
+    time.sleep(check_interval)
+
+if not kafka_available:
+    sys.stderr.write("❌ Kafka not available. Consumer cannot start.\n")
+    sys.exit(1)
+END
+
+echo "✅ Kafka is available"
+
+# ============================================
+# 3. Démarrer le Kafka Consumer
+# ============================================
+echo "🚀 Starting Kafka Consumer..."
+
+exec python3 manage.py run_kafka_consumer --topic=all
