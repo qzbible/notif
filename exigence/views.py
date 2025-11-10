@@ -30,7 +30,16 @@ from django.utils.dateparse import parse_datetime
 from django.conf import settings
  
 from dateutil.relativedelta import relativedelta
- 
+
+
+# Import conditionnel
+try:
+    from kafka_app.producers import kafka_producer
+    KAFKA_AVAILABLE = True
+except Exception as e:
+    print(f"Kafka import failed: {e}")
+    kafka_producer = None
+    KAFKA_AVAILABLE = False
 
 
 def get_current_date_iso():
@@ -83,6 +92,19 @@ def parse_date_to_730(date_str):
 class ExigenceResponsableView(APIView):
     permission_classes = [AllowAny]
     
+    def _send_kafka_event(self, event_type, data):
+        """Helper pour envoyer des événements Kafka"""
+        if not KAFKA_AVAILABLE or kafka_producer is None:
+            print("Kafka not available, skipping event")
+            return None
+        
+        return kafka_producer.send_message(
+            topic='exigence.events',
+            message={
+                'event_type': event_type,
+                'data': data,
+            }
+        )
     @extend_schema(
         request=ExigenceSerializer,
         responses={
@@ -222,32 +244,11 @@ class ExigenceResponsableView(APIView):
             exigence.save() 
             # Envoi de l'email 
 
-             # 2. Publier l'événement dans Kafka
-            event = {
-                'event_type': 'order.created',
-                'order_id': str(exigence.id), 
-                'items': [ ],
-                'timestamp': exigence.created_at.isoformat(),
-            }
-
-            try:
-                KafkaProducerClient.send_message(
-                    topic=settings.KAFKA_TOPICS['ORDER_EVENTS'],
-                    message=event,
-                    key=str(exigence.id)
-                )
-            except Exception as e:
-                # Log l'erreur mais ne bloque pas la création
-                logger.error(f"Failed to send Kafka message: {e}")
-
-            # 3. Retourner la réponse
-            headers = self.get_success_headers(serializer.data)
-            # return Response(
-            #     serializer.data,
-            #     status=status.HTTP_201_CREATED,
-            #     headers=headers
-            # )
-
+            # Envoyer événement Kafka (optionnel)
+            self._send_kafka_event(
+                event_type='exigence.created',
+                data={'id': exigence.id}
+            )
 
 
             return Response(

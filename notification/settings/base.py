@@ -263,36 +263,27 @@ EMAIL_HOST_USER = 'no-reply@klivar.com'
 EMAIL_HOST_PASSWORD = 'kkai hkqz idar sjql'
 APP_NAME = 'Klivar'
 
+
 # === KAFKA CONFIGURATION ===
-KAFKA_BOOTSTRAP_SERVERS = ['kafka.klivar.com:9092']  # Ton broker Kafka
+import os
 
-# Configuration Producer
-KAFKA_PRODUCER_CONFIG = {
-    'bootstrap_servers': KAFKA_BOOTSTRAP_SERVERS,
-    'value_serializer': lambda v: json.dumps(v).encode('utf-8'),
-    'key_serializer': lambda k: k.encode('utf-8') if k else None,
-    'acks': 'all',  # Attendre confirmation de tous les replicas
-    'retries': 3,
-    'max_in_flight_requests_per_connection': 1,
-}
+# Enable/Disable Kafka
+KAFKA_ENABLED = os.environ.get('KAFKA_ENABLED', 'true').lower() in ['true', '1', 'yes']
 
-# Configuration Consumer
-KAFKA_CONSUMER_CONFIG = {
-    'bootstrap_servers': KAFKA_BOOTSTRAP_SERVERS,
-    'value_deserializer': lambda m: json.loads(m.decode('utf-8')),
-    'key_deserializer': lambda k: k.decode('utf-8') if k else None,
-    'auto_offset_reset': 'earliest',  # Lire depuis le début
-    'enable_auto_commit': True,
-    'auto_commit_interval_ms': 1000,
-}
+# Bootstrap servers
+KAFKA_BOOTSTRAP_SERVERS = os.environ.get(
+    'KAFKA_BOOTSTRAP_SERVERS',
+    'kafka.klivar.com:9092'
+).split(',')
 
-# Topics Kafka
+# Topics
 KAFKA_TOPICS = {
     'USER_EVENTS': 'user.events',
     'ORDER_EVENTS': 'order.events',
     'NOTIFICATION_EVENTS': 'notification.events',
+    'EXIGENCE_EVENTS': 'exigence.events',
     'MICROSERVICE_COMMUNICATION': 'microservice.communication',
 }
 
-# Consumer Groups (un par microservice)
-KAFKA_CONSUMER_GROUP = f"{os.environ.get('SERVICE_NAME', 'django-service')}"
+# Consumer group
+KAFKA_CONSUMER_GROUP = os.environ.get('SERVICE_NAME', 'django-service')
