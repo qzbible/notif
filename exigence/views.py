@@ -5,6 +5,7 @@ from exigence.service import accept_anwser, exigence_approver, exigence_notifica
 from exigence.serializers import ExigenceSerializer
 # from exigence.utils import send_mail_created
 
+from kafka_app.producers import KafkaProducerClient
 from rest_framework.response import Response
 from rest_framework import status
  
@@ -26,7 +27,7 @@ from celery import current_app
 from dateutil.parser import parse as dateutil_parse
 import pytz
 from django.utils.dateparse import parse_datetime
-
+from django.conf import settings
  
 from dateutil.relativedelta import relativedelta
  
@@ -189,11 +190,7 @@ class ExigenceResponsableView(APIView):
                 role = validated_data.get("role"),
                 lang = lang,
             )
-            print("✅ Exigence créée avec ID:", exigence.id)
-            # print id client, id projet id action id analysis id indicateur id reporting
-            print("   ID Client:", exigence.id_client)
-            print("   ID Projet:", exigence.id_project)
-            print("   ID Action:", exigence.id_action)
+           
 
             # Gestion des scopes (s'il s'agit du modèle avec ArrayField)
             if "scope" in validated_data and validated_data.get("scope"):
@@ -224,6 +221,35 @@ class ExigenceResponsableView(APIView):
             exigence.task_id = task.id
             exigence.save() 
             # Envoi de l'email 
+
+             # 2. Publier l'événement dans Kafka
+            event = {
+                'event_type': 'order.created',
+                'order_id': str(exigence.id), 
+                'items': [ ],
+                'timestamp': exigence.created_at.isoformat(),
+            }
+
+            try:
+                KafkaProducerClient.send_message(
+                    topic=settings.KAFKA_TOPICS['ORDER_EVENTS'],
+                    message=event,
+                    key=str(exigence.id)
+                )
+            except Exception as e:
+                # Log l'erreur mais ne bloque pas la création
+                logger.error(f"Failed to send Kafka message: {e}")
+
+            # 3. Retourner la réponse
+            headers = self.get_success_headers(serializer.data)
+            # return Response(
+            #     serializer.data,
+            #     status=status.HTTP_201_CREATED,
+            #     headers=headers
+            # )
+
+
+
             return Response(
                 {
                     "message": "Exigence créée avec succès",
@@ -231,7 +257,7 @@ class ExigenceResponsableView(APIView):
                     "code": 201,
                     "id": exigence.id
                 },
-                status=status.HTTP_201_CREATED
+                status=status.HTTP_201_CREATED, headers=headers
             )
         except Exception as e:
             # Log l'erreur pour le débogage

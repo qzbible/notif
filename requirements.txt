@@ -248,3 +248,6 @@ zipp==1.0.0
 zope.event==4.5.0
 zope.interface==5.4.0
 
+
+kafka-python==2.0.2
+django-kafka==0.1.1

@@ -45,6 +45,10 @@ COPY ./docker/local/django/start-daphne /start-daphne
 RUN sed -i 's/\r$//g' /start-daphne
 RUN chmod +x /start-daphne
 
+COPY ./docker/local/django/start-kafka /start-kafka
+RUN sed -i 's/\r$//g' /start-kafka
+RUN chmod +x /start-kafka
+
 
 COPY ./docker/local/django/celery/worker/start /start-celeryworker
 RUN sed -i 's/\r$//g' /start-celeryworker
