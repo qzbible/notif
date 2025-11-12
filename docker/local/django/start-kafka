@@ -12,11 +12,9 @@ echo "=== Starting Kafka Consumer Service ==="
 echo "⏳ Checking PostgreSQL availability..."
 
 python << END
-import sys
-import time
-import psycopg2
+import sys, time, psycopg2
 
-suggest_unrecoverable_after = 30
+timeout = 30
 start = time.time()
 
 while True:
@@ -28,20 +26,45 @@ while True:
             host="${POSTGRES_HOST}",
             port="${POSTGRES_PORT}",
         )
+        print("✅ PostgreSQL is available")
         break
-    except psycopg2.OperationalError as error:
-        sys.stderr.write("Waiting for PostgreSQL to become available...\n")
-        if time.time() - start > suggest_unrecoverable_after:
-            sys.stderr.write("  This is taking longer than expected. The following exception may be indicative of an unrecoverable error: '{}'\n".format(error))
-    time.sleep(1)
+    except psycopg2.OperationalError as e:
+        if time.time() - start > timeout:
+            sys.stderr.write("❌ PostgreSQL did not become available in time: {}\n".format(e))
+            sys.exit(1)
+        sys.stderr.write("⏳ Waiting for PostgreSQL...\n")
+        time.sleep(1)
 END
 
-echo "✅ PostgreSQL is available"
- 
+# ============================================
+# 2. Vérifier la disponibilité de Kafka
+# ============================================
+echo "⏳ Checking Kafka availability..."
+
+python << END
+import socket, time, sys
+
+host = "${KAFKA_BOOTSTRAP_SERVERS}".split(":")[0]
+port = int("${KAFKA_BOOTSTRAP_SERVERS}".split(":")[1])
+timeout = 30
+start = time.time()
+
+while True:
+    try:
+        s = socket.create_connection((host, port), timeout=3)
+        s.close()
+        print("✅ Kafka is available")
+        break
+    except Exception as e:
+        if time.time() - start > timeout:
+            sys.stderr.write("❌ Kafka broker not reachable: {}\n".format(e))
+            sys.exit(1)
+        sys.stderr.write("⏳ Waiting for Kafka broker...\n")
+        time.sleep(2)
+END
 
 # ============================================
 # 3. Démarrer le Kafka Consumer
 # ============================================
 echo "🚀 Starting Kafka Consumer..."
-
 exec python3 manage.py run_kafka_consumer --topic=all
