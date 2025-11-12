@@ -147,7 +147,6 @@ services:
 
   kafka-consumer:
     <<: *api
-    image: "kafka-consumer"
     command: /start-kafka
     healthcheck: # TODO: needs to be implemented
       test: []
