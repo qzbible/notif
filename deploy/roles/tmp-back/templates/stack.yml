@@ -150,6 +150,8 @@ services:
     command: /start-kafka
     env_file:
       - ./.django.env
+    networks:
+      - klivar
     healthcheck: # TODO: needs to be implemented
       test: []
       disable: true
