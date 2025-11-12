@@ -151,7 +151,7 @@ services:
     env_file:
       - ./.django.env
     networks:
-      - klivar
+      - host
     healthcheck: # TODO: needs to be implemented
       test: []
       disable: true
