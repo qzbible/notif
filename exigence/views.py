@@ -34,11 +34,11 @@ from dateutil.relativedelta import relativedelta
 
 # Import conditionnel
 try:
-    from kafka_app.producers import KafkaProducerClient
+    from kafka_app.producers import kafka_producer
     KAFKA_AVAILABLE = True
 except Exception as e:
     print(f"Kafka import failed: {e}")
-    KafkaProducerClient = None
+    kafka_producer = None
     KAFKA_AVAILABLE = False
 
 
@@ -94,12 +94,12 @@ class ExigenceResponsableView(APIView):
     
     def _send_kafka_event(self, event_type, data):
         """Helper pour envoyer des événements Kafka"""
-        if not KAFKA_AVAILABLE or KafkaProducerClient is None:
+        if not KAFKA_AVAILABLE or kafka_producer is None:
             print("Kafka not available, skipping event")
             return None
         
-        return KafkaProducerClient.send_message(
-            topic='notification.events',
+        return kafka_producer.send_message(
+            topic='exigence.events',
             message={
                 'event_type': event_type,
                 'data': data,
