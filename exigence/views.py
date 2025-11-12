@@ -99,7 +99,7 @@ class ExigenceResponsableView(APIView):
             return None
         
         return kafka_producer.send_message(
-            topic='exigence.events',
+            topic='notification.events',
             message={
                 'event_type': event_type,
                 'data': data,
@@ -246,7 +246,7 @@ class ExigenceResponsableView(APIView):
 
             # Envoyer événement Kafka (optionnel)
             self._send_kafka_event(
-                event_type='exigence.created',
+                event_type='task.created',
                 data={'id': exigence.id}
             )
 
