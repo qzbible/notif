@@ -264,7 +264,7 @@ EMAIL_HOST_PASSWORD = 'kkai hkqz idar sjql'
 APP_NAME = 'Klivar'
 
 # === KAFKA CONFIGURATION ===
-KAFKA_BOOTSTRAP_SERVERS = ['kafka.klivar.com:9092']  # Ton broker Kafka
+KAFKA_BOOTSTRAP_SERVERS = ['kafka.klivar.com:9992']  # Ton broker Kafka
 
 # Configuration Producer
 KAFKA_PRODUCER_CONFIG = {
