@@ -132,3 +132,4 @@ class KafkaProducerClient:
 
 # Instance globale (mais PAS encore initialisée)
 kafka_producer = KafkaProducerClient()
+ 

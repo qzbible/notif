@@ -148,6 +148,8 @@ services:
   kafka-consumer:
     <<: *api
     command: /start-kafka
+    env_file:
+      - ./.django.env
     healthcheck: # TODO: needs to be implemented
       test: []
       disable: true
