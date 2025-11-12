@@ -148,6 +148,9 @@ services:
   kafka-consumer:
     <<: *api
     command: /start-kafka
+    network_mode: "host"
+    volumes:
+      - .:/app  
     env_file:
       - ./.django.env
 
