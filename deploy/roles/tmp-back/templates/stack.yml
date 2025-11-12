@@ -150,8 +150,12 @@ services:
     command: /start-kafka
     env_file:
       - ./.django.env
+
+    environment:
+      - KAFKA_BOOTSTRAP_SERVERS=kafka.klivar.com:9992
+      - SERVICE_NAME=django-orders-service
     networks:
-      - host
+      - klivar
     healthcheck: # TODO: needs to be implemented
       test: []
       disable: true
