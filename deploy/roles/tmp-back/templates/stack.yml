@@ -145,23 +145,23 @@ services:
         constraints:
           - node.role == manager
 
-  kafka-consumer:
-    <<: *api
-    command: /start-kafka
+  # kafka-consumer:
+  #   <<: *api
+  #   command: /start-kafka
 
-    volumes:
-      - .:/app  
-    env_file:
-      - ./.django.env
+  #   volumes:
+  #     - .:/app  
+  #   env_file:
+  #     - ./.django.env
 
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka.klivar.com:9992
-      - SERVICE_NAME=django-orders-service
-    networks:
-      - klivar
-    healthcheck: # TODO: needs to be implemented
-      test: []
-      disable: true
+  #   environment:
+  #     - KAFKA_BOOTSTRAP_SERVERS=kafka.klivar.com:9992
+  #     - SERVICE_NAME=django-orders-service
+  #   networks:
+  #     - klivar
+  #   healthcheck: # TODO: needs to be implemented
+  #     test: []
+  #     disable: true
 
 volumes:
   static_volume:
