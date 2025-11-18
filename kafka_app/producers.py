@@ -75,6 +75,7 @@ class KafkaProducerClient:
             future = self._producer.send(topic=topic, value=message, key=key)
             record_metadata = future.get(timeout=10)
             
+            print(f"Message sent to {topic}: {message}")
             logger.info(
                 f"✅ Message sent to {topic} - "
                 f"Partition: {record_metadata.partition}, "
