@@ -113,7 +113,7 @@ services:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
     environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka.klivar.com:9992
+      - KAFKA_BOOTSTRAP_SERVERS=dev-kafka.klivar.com:9992
       - SERVICE_NAME=django-orders-service
     networks:
       - klivar-api-local-live-nw
