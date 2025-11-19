@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'projet', 
     'file',
     'board',
-    'kafka_app',
+    # 'kafka_app',
     'cartographie',
 
     # Healthchecks
