@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'projet', 
     'file',
     'board',
-    # 'kafka_app',
+    'kafka_app',
     'cartographie',
 
     # Healthchecks
@@ -264,7 +264,7 @@ EMAIL_HOST_PASSWORD = 'kkai hkqz idar sjql'
 APP_NAME = 'Klivar'
 
 # === KAFKA CONFIGURATION ===
-KAFKA_BOOTSTRAP_SERVERS = ['dev-kafka.klivar.com:9992']  # Ton broker Kafka
+KAFKA_BOOTSTRAP_SERVERS = ['host.docker.internal:9992','localhost:9992']  # Ton broker Kafka
 
 # Configuration Producer
 KAFKA_PRODUCER_CONFIG = {
@@ -288,8 +288,7 @@ KAFKA_CONSUMER_CONFIG = {
 
 # Topics Kafka
 KAFKA_TOPICS = {
-    'USER_EVENTS': 'user.events',
-    'ORDER_EVENTS': 'order.events',
+    'USER_EVENTS': 'user.events', 
     'NOTIFICATION_EVENTS': 'notification.events',
     'MICROSERVICE_COMMUNICATION': 'microservice.communication',
 }

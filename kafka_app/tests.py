@@ -9,7 +9,7 @@ class KafkaIntegrationTest(TestCase):
     
     def test_send_message(self):
         """Test d'envoi d'un message"""
-        topic = settings.KAFKA_TOPICS['ORDER_EVENTS']
+        topic = settings.KAFKA_TOPICS['NOTIFICATION_EVENTS']
         message = {
             'event_type': 'order.test',
             'order_id': '123',
@@ -24,7 +24,7 @@ class KafkaIntegrationTest(TestCase):
     
     def test_consumer_connection(self):
         """Test de connexion du consumer"""
-        topics = [settings.KAFKA_TOPICS['ORDER_EVENTS']]
+        topics = [settings.KAFKA_TOPICS['NOTIFICATION_EVENTS']]
         
         consumer = KafkaConsumerClient(topics, group_id='test-group')
         

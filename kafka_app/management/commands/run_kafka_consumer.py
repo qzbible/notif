@@ -38,10 +38,10 @@ class Command(BaseCommand):
                 [settings.KAFKA_TOPICS['USER_EVENTS']],
                 handle_user_event
             ),
-            'order_events': (
-                [settings.KAFKA_TOPICS['ORDER_EVENTS']],
-                handle_order_event
-            ),
+            # 'order_events': (
+            #     [settings.KAFKA_TOPICS['ORDER_EVENTS']],
+            #     handle_order_event
+            # ),
             'notification_events': (
                 [settings.KAFKA_TOPICS['NOTIFICATION_EVENTS']],
                 handle_notification_event
@@ -84,7 +84,7 @@ class Command(BaseCommand):
         
         handlers = {
             settings.KAFKA_TOPICS['USER_EVENTS']: handle_user_event,
-            settings.KAFKA_TOPICS['ORDER_EVENTS']: handle_order_event,
+            # settings.KAFKA_TOPICS['ORDER_EVENTS']: handle_order_event,
             settings.KAFKA_TOPICS['NOTIFICATION_EVENTS']: handle_notification_event,
         }
         
