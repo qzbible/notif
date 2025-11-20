@@ -73,7 +73,8 @@ class Command(BaseCommand):
 
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
-
+        
+        print("Consumer is running. Press Ctrl+C to stop. ${}", settings.KAFKA_BOOTSTRAP_SERVERS)
         # Démarrer le consumer
         consumer = KafkaConsumerClient(topics, group_id=group_id)
         consumer.consume_messages(handler)
