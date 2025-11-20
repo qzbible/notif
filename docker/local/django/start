@@ -9,7 +9,7 @@ echo "🧠 Starting Django server..."
 
 python3 manage.py runserver "0.0.0.0:${DJANGO_LISTENING_PORT:-9081}" &
 
-echo "🕵️‍♂️ Starting Kafka producer... ${KAFKA_BOOTSTRAP_SERVERS}"
+echo "🕵️‍♂️ Starting Kafka producer... ===== ${KAFKA_BOOTSTRAP_SERVERS}"
 echo "🎧 Waiting 5s before launching Kafka consumer..."
 sleep 10
 python3 manage.py run_kafka_consumer --topic=all 

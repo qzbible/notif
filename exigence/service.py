@@ -154,6 +154,8 @@ def exigence_responsable( object, title, type_task, description, dest_email, sen
         path = "deployer/evaluation/responsable/responsable-exigence-fr.html" 
 
     path_txt = "deployer/evaluation/responsable/responsable-exigence.txt" 
+    print("execution")
+    print("back_url", back_url)
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
