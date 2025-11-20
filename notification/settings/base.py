@@ -264,7 +264,9 @@ EMAIL_HOST_PASSWORD = 'kkai hkqz idar sjql'
 APP_NAME = 'Klivar'
 
 # === KAFKA CONFIGURATION ===
-KAFKA_BOOTSTRAP_SERVERS = ['host.docker.internal:9992','localhost:9992']  # Ton broker Kafka
+KAFKA_BOOTSTRAP_SERVERS = [ os.getenv(
+    "SWAN_CONDUKTOR_URL", 'host.docker.internal:9992'), os.getenv(
+    "SWAN_KAFKA_URL", 'localhost:9992')]  # Ton broker Kafka
 
 # Configuration Producer
 KAFKA_PRODUCER_CONFIG = {
