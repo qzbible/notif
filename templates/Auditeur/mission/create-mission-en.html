@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title></title>
+    <title>alert to the Klivar</title>
     <style>
       /* Reset */
       * {
@@ -53,6 +53,14 @@
         margin: 8px 4px;
       }
 
+      .icon-placeholder {
+        width: 15px;
+        height: 15px;
+        background-color: #7a1cac;
+        border-radius: 2px;
+        display: inline-block;
+      }
+
       a[x-apple-data-detectors] {
         color: inherit !important;
         text-decoration: inherit !important;
@@ -96,8 +104,23 @@
         pointer-events: none;
         position: relative;
       }
+
+      .image-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        z-index: 10;
+      }
       
-      /* Classes pour le tableau des détails */
+      /* Nouvelles classes pour le tableau des détails */
       .details-table {
         border-radius: 10px;
         border: 1px solid #e0e0e0;
@@ -133,34 +156,47 @@
       .details-description {
         font-size: 12px;
         color: #666;
-        margin: 0 0 20px 0;
-        line-height: 1.6;
-      }
-      
-      .info-row {
-        margin-bottom: 12px;
-      }
-      
-      .info-label {
-        font-size: 12px;
-        font-weight: 600;
-        color: #333;
-        padding-right: 10px;
-        vertical-align: top;
-      }
-      
-      .info-value {
-        font-size: 12px;
-        color: #666;
-        vertical-align: top;
+        margin: 0 0 15px 0;
+        line-height: 1.5;
       }
 
-      .list-item {
+      .details-type{
         font-size: 12px;
-        color: #353739;
-        margin: 0 0 8px 0;
-        line-height: 1.5;
-        padding-left: 5px;
+        color: #666;
+        margin: 0 0 15px 0;
+        line-height: 1.5; 
+      }
+
+      .details-duree{
+        font-size: 12px;
+        color: #666;
+        margin: 0 0 15px 0;
+        line-height: 1.5; 
+      }
+      
+      .date-row {
+        border-top: 1px solid #f0f0f0;
+        padding-top: 15px;
+      }
+      
+      .date-table {
+        width: 100%;
+      }
+      
+      .date-cell {
+        padding: 8px 0;
+        font-size: 12px;
+        color: #555;
+        vertical-align: top;
+      }
+      
+      .date-label {
+        font-weight: 600;
+        width: 80px;
+      }
+      
+      .date-value {
+        color: #333;
       }
 
       /* Responsive Styles */
@@ -185,6 +221,15 @@
           max-height: none !important;
         }
 
+        .hero-bg {
+          padding: 30px 20px !important;
+        }
+
+        .hero-title {
+          font-size: 32px !important;
+          text-align: center !important;
+        }
+
         .content-padding {
           padding: 30px 20px !important;
         }
@@ -192,6 +237,36 @@
         .logo-container {
           width: 120px !important;
           height: 48px !important;
+        }
+
+        .logo-text {
+          font-size: 16px !important;
+        }
+
+        .feature-table {
+          width: 100% !important;
+        }
+
+        .feature-icon {
+          width: 20px !important;
+          padding-right: 12px !important;
+        }
+
+        .feature-text {
+          width: calc(100% - 32px) !important;
+        }
+
+        .checklist-table {
+          width: 100% !important;
+        }
+
+        .check-icon {
+          width: 20px !important;
+          padding-right: 10px !important;
+        }
+
+        .check-text {
+          width: calc(100% - 30px) !important;
         }
 
         body {
@@ -217,6 +292,14 @@
       }
 
       @media screen and (max-width: 480px) {
+        .hero-bg {
+          padding: 25px 15px !important;
+        }
+
+        .hero-title {
+          font-size: 28px !important;
+        }
+
         .content-padding {
           padding: 25px 15px !important;
         }
@@ -231,9 +314,18 @@
           line-height: 1.6 !important;
         }
 
+        .feature-text-content {
+          font-size: 11px !important;
+          line-height: 1.6 !important;
+        }
+
         .logo-container {
           width: 100px !important;
           height: 40px !important;
+        }
+
+        .logo-text {
+          font-size: 14px !important;
         }
         
         .details-header-text {
@@ -244,7 +336,13 @@
           font-size: 13px !important;
         }
         
-        .details-description, .list-item {
+        .details-description {
+          font-size: 11px !important;
+        }
+        .details-type {
+          font-size: 11px !important;
+        }
+        .details-duree {
           font-size: 11px !important;
         }
       }
@@ -264,7 +362,7 @@
     >
       <!-- Header avec logo -->
       <tr>
-        <td align="center"   >
+        <td align="center" style="padding: 20px 0">
           <table
             class="logo-container"
             width="144"
@@ -281,8 +379,8 @@
                 class="logo-text"
                 style="color: white; font-weight: bold; font-size: 18px"
               >
-                <img 
-                  src="{{back_host}}media/icons/cropped-Logo-Klivar-1.png"
+                <img
+                  src="{{back_url}}media/icons_mail/cropped-Logo-Klivar-1.png"
                   class="protected-image"
                   oncontextmenu="return false;"
                   ondragstart="return false;"
@@ -306,26 +404,24 @@
           "
         >
           <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            <!-- Icône -->
-            <tr>
-              <td
-                align="center"
-                valign="middle"
-                class="logo-text"
-                style="color: white; padding-bottom: 20px;"
-              >
-              <img
-              src="{{back_host}}media/icons/projet-lance.png"
-              class="protected-image"
-              oncontextmenu="return false;"
-              ondragstart="return false;"
-              onselectstart="return false;"
-              alt="projet-lance"
-            />
-              </td>
-            </tr>
-            
             <!-- Titre -->
+            <tr>
+                <td
+                  align="center"
+                  valign="middle"
+                  class="logo-text"
+                  style="color: white;"
+                >
+                  <img
+                    src="../../../file/icons_mail/mission.png"
+                    class="protected-image"
+                    oncontextmenu="return false;"
+                    ondragstart="return false;"
+                    onselectstart="return false;"
+                    alt="projet-lance"
+                  />
+                </td>
+              </tr>
             <tr>
               <td style="padding-bottom: 10px">
                 <h1
@@ -339,66 +435,14 @@
                     text-align: center;
                   "
                 >
-                  Nouveau dossier d'arbitrage créé
+                  Audit mission launched
                 </h1>
               </td>
             </tr>
             
             <!-- Message d'accueil -->
             <tr>
-              <td style="padding-bottom: 20px">
-                <p
-                  class="body-text"
-                  style="
-                    font-size: 12px;
-                    color: #353739;
-                    margin: 0 0 15px 0;
-                    line-height: 1.5;
-                    letter-spacing: 0.2px;
-                  "
-                >
-                  Cher {{name}},
-                </p>
-                <p
-                  class="body-text"
-                  style="
-                    font-size: 12px;
-                    color: #353739;
-                    margin: 0 0 15px 0;
-                    line-height: 1.5;
-                    letter-spacing: 0.2px;
-                  "
-                >
-                  Un nouveau <strong>dossier d'arbitrage</strong> a été créé dans le cadre du comité <strong>{{committee_name}} </strong> prévu le <strong> {{committee_date}} </strong>.
-                </p>
-                <p
-                  class="body-text"
-                  style="
-                    font-size: 12px;
-                    color: #353739;
-                    margin: 0 0 8px 0;
-                    line-height: 1.5;
-                    letter-spacing: 0.2px;
-                  "
-                >
-                  Ce dossier contient les éléments suivants à examiner :
-                </p>
-                <!-- Liste des éléments -->
-                <ul style="margin: 0; padding-left: 20px;">
-                  <li class="list-item">
-                    <strong> {{nomber_elements}} </strong> élément(s) à arbitrer
-                  </li>
-                  <li class="list-item">
-                    <strong>Types d'éléments :</strong> {{type_arbitration_elements | safe }}
-                  </li>
-                   
-                </ul>
-              </td>
-            </tr>
-
-            <!-- Message de remerciement -->
-            <tr>
-              <td style="padding-bottom: 20px">
+              <td style="padding-bottom: 10px">
                 <p
                   class="body-text"
                   style="
@@ -409,23 +453,15 @@
                     letter-spacing: 0.2px;
                   "
                 >
-                  Merci de consulter ces éléments avant la réunion et de préparer vos propositions d'arbitrage.
-
-                  <a href="{{url_connect}}" style=" font-size: 12px;
-                  color: #7a1cac;
-                  margin: 0;
-                  line-height: 1.5;
-                  letter-spacing: 0.2px;
-                  font-weight: 500;">    Connectez-vous</a>
+                  Dear <strong>{{name}}</strong>,<br /><br />
+                  Well done! Your audit mission {{Mission_name}} has been successfully launched.
                 </p>
               </td>
             </tr>
 
-            
-
-            <!-- Tableau des détails -->
+            <!-- Tableau des détails corrigé -->
             <tr>
-              <td style="padding-bottom: 20px">
+              <td style="padding-bottom: 10px">
                 <table 
                   class="details-table" 
                   width="100%" 
@@ -437,7 +473,7 @@
                   <tr>
                     <td class="details-header">
                       <h3 class="details-header-text">
-                        Détail de l'instance :
+                        Details of the audit mission :
                       </h3>
                     </td>
                   </tr>
@@ -445,46 +481,22 @@
                   <!-- Contenu -->
                   <tr>
                     <td class="details-content">
-                      <!-- Titre du comité -->
-                      <p class="details-title">Instance – {{instance_name}}</p>
+                      <!-- Titre du projet -->
+                      <p class="details-title">{{title}}</p>
                       
                       <!-- Description -->
                       <div class="details-description">
-                        {{instance_description | safe}}
+                        {{description|safe}}
+                      </div>
+
+                      <!-- Type -->
+                      <div class="details-type">
+                        <strong>Type</strong> : {{type}}
                       </div>
                       
-                      <!-- Dates (Début et Fin côte à côte) -->
-                      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 12px;">
-                        <tr>
-                          <td class="info-label" style="padding-bottom: 2px;">
-                            {{instance_date}}
-                          </td>
-                           
-                        </tr>
-                      </table>
-                      
-                      <!-- Lieu / Lien de réunion -->
-                      <div class="info-row">
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                          <tr>
-                            <td class="info-label" colspan="2" style="padding-bottom: 2px;">
-                              <strong>Lieu / Lien de réunion :</strong> {{instance_location}}
-                            </td>
-                          </tr>
-                           
-                        </table>
-                      </div>
-                      
-                      <!-- Participants -->
-                      <div class="info-row">
-                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
-                          <tr>
-                            <td class="info-label" colspan="2" style="padding-bottom: 2px;">
-                              <strong>Participants :</strong> {{instance_participants}}
-                            </td>
-                          </tr>
-                          
-                        </table>
+                      <!-- duree -->
+                      <div class="details-duree">
+                        <strong>Duration</strong> : {{duree}}
                       </div>
                       
                     </td>
@@ -492,6 +504,24 @@
                 </table>
               </td>
             </tr>
+            <!-- Bouton d'action (optionnel) -->
+            <!-- <tr>
+              <td align="center" style="padding-bottom: 10px">
+                <a href="{{url}}" class="cta-button">
+                  Accéder au module Déployer
+                </a>
+              </td>
+            </tr> -->
+
+            {% if url %}
+            <tr>
+              <td align="center" style="padding-bottom: 10px">
+                <a href="{{url}}" class="cta-button">
+                  Access the Audit module
+                </a>
+              </td>
+            </tr>
+            {% endif %}
 
             <!-- Signature -->
             <tr>
@@ -506,7 +536,7 @@
                     letter-spacing: 0.2px;
                   "
                 >
-                  <strong>Votre équipe {{committee_name}}</strong>
+                  <strong>Your team {{company}}</strong>
                 </p>
               </td>
             </tr>
