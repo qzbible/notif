@@ -38,10 +38,10 @@ class Command(BaseCommand):
                 [settings.KAFKA_TOPICS['USER_EVENTS']],
                 handle_user_event
             ),
-            'order_events': (
-                [settings.KAFKA_TOPICS['ORDER_EVENTS']],
-                handle_order_event
-            ),
+            # 'order_events': (
+            #     [settings.KAFKA_TOPICS['ORDER_EVENTS']],
+            #     handle_order_event
+            # ),
             'notification_events': (
                 [settings.KAFKA_TOPICS['NOTIFICATION_EVENTS']],
                 handle_notification_event
@@ -73,7 +73,8 @@ class Command(BaseCommand):
 
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
-
+        
+        print("Consumer is running. Press Ctrl+C to stop. ${}", settings.KAFKA_BOOTSTRAP_SERVERS)
         # Démarrer le consumer
         consumer = KafkaConsumerClient(topics, group_id=group_id)
         consumer.consume_messages(handler)
@@ -84,7 +85,7 @@ class Command(BaseCommand):
         
         handlers = {
             settings.KAFKA_TOPICS['USER_EVENTS']: handle_user_event,
-            settings.KAFKA_TOPICS['ORDER_EVENTS']: handle_order_event,
+            # settings.KAFKA_TOPICS['ORDER_EVENTS']: handle_order_event,
             settings.KAFKA_TOPICS['NOTIFICATION_EVENTS']: handle_notification_event,
         }
         

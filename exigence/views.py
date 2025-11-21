@@ -32,14 +32,14 @@ from django.conf import settings
 from dateutil.relativedelta import relativedelta
 
 
-# Import conditionnel
-try:
-    from kafka_app.producers import kafka_producer
-    KAFKA_AVAILABLE = True
-except Exception as e:
-    print(f"Kafka import failed: {e}")
-    kafka_producer = None
-    KAFKA_AVAILABLE = False
+# # Import conditionnel
+# try:
+#     from kafka_app.producers import kafka_producer
+#     KAFKA_AVAILABLE = True
+# except Exception as e:
+#     print(f"Kafka import failed: {e}")
+#     kafka_producer = None
+#     KAFKA_AVAILABLE = False
 
 
 def get_current_date_iso():
@@ -92,19 +92,19 @@ def parse_date_to_730(date_str):
 class ExigenceResponsableView(APIView):
     permission_classes = [AllowAny]
     
-    def _send_kafka_event(self, event_type, data):
-        """Helper pour envoyer des événements Kafka"""
-        if not KAFKA_AVAILABLE or kafka_producer is None:
-            print("Kafka not available, skipping event")
-            return None
+    # def _send_kafka_event(self, event_type, data):
+    #     """Helper pour envoyer des événements Kafka"""
+    #     if not KAFKA_AVAILABLE or kafka_producer is None:
+    #         print("Kafka not available, skipping event")
+    #         return None
         
-        return kafka_producer.send_message(
-            topic='notification.events',
-            message={
-                'event_type': event_type,
-                'data': data,
-            }
-        )
+    #     return kafka_producer.send_message(
+    #         topic='notification.events',
+    #         message={
+    #             'event_type': event_type,
+    #             'data': data,
+    #         }
+    #     )
     @extend_schema(
         request=ExigenceSerializer,
         responses={
@@ -173,6 +173,7 @@ class ExigenceResponsableView(APIView):
         # Récupération des données validées
         validated_data = serializer.validated_data  
         # 2025-04-03T22:23:52.900Z
+        print("validated_data", validated_data)
         try:
 
             if validated_data.get("type_task") == "EXIGENCE":
@@ -187,6 +188,7 @@ class ExigenceResponsableView(APIView):
                     type_task="[Corrective action]"
 
             lang = get_lang_request(request)
+            ExigenceMail.objects.all().delete()
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
                 object=validated_data.get("object"),
@@ -244,11 +246,11 @@ class ExigenceResponsableView(APIView):
             exigence.save() 
             # Envoi de l'email 
 
-            # Envoyer événement Kafka (optionnel)
-            self._send_kafka_event(
-                event_type='task.created',
-                data={'id': exigence.id}
-            )
+            # # Envoyer événement Kafka (optionnel)
+            # self._send_kafka_event(
+            #     event_type='task.created',
+            #     data={'id': exigence.id}
+            # )
 
 
             return Response(
@@ -697,6 +699,7 @@ class ValidateAuthCodeView(APIView):
             id_reporting = instance_customUser.id_reporting
             id_indicateur = instance_customUser.id_indicateur
             type_task = instance_customUser.type_task
+            id_project = instance_customUser.id_project
             
             # Suppression du code d'authentification après utilisation
             auth_code_instance.delete()
@@ -707,6 +710,7 @@ class ValidateAuthCodeView(APIView):
                         "id_answer": instance_customUser.id_answer, 
                         "id_task": instance_customUser.id_action, 
                         "type_task": type_task, 
+                        "id_project":id_project,
                         "is_read": True
                     }, 
                     status=status.HTTP_200_OK
@@ -717,6 +721,7 @@ class ValidateAuthCodeView(APIView):
                         "id_answer": instance_customUser.id_answer, 
                         "id_task": instance_customUser.id_action, 
                         "type_task": type_task, 
+                        "id_project"    :id_project,
                         "is_read": False
                     }, 
                     status=status.HTTP_200_OK
@@ -730,6 +735,7 @@ class ValidateAuthCodeView(APIView):
                     "id_reporting": id_reporting, 
                     "id_indicateur": id_indicateur, 
                     "type_task": type_task, 
+                    "id_project":id_project,
                     "is_read": False
                 }, 
                 status=status.HTTP_200_OK

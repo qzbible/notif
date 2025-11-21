@@ -154,6 +154,8 @@ def exigence_responsable( object, title, type_task, description, dest_email, sen
         path = "deployer/evaluation/responsable/responsable-exigence-fr.html" 
 
     path_txt = "deployer/evaluation/responsable/responsable-exigence.txt" 
+    print("execution")
+    print("back_url", back_url)
     context = {
         "sender_name":sender_name, 
         "name": dest_name,
@@ -165,7 +167,7 @@ def exigence_responsable( object, title, type_task, description, dest_email, sen
         "deadline": format_date_string_short(deadline_text,lang ),
         "company": company,
         "type_task": type_task,
-        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+        "back_url" :  os.environ.get("BACK_HOST_URL", "")
     } 
     body_content = render_to_string(
         path,
@@ -229,7 +231,7 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
         "deadline": format_date_string_short(deadline_text,lang ),
         "company": company,
         "type_task": type_task,
-        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+        "back_url" : os.environ.get("BACK_HOST_URL", "")
     }
     
     body_content = render_to_string(
@@ -403,7 +405,7 @@ def exigence_notification( object, title, type_task, description, dest_email, se
         "deadline": format_date_string_short(deadline_text,lang ),
         "company": company,
         "type_task": type_task,
-        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+        "back_url" : os.environ.get("BACK_HOST_URL", "")
     }
  
     body_content = render_to_string(
@@ -446,7 +448,7 @@ def accept_anwser( object, email,  type_task, description, title, dest_name, com
             "description":description, 
             "company": company,
             "type_task": type_task,
-            "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+            "back_url" :  os.environ.get("BACK_HOST_URL", "")
         }
         html_content = render_to_string(
             path,
@@ -488,7 +490,7 @@ def rejet_anwser( object, email,  type_task, description, title, dest_name, comp
         "description":description, 
         "company": company,
         "type_task": type_task,
-        "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+        "back_url" : os.environ.get("BACK_HOST_URL", "")
     }
     html_content = render_to_string(
         path,
@@ -793,7 +795,7 @@ def notification_approuver( object, title, type_task, description, dest_email, s
                 "deadline": format_date_string_short(deadline_text,lang ),
                 "company": company,
                 "type_task": type_task,
-                "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+                "back_url" : os.environ.get("BACK_HOST_URL", "")
         }
         
         text_content = render_to_string(
@@ -880,7 +882,7 @@ def notification_consulting( object, title, type_task, description, dest_email, 
                 "deadline": format_date_string_short(deadline_text,lang ),
                 "company": company,
                 "type_task": type_task,
-                "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+                "back_url" :  os.environ.get("BACK_HOST_URL", "")
         }
         
         text_content = render_to_string(
@@ -967,7 +969,7 @@ def notification_informer( object, title, type_task, description, dest_email, se
                 "deadline": format_date_string_short(deadline_text,lang ),
                 "company": company,
                 "type_task": type_task,
-                "back_url" :  "https://dev-backend.app.klivar.com/" if back_url == None else back_url
+                "back_url" : os.environ.get("BACK_HOST_URL", "")
         }
         
         text_content = render_to_string(

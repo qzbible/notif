@@ -100,26 +100,26 @@ services:
     depends_on:
       - redis
 
-  kafka-consumer:
-    <<: *api
-    image: klivar-backend-kafka-consumer
-    command: /start-kafka
-    healthcheck:
-      test: []
-      disable: true
-    volumes:
-      - .:/app
-    env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
-    environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka.klivar.com:9992
-      - SERVICE_NAME=django-orders-service
-    networks:
-      - klivar-api-local-live-nw
-    depends_on:
-      - redis
-      - api
+  # kafka-consumer:
+  #   <<: *api
+  #   image: klivar-backend-kafka-consumer
+  #   command: /start-kafka
+  #   healthcheck:
+  #     test: []
+  #     disable: true
+  #   volumes:
+  #     - .:/app
+  #   env_file:
+  #     - ./.envs/.local/.django
+  #     - ./.envs/.local/.postgres
+  #   environment:
+  #     - KAFKA_BOOTSTRAP_SERVERS=dev-kafka.klivar.com:9992
+  #     - SERVICE_NAME=django-orders-service
+  #   networks:
+  #     - klivar-api-local-live-nw
+  #   depends_on:
+  #     - redis
+  #     - api
 
 
   nginx:

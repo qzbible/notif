@@ -1,6 +1,6 @@
 ---
 - name: Deploy Backend
-  hosts: ovh_manager_v2
+  hosts: ghp_manager_dev
   vars_files:
     - environments/all.yml
     - environments/{{ env }}/vars.yml
