@@ -699,6 +699,7 @@ class ValidateAuthCodeView(APIView):
             id_reporting = instance_customUser.id_reporting
             id_indicateur = instance_customUser.id_indicateur
             type_task = instance_customUser.type_task
+            id_project = instance_customUser.id_project
             
             # Suppression du code d'authentification après utilisation
             auth_code_instance.delete()
@@ -709,6 +710,7 @@ class ValidateAuthCodeView(APIView):
                         "id_answer": instance_customUser.id_answer, 
                         "id_task": instance_customUser.id_action, 
                         "type_task": type_task, 
+                        "id_project":id_project,
                         "is_read": True
                     }, 
                     status=status.HTTP_200_OK
@@ -719,6 +721,7 @@ class ValidateAuthCodeView(APIView):
                         "id_answer": instance_customUser.id_answer, 
                         "id_task": instance_customUser.id_action, 
                         "type_task": type_task, 
+                        "id_project"    :id_project,
                         "is_read": False
                     }, 
                     status=status.HTTP_200_OK
@@ -732,6 +735,7 @@ class ValidateAuthCodeView(APIView):
                     "id_reporting": id_reporting, 
                     "id_indicateur": id_indicateur, 
                     "type_task": type_task, 
+                    "id_project":id_project,
                     "is_read": False
                 }, 
                 status=status.HTTP_200_OK
