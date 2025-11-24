@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import json
 from pathlib import Path
 
+ 
+
 import os
 from dotenv import load_dotenv
 import environ
@@ -52,7 +54,7 @@ INSTALLED_APPS = [
     'projet', 
     'file',
     'board',
-    # 'kafka_app',
+    'messaging',
     'cartographie',
 
     # Healthchecks
@@ -263,38 +265,30 @@ EMAIL_HOST_USER = 'no-reply@klivar.com'
 EMAIL_HOST_PASSWORD = 'kkai hkqz idar sjql'
 APP_NAME = 'Klivar'
 
-# === KAFKA CONFIGURATION ===
-KAFKA_BOOTSTRAP_SERVERS = [ os.getenv(
-    "SWAN_CONDUKTOR_URL", 'host.docker.internal:9992'), os.getenv(
-    "SWAN_KAFKA_URL", 'localhost:9992')]  # Ton broker Kafka
 
-# Configuration Producer
-KAFKA_PRODUCER_CONFIG = {
-    'bootstrap_servers': KAFKA_BOOTSTRAP_SERVERS,
-    'value_serializer': lambda v: json.dumps(v).encode('utf-8'),
-    'key_serializer': lambda k: k.encode('utf-8') if k else None,
-    'acks': 'all',  # Attendre confirmation de tous les replicas
-    'retries': 3,
-    'max_in_flight_requests_per_connection': 1,
+# RabbitMQ Configuration
+RABBITMQ_CONFIG = {
+    'HOST': os.environ.get('RABBITMQ_HOST', 'localhost'),
+    'PORT': int(os.environ.get('RABBITMQ_PORT', '5672')),
+    'USERNAME': os.environ.get('RABBITMQ_USERNAME', 'admin'),
+    'PASSWORD': os.environ.get('RABBITMQ_PASSWORD'),
+    'VHOST': os.environ.get('RABBITMQ_VHOST', '/'),
+    'HEARTBEAT': int(os.environ.get('RABBITMQ_HEARTBEAT', '600')),
+    'BLOCKED_CONNECTION_TIMEOUT': int(os.environ.get('RABBITMQ_BLOCKED_CONNECTION_TIMEOUT', '300')),
 }
-
-# Configuration Consumer
-KAFKA_CONSUMER_CONFIG = {
-    'bootstrap_servers': KAFKA_BOOTSTRAP_SERVERS,
-    'value_deserializer': lambda m: json.loads(m.decode('utf-8')),
-    'key_deserializer': lambda k: k.decode('utf-8') if k else None,
-    'auto_offset_reset': 'earliest',  # Lire depuis le début
-    'enable_auto_commit': True,
-    'auto_commit_interval_ms': 1000,
-}
-
-# Topics Kafka
-KAFKA_TOPICS = {
-    'USER_EVENTS': 'user.events', 
-    'NOTIFICATION_EVENTS': 'notification.events',
-    'MICROSERVICE_COMMUNICATION': 'microservice.communication',
-}
-
-# Consumer Groups (un par microservice)
-KAFKA_CONSUMER_GROUP = f"{os.environ.get('SERVICE_NAME', 'django-service')}"
+# Validation
+if not RABBITMQ_CONFIG['PASSWORD']:
+    import warnings
+    warnings.warn(
+        "⚠️  RABBITMQ_PASSWORD non défini. RabbitMQ sera indisponible.",
+        RuntimeWarning
+    )
+ 
+# Celery Configuration (pour les tâches async)
+CELERY_BROKER_URL = f"amqp://{RABBITMQ_CONFIG['USERNAME']}:{RABBITMQ_CONFIG['PASSWORD']}@{RABBITMQ_CONFIG['HOST']}:{RABBITMQ_CONFIG['PORT']}/{RABBITMQ_CONFIG['VHOST']}"
+# CELERY_RESULT_BACKEND = config('REDIS_URL', default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
 

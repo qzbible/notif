@@ -11,3 +11,10 @@ CELERY_BROKER_URL=redis://redis:6379/0
 
 
 BACK_HOST_URL=http://localhost:8083/
+
+
+RABBITMQ_HOST=dev-rabbitmq.klivar.com
+RABBITMQ_PORT=5672
+RABBITMQ_USERNAME=admin
+RABBITMQ_PASSWORD=AZA_udb2jxp-zqx0dejpjcond
+RABBITMQ_VHOST=/

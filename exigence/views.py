@@ -4,8 +4,7 @@ from exigence.serializers import AcceptSerializer, ErrorResponseSerializer, Exig
 from exigence.service import accept_anwser, exigence_approver, exigence_notification, exigence_responsable, follow_up_task, notification_approuver, notification_consulting, notification_informer, rejet_anwser, task_responsable
 from exigence.serializers import ExigenceSerializer
 # from exigence.utils import send_mail_created
-
-from kafka_app.producers import KafkaProducerClient
+ 
 from rest_framework.response import Response
 from rest_framework import status
  
@@ -31,16 +30,7 @@ from django.conf import settings
  
 from dateutil.relativedelta import relativedelta
 
-
-# # Import conditionnel
-# try:
-#     from kafka_app.producers import kafka_producer
-#     KAFKA_AVAILABLE = True
-# except Exception as e:
-#     print(f"Kafka import failed: {e}")
-#     kafka_producer = None
-#     KAFKA_AVAILABLE = False
-
+ 
 
 def get_current_date_iso():
     now_utc = datetime.now(pytz.UTC)
@@ -92,19 +82,7 @@ def parse_date_to_730(date_str):
 class ExigenceResponsableView(APIView):
     permission_classes = [AllowAny]
     
-    # def _send_kafka_event(self, event_type, data):
-    #     """Helper pour envoyer des événements Kafka"""
-    #     if not KAFKA_AVAILABLE or kafka_producer is None:
-    #         print("Kafka not available, skipping event")
-    #         return None
-        
-    #     return kafka_producer.send_message(
-    #         topic='notification.events',
-    #         message={
-    #             'event_type': event_type,
-    #             'data': data,
-    #         }
-    #     )
+    
     @extend_schema(
         request=ExigenceSerializer,
         responses={
@@ -246,11 +224,7 @@ class ExigenceResponsableView(APIView):
             exigence.save() 
             # Envoi de l'email 
 
-            # # Envoyer événement Kafka (optionnel)
-            # self._send_kafka_event(
-            #     event_type='task.created',
-            #     data={'id': exigence.id}
-            # )
+           
 
 
             return Response(
