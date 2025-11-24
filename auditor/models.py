@@ -108,6 +108,14 @@ class MissionAudit(models.Model):
         auto_now=True,
         verbose_name="Date de modification"
     )
+    is_mission =  models.BooleanField(default=False)
+    is_demande =  models.BooleanField(default=False)
+
+    test = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
 
 
     class Meta:

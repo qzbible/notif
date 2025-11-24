@@ -112,8 +112,7 @@ def verifier_presence_t(chaine):
 @shared_task
 def service_mission( object, title, mission_name, description, dest_email, mission_type, dest_name, company, url, stat_date, end_date,  back_url=None, lang=None ):
     # object and description
-
-     
+ 
     if lang == "fr-FR" :
         path = "auditor/mission/create-mission-fr.html" 
         path_txt = "auditor/mission/create-mission-fr.txt"
@@ -148,7 +147,7 @@ def service_mission( object, title, mission_name, description, dest_email, missi
     return True
 
 
-def task_responsable( object, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[], during="", start_date="", back_url=None, lang=None ):
+def service_demand( object, title, description, dest_email, dest_name, company, url, test,  start_date="", end_date="", back_url=None, lang=None ):
     # object and description
     deadline_text = "non défini" 
     filename = None
@@ -157,6 +156,12 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
         new_deadline = start_date 
     else: 
         new_deadline = start_date+"T07:30:00.000Z"
+
+    if verifier_presence_t(end_date):
+        end_new_deadline = end_date 
+    else: 
+        end_new_deadline = end_date+"T07:30:00.000Z"
+
     if is_valid_date_string(new_deadline):
         start_date = new_deadline.split(" ")[0]
         # Analyser la date ISO 8601
@@ -164,35 +169,36 @@ def task_responsable( object, type_task, description, dest_email, sender_name, d
         # Reformater au format souhaité
         formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
         date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
-        date_end = date_begin + timedelta(minutes=int(during))
+        date_end = date_begin + timedelta(minutes=int(30))
         deadline_text = date_end.strftime("%Y-%m-%d %H:%M" )
         # configuration iCalendar
         if company != None: 
             filename = add_calendar(
-                    object, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+                    title, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
         else:
             filename = add_calendar(
-                object, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+                title, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
     
     if lang == "fr-FR" :
-        path = "deployer/evaluation/tache-conformite-fr.html" 
+        path = "auditor/audit_test/new-demande-fr.html" 
+        path_txt = "auditor/audit_test/new-demande-fr.txt" 
     elif lang == "en-US":
-        path = "deployer/evaluation/tache-conformite-en.html" 
+        path = "auditor/audit_test/new-demande-en.html" 
+        path_txt = "auditor/audit_test/new-demande-en.txt" 
     else:
-        path = "deployer/evaluation/tache-conformite-fr.html" 
+        path = "auditor/audit_test/new-demande-fr.html"
+        path_txt = "auditor/audit_test/new-demande-fr.txt"  
 
-    path_txt = "deployer/evaluation/tache-conformite.txt" 
-    context = {
-        "sender_name":sender_name, 
+   
+    context = { 
         "name": dest_name,
-        "title": object, 
+        "title": title, 
+        "test" :test,
         "url": url,
         "description":description,
-        "time": during,
-        "scope":scope,
-        "deadline": format_date_string_short(deadline_text,lang ),
-        "company": company,
-        "type_task": type_task,
+        "time": "30", 
+        "deadline": format_date_string_short(end_new_deadline,lang ),
+        "company": company, 
         "back_url" : os.environ.get("BACK_HOST_URL", "")
     }
     
@@ -219,8 +225,6 @@ def exigence_approver( object, title, type_task, description, dest_email, sender
     # object and description
 
     deadline_text = "non défini" 
-
-   
     if verifier_presence_t(deadline):
         new_deadline = deadline 
     else: 
