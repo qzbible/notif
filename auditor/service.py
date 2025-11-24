@@ -133,7 +133,7 @@ def service_mission( object, title, mission_name, description, dest_email, missi
         "duree": stat_date + "-" + end_date ,             # {{duree}}
         "company": company,         # {{company}}
         "url": url,                 # {{url}}
-        "back_url": back_url or os.environ.get("BACK_HOST_URL", ""), # {{back_url}}
+        "back_url": os.environ.get("BACK_HOST_URL", ""), # {{back_url}}
     }
     body_content = render_to_string(
         path,

@@ -70,9 +70,9 @@ class MissionAuditCreateView(APIView):
             # Ici vous pourriez déclencher l'envoi d'email
             # launch_mission_email.delay(mission.id)
             if 'fr' in request.data.get('language', 'fr-FR'): 
-                prefix_object = "[ MISSION D'AUDIT ]"
+                prefix_object = "[MISSION D'AUDIT]"
             else: 
-                prefix_object = "[ AUDIT MISSION ]"
+                prefix_object = "[AUDIT MISSION]"
 
             task = service_mission.apply_async(
                 args=[
