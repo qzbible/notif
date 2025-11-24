@@ -1,0 +1,29 @@
+Audit Mission Launched
+
+Dear {{name}},
+
+Congratulations! Your audit mission {{Nom_mission}} has been successfully launched.
+
+AUDIT MISSION DETAILS:
+==========================================
+
+{{title}}
+
+{{description}}
+
+Type: {{type}}
+Duration: {{duree}}
+
+{% if url %}
+Access the Audit module: {{url}}
+{% endif %}
+
+If you have any questions or need assistance, please don't hesitate to contact us.
+
+Your {{company}} team
+
+---
+Contact: avotreecoute@klivar.com
+Website: https://www.klivar.fr/
+
+This message was sent automatically by the Klivar system.

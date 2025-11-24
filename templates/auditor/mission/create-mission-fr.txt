@@ -1,0 +1,29 @@
+Mission d'audit lancée
+
+Cher/Chère {{name}},
+
+Bravo! Votre mission d'audit {{Nom_mission}} a été lancée avec succès.
+
+DÉTAIL DE LA MISSION D'AUDIT :
+==========================================
+
+{{title}}
+
+{{description}}
+
+Type : {{type}}
+Durée : {{duree}}
+
+{% if url %}
+Accéder au module Auditer : {{url}}
+{% endif %}
+
+Pour toute question ou assistance, n'hésitez pas à nous contacter.
+
+Votre équipe {{company}}
+
+---
+Contact : avotreecoute@klivar.com
+Site web : https://www.klivar.fr/
+
+Ce message a été envoyé automatiquement par le système Klivar.

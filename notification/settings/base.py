@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'board',
     'messaging',
     'cartographie',
+    'auditor',
 
     # Healthchecks
     'health_check',  # required
