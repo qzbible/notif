@@ -126,15 +126,14 @@ def service_mission( object, title, mission_name, description, dest_email, missi
     
    
     context = {
-        "name": dest_name,           # {{name}}
-        
+        "name": dest_name,           # {{name}} 
         "title": title,              # {{title}}
         "description": description,  # {{description|safe}}
         "type": mission_type, # {{type}}
-        "duree": stat_date + "-" + end_date ,             # {{duree}}
+        "duree": stat_date + "-" + end_date,             # {{duree}}
         "company": company,         # {{company}}
         "url": url,                 # {{url}}
-        "back_url": os.environ.get("BACK_HOST_URL", ""), # {{back_url}}
+        "back_url": os.environ.get("BACK_HOST_URL", "dev-notif.back.klivar.com"), # {{back_url}}
     }
     body_content = render_to_string(
         path,
