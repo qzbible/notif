@@ -127,7 +127,7 @@ def service_mission( object, title, mission_name, description, dest_email, missi
    
     context = {
         "name": dest_name,           # {{name}}
-        "Nom_mission": mission_name, # {{Nom_mission}}  
+        
         "title": title,              # {{title}}
         "description": description,  # {{description|safe}}
         "type": mission_type, # {{type}}
