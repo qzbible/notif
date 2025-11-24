@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render
 
 # Create your views here.
@@ -33,8 +34,13 @@ class MissionAuditCreateView(APIView):
                     'start_date': '2025-02-01T09:00:00Z',
                     'end_date': '2025-02-21T17:00:00Z', 
                     'company': 'Entreprise ABC',
-                    'auditor_name': 'Jean Martin',
-                    'auditor_email': 'jean.martin@klivar.com', 
+                    'auditor' : [
+                       {
+                            "name": "Jean Martin",
+                            "email" : "samyfabiol@gmail.com"
+                       }
+                    ],
+                   
                     'access_url': 'https://app.klivar.com/audit/123',
                     'base_url': 'https://api.klivar.com/',
                     'language': 'fr-FR',
@@ -54,43 +60,44 @@ class MissionAuditCreateView(APIView):
         try:
             # Créer la mission 
             data = request.data
-
-            instance = MissionAudit.objects.create(
-                title=data.get("title"),
-                description=data.get("description"),
-                mission_type=data.get("mission_type", "COMPLIANCE"),
-                start_date=data.get("start_date"),
-                end_date=data.get("end_date"),
-                auditor_name=data.get("auditor_name"),
-                auditor_email=data.get("auditor_email"),
-                company=data.get("company"),
-                access_url=data.get("access_url"),
-                base_url=data.get("base_url"),
-            )
-            # Ici vous pourriez déclencher l'envoi d'email
-            # launch_mission_email.delay(mission.id)
-            if 'fr' in request.data.get('language', 'fr-FR'): 
-                prefix_object = "[MISSION D'AUDIT]"
-            else: 
-                prefix_object = "[AUDIT MISSION]"
-
-            task = service_mission.apply_async(
-                args=[
-                    prefix_object + " "+data.get("title"),
-                    data.get("title"),
-                    data.get("mission_name"),
-                    data.get("description"),
-                    data.get("auditor_email"),
-                    data.get("mission_type"),
-                    data.get("auditor_name"),
-                    data.get("company"), 
-                    data.get("access_url"),
-                    data.get("start_date", ''),
-                    data.get("end_date", ''), 
-                    None,
-                    data.get("language", 'fr-FR'),
-                ]
-            ) 
+            users = data.get("auditor", [{}])
+            for user in users:
+                instance = MissionAudit.objects.create(
+                    title=data.get("title"),
+                    description=data.get("description"),
+                    mission_type=data.get("mission_type", "COMPLIANCE"),
+                    start_date=data.get("start_date"),
+                    end_date=data.get("end_date"),
+                    auditor_name=user.get("name"),
+                    auditor_email=user.get("email"),
+                    company=data.get("company"),
+                    access_url=data.get("access_url"),
+                    base_url=data.get("base_url"),
+                )
+                # Ici vous pourriez déclencher l'envoi d'email
+                # launch_mission_email.delay(mission.id)
+                if 'fr' in request.data.get('language', 'fr-FR'): 
+                    prefix_object = "[MISSION D'AUDIT]"
+                else: 
+                    prefix_object = "[AUDIT MISSION]"
+                print('urls', os.environ.get("BACK_HOST_URL", ""))
+                task = service_mission.apply_async(
+                    args=[
+                        prefix_object + " "+data.get("title"),
+                        data.get("title"),
+                        data.get("mission_name"),
+                        data.get("description"),
+                        user.get("email"),
+                        data.get("mission_type"),
+                        user.get("name"),
+                        data.get("company"), 
+                        data.get("access_url"),
+                        data.get("start_date", ''),
+                        data.get("end_date", ''), 
+                        None,
+                        data.get("language", 'fr-FR'),
+                    ]
+                ) 
             # Sauvegarder l'ID de la tâche 
             return Response(
                 {

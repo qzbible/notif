@@ -123,7 +123,8 @@ def service_mission( object, title, mission_name, description, dest_email, missi
     else:
         path = "auditor/mission/create-mission-fr.html" 
         path_txt = "auditor/mission/create-mission-fr.txt"
- 
+    
+   
     context = {
         "name": dest_name,           # {{name}}
         "Nom_mission": mission_name, # {{Nom_mission}}  
