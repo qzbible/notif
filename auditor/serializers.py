@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from datetime import datetime
-from .models import MissionAudit
+from .models import  Task
 
 class MissionAuditSerializer(serializers.ModelSerializer):
     """
@@ -103,7 +103,7 @@ class MissionAuditSerializer(serializers.ModelSerializer):
     )
       
     class Meta:
-        model = MissionAudit
+        model = Task
         fields = [
             "id",
             "title",

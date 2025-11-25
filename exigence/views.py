@@ -166,7 +166,7 @@ class ExigenceResponsableView(APIView):
                     type_task="[Corrective action]"
 
             lang = get_lang_request(request)
-            ExigenceMail.objects.all().delete()
+            # ExigenceMail.objects.all().delete()
             # Sauvegarde des données dans le modèle
             exigence = ExigenceMail.objects.create(
                 object=validated_data.get("object"),
