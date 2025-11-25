@@ -188,11 +188,11 @@ class Task(models.Model):
     )
     
     # === URLS ET LIENS ===
-    access_url = models.URLField(
-        verbose_name="URL d'accès au module",
+    access_url = models.TextField(
+        verbose_name="Token JWT",
         null=True,
         blank=True,
-        help_text="Lien vers l'interface d'audit"
+        help_text="Token d'authentification pour l'accès"
     )
     
     base_url = models.URLField(
