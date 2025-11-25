@@ -261,11 +261,11 @@ class Task(models.Model):
         null=True,
         blank=True
     )
-    jwt_token = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    # jwt_token = models.CharField(
+    #     max_length=255,
+    #     null=True,
+    #     blank=True
+    # )
     
     expires_code_at = models.DateTimeField(default=timezone.now)
 
