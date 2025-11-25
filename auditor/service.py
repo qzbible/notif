@@ -157,10 +157,10 @@ def service_demand( object, title, description, dest_email, dest_name, company, 
     else: 
         new_deadline = start_date+"T07:30:00.000Z"
 
-    if verifier_presence_t(end_date):
-        end_new_deadline = end_date 
-    else: 
-        end_new_deadline = end_date+"T07:30:00.000Z"
+    # if verifier_presence_t(end_date):
+    #     end_new_deadline = end_date 
+    # else: 
+    #     end_new_deadline = end_date+"T07:30:00.000Z"
 
     if is_valid_date_string(new_deadline):
         start_date = new_deadline.split(" ")[0]
@@ -197,7 +197,7 @@ def service_demand( object, title, description, dest_email, dest_name, company, 
         "url": url,
         "description":description,
         "time": "30", 
-        "deadline": format_date_string_short(end_new_deadline,lang ),
+        "deadline": format_date_string_short(end_date.split('T')[0],lang ),
         "company": company, 
         "back_url" : os.environ.get("BACK_HOST_URL", "")
     }
