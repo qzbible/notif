@@ -73,7 +73,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup ansible
-        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v3.0.0
+        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v3.1.0
         with:
           ssh_private_key: ${{ secrets.OVH_MANAGER_SSH_PRIVATE_KEY }}
           ansible_vault_pass: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
@@ -140,7 +140,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup ansible
-        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v2.1.1
+        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v3.1.0
         with:
           ssh_private_key: ${{ secrets.OVH_MANAGER_SSH_PRIVATE_KEY }}
           ansible_vault_pass: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
