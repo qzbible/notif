@@ -129,7 +129,7 @@ def service_mission( object, title, mission_name, description, dest_email, missi
         "title": title,              # {{title}}
         "description": description,  # {{description|safe}}
         "type": mission_type, # {{type}}
-        "duree": stat_date + "-" + end_date,             # {{duree}}
+        "duree": format_date_string_short(stat_date, lang) + " - " + format_date_string_short(end_date, lang),             # {{duree}}
         "company": company,         # {{company}}
         "url": url,                 # {{url}}
         "back_url": os.environ.get("BACK_HOST_URL", "dev-notif.back.klivar.com"), # {{back_url}}
