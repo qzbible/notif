@@ -197,7 +197,7 @@ def service_demand( object, title, description, dest_email, dest_name, company, 
         "url": url,
         "description":description,
         "time": "30", 
-        "deadline": format_date_string_short(end_date.split('T')[0],lang ),
+        "deadline": format_date_string_short(end_date,lang ),
         "company": company, 
         "back_url" : os.environ.get("BACK_HOST_URL", "")
     }

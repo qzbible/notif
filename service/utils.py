@@ -979,9 +979,58 @@ def get_formatted_date(language='fr'):
         return f"{day_name}, {month_name} {now.day}, {now.year} at {hour_12}:{now.minute:02d} {am_pm}"
     
 
+# def format_date_string_short(date_string, language='fr'):
+#     """
+#     Version courte sans le jour de la semaine
+    
+#     Returns:
+#         str: Date formatée courte
+#             - FR: "11 août 2025"
+#             - EN: "August 11, 2025"
+#     """
+    
+#     try:
+#         if 'fr' in language.lower():
+#             # Format français DD-MM-YYYY
+#             if '-' in date_string:
+#                 dt = datetime.strptime(date_string, '%d-%m-%Y')
+#             elif '/' in date_string:
+#                 dt = datetime.strptime(date_string, '%d/%m/%Y')
+#             else:
+#                 raise ValueError("Format de date français non reconnu")
+            
+#             months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+#                      'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
+            
+#             month_name = months[dt.month - 1]
+#             return f"{dt.day} {month_name} {dt.year}"
+        
+#         else:
+#             # Format anglais YYYY-MM-DD
+#             if '-' in date_string:
+#                 dt = datetime.strptime(date_string, '%Y-%m-%d')
+#             elif '/' in date_string:
+#                 dt = datetime.strptime(date_string, '%Y/%m/%d')
+#             else:
+#                 raise ValueError("Format de date anglais non reconnu")
+            
+#             months = ['January', 'February', 'March', 'April', 'May', 'June',
+#                      'July', 'August', 'September', 'October', 'November', 'December']
+            
+#             month_name = months[dt.month - 1]
+#             return f"{month_name} {dt.day}, {dt.year}"
+    
+#     except ValueError:
+#         return date_string
+    
 def format_date_string_short(date_string, language='fr'):
     """
     Version courte sans le jour de la semaine
+    Supporte les formats : DD-MM-YYYY, DD/MM/YYYY, YYYY-MM-DD, YYYY/MM/DD, et ISO 8601
+    
+    Args:
+        date_string (str): Date à formater
+        language (str): Langue de formatage ('fr' ou 'en')
     
     Returns:
         str: Date formatée courte
@@ -990,15 +1039,41 @@ def format_date_string_short(date_string, language='fr'):
     """
     
     try:
-        if 'fr' in language.lower():
-            # Format français DD-MM-YYYY
+        # Détection du format ISO 8601 (avec T et optionnellement Z)
+        if 'T' in date_string:
+            # Supporte les formats :
+            # 2025-11-25T11:22:22.453Z
+            # 2025-11-25T11:22:22Z
+            # 2025-11-25T11:22:22.453
+            # 2025-11-25T11:22:22
+            
+            # Nettoyer la string : enlever le Z final et tout après le point des millisecondes
+            clean_date = date_string.replace('Z', '')
+            if '.' in clean_date:
+                clean_date = clean_date.split('.')[0]
+            
+            dt = datetime.strptime(clean_date, '%Y-%m-%dT%H:%M:%S')
+        
+        elif 'fr' in language.lower():
+            # Format français DD-MM-YYYY ou DD/MM/YYYY
             if '-' in date_string:
                 dt = datetime.strptime(date_string, '%d-%m-%Y')
             elif '/' in date_string:
                 dt = datetime.strptime(date_string, '%d/%m/%Y')
             else:
                 raise ValueError("Format de date français non reconnu")
-            
+        
+        else:
+            # Format anglais YYYY-MM-DD ou YYYY/MM/DD
+            if '-' in date_string:
+                dt = datetime.strptime(date_string, '%Y-%m-%d')
+            elif '/' in date_string:
+                dt = datetime.strptime(date_string, '%Y/%m/%d')
+            else:
+                raise ValueError("Format de date anglais non reconnu")
+        
+        # Formatage selon la langue
+        if 'fr' in language.lower():
             months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
                      'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
             
@@ -1006,20 +1081,14 @@ def format_date_string_short(date_string, language='fr'):
             return f"{dt.day} {month_name} {dt.year}"
         
         else:
-            # Format anglais YYYY-MM-DD
-            if '-' in date_string:
-                dt = datetime.strptime(date_string, '%Y-%m-%d')
-            elif '/' in date_string:
-                dt = datetime.strptime(date_string, '%Y/%m/%d')
-            else:
-                raise ValueError("Format de date anglais non reconnu")
-            
             months = ['January', 'February', 'March', 'April', 'May', 'June',
                      'July', 'August', 'September', 'October', 'November', 'December']
             
             month_name = months[dt.month - 1]
             return f"{month_name} {dt.day}, {dt.year}"
     
-    except ValueError:
+    except ValueError as e:
+        print(f"Erreur de parsing de date: {e}")
         return date_string
+
 
