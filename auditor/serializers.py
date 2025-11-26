@@ -4,6 +4,12 @@ from django.utils import timezone
 from datetime import datetime
 from .models import  Task
 
+
+ 
+from django.utils import timezone
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+
 class MissionAuditSerializer(serializers.ModelSerializer):
     """
     Serializer pour créer et valider une mission d'audit
@@ -128,3 +134,143 @@ class MissionAuditSerializer(serializers.ModelSerializer):
             "company": {"required": True},
             "start_date": {"required": True},
         }
+
+
+
+# Serializer pour les acteurs
+class ActorFollowSerializer(serializers.Serializer):
+    role = serializers.CharField(
+        required=True,
+        help_text="Rôle de l'acteur (ex: RESPONSABLE, COLLABORATEUR)"
+    )
+    
+    id_user = serializers.IntegerField(
+        required=True,
+        help_text="ID de l'utilisateur"
+    )
+    
+    full_name = serializers.CharField(
+        required=True,
+        help_text="Nom complet de l'acteur"
+    )
+    
+    email = serializers.EmailField(
+        required=True,
+        help_text="Email de l'acteur"
+    )
+
+    jwt_token = serializers.CharField(
+        required=True,
+        allow_null=True, 
+        help_text="Token user config exigence"
+    )
+
+
+# Serializer principal pour FollowUp
+class FollowUpSerializer(serializers.Serializer):
+    unit = serializers.ChoiceField(
+        choices=['minutes', 'hours', 'days', 'weeks', 'months'],
+        required=True,
+        help_text="Unité de temps pour le délai"
+    )
+    
+    value = serializers.IntegerField(
+        required=True,
+        min_value=0,
+        help_text="Valeur du délai"
+    )
+    
+    type = serializers.ChoiceField(
+        choices=['after', 'before'],
+        required=True,
+        help_text="Type de calcul (après ou avant la deadline)"
+    )
+    
+    id_project = serializers.IntegerField(
+        required=True,
+        help_text="ID du projet"
+    )
+    
+    id_action = serializers.IntegerField(
+        required=True,
+        help_text="ID de l'action"
+    )
+    
+    id_client = serializers.IntegerField(
+        required=True,
+        help_text="ID du client"
+    )
+    
+    deadline = serializers.DateTimeField(
+        required=True,
+        help_text="Date limite au format ISO (ex: 2025-02-12T22:23:52.900Z)"
+    )
+    
+    actors = ActorFollowSerializer(
+        many=True,
+        required=True,
+        help_text="Liste des acteurs concernés"
+    )
+    
+    def validate_actors(self, value):
+        """Valider qu'il y a au moins un acteur"""
+        if not value:
+            raise serializers.ValidationError("Au moins un acteur est requis")
+        return value
+    
+    def validate(self, data):
+        """Validation globale - calculer et valider l'eta"""
+        # Calculer l'eta_datetime
+        eta_datetime = self.calcul_date(
+            deadline=data['deadline'],
+            unit=data['unit'],
+            value=data['value'],
+            type=data['type']
+        )
+        
+        # Vérifier que la date calculée est dans le futur
+        if eta_datetime <= timezone.now():
+            raise serializers.ValidationError({
+                "eta": "La date calculée doit être dans le futur"
+            })
+        
+        # Ajouter eta_datetime aux données validées
+        data['eta_datetime'] = eta_datetime
+        
+        return data
+    
+    def calcul_date(self, deadline, unit, value, type):
+        """
+        Calcule la date d'envoi du mail basée sur la deadline
+        """
+        # S'assurer que deadline est timezone-aware
+        if timezone.is_naive(deadline):
+            deadline = timezone.make_aware(deadline)
+        
+        # Calculer le delta selon l'unité
+        if unit == "minutes":
+            delta = timedelta(minutes=value)
+        elif unit == "hours":
+            delta = timedelta(hours=value)
+        elif unit == "days":
+            delta = timedelta(days=value)
+        elif unit == "weeks":
+            delta = timedelta(weeks=value)
+        elif unit == "months":
+            delta = relativedelta(months=value)
+        else:
+            raise serializers.ValidationError(
+                f"Unité '{unit}' non reconnue"
+            )
+        
+        # Appliquer le delta selon le type
+        if type == "after":
+            result_date = deadline + delta
+        elif type == "before":
+            result_date = deadline - delta
+        else:
+            raise serializers.ValidationError(
+                f"Type '{type}' non reconnu"
+            )
+        
+        return result_date

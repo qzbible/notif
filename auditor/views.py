@@ -2,8 +2,8 @@ import os
 from django.shortcuts import render
 import random
 # Create your views here.
-from auditor.models import Task
-from auditor.serializers import  MissionAuditSerializer
+from auditor.models import ActorFollow, FollowUp, Task
+from auditor.serializers import  FollowUpSerializer, MissionAuditSerializer
 from auditor.service import service_demand, service_mission, service_test
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -500,3 +500,198 @@ class TestCreateView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+
+
+class FollowUpAuditView(APIView):
+    permission_classes = [AllowAny]
+    
+    @extend_schema( 
+        request=FollowUpSerializer(many=True),
+        examples=[
+             
+            OpenApiExample(
+                'Exemple de requête valide',
+                value=
+                    {
+                        'unit': 'minutes',
+                        'value': 20,
+                        'type': 'after',
+                        'id_project': 20,
+                        'id_action': 20,
+                        'id_client': 20, 
+                      
+                        'deadline': '2025-02-12T22:23:52.900Z',
+                        'actors': [
+                            {
+                                'role': 'Responsable',
+                                'id_user': 10,
+                                'full_name': 'John Doe',
+                                "token" : "jhqguyq_kjsiuq jsiuiqs",
+                                'email': 'samyfabiol@gmail.com'
+                            }
+                        ] 
+                    }
+                ,
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Réponse de succès',
+                value={
+                    'message': 'Follow Up créée avec succès',
+                    'status': 'success',
+                    'code': 201,
+                    'data': {
+                        'total_created': 1,
+                        'follow_ups': [
+                            {
+                                'id_project': 20,
+                                'id_action': 20,
+                                'scheduled_for': '2025-02-12T22:43:52.900Z'
+                            }
+                        ]
+                    }
+                },
+                response_only=True,
+                status_codes=['201'],
+            ),
+        ],
+        description="Crée une exigence et programme l'envoi de notifications par email",
+        summary="Créer une exigence avec follow-up",
+        tags=["Exigences"],
+    )
+    def post(self, request):
+        id_project = request.query_params.get('id_project', None)
+        id_action = request.query_params.get('id_action', None)
+        # Valider toutes les données en une fois
+        # 
+        if id_project and id_action:
+            delete_follow_up(id_project,  id_action)
+            
+        serializer = FollowUpSerializer(data=request.data, many=True)
+        
+        if not serializer.is_valid():
+            return Response(
+                {
+                    "message": "Données invalides",
+                    "status": "error",
+                    "errors": serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        created_follow_ups = []
+        
+        for item_data in serializer.validated_data:
+            try:
+                # Créer ou récupérer le FollowUp
+                follow_up_instance, created = FollowUp.objects.get_or_create( 
+                    id_project=item_data["id_project"],
+                    id_action=item_data["id_action"],
+                    id_client=item_data["id_client"],
+                    defaults={
+                        "unit": item_data["unit"],
+                        "value": item_data["value"],
+                        "type": item_data["type"],
+                        "deadline": item_data["deadline"]
+                       
+                    }
+                )
+                
+                # Récupérer l'eta_datetime déjà calculé et validé
+                eta_datetime = item_data["eta_datetime"]
+                
+                actors_data = item_data["actors"]
+                scheduled_actors = []
+                
+                for actor_data in actors_data:
+                    # Créer ou récupérer l'acteur
+                    ins_acto, _ = ActorFollow.objects.get_or_create(
+                        follow_up=follow_up_instance,
+                        id_user=actor_data["id_user"],
+                        defaults={
+                            "role": actor_data["role"],
+                            "full_name": actor_data["full_name"],
+                            "email": actor_data["email"],
+                             "jwt_token": actor_data["jwt_token"],
+                        }
+                    )
+                    
+                    # Programmer l'envoi du mail avec Celery
+                    task_result = follow_up_task.apply_async(
+                        args=[
+                            item_data["id_project"], 
+                            item_data["id_action"],
+                            actor_data["role"],
+                            item_data["id_client"],
+                            actor_data["email"],
+                            actor_data["full_name"],
+                            os.environ.get("DEPLOYER_SERVICE_NAME", ""),
+                            follow_up_instance.pk,
+                            actor_data["id_user"],
+                            actor_data["jwt_token"]
+                        ],
+                        eta=eta_datetime
+                    )
+                    
+                    # Sauvegarder le task_id pour pouvoir révoquer si besoin
+                    ins_acto.task_id = task_result.id
+                    ins_acto.save()
+                    
+                    scheduled_actors.append({
+                        "email": actor_data["email"],
+                        "task_id": task_result.id
+                    })
+                
+                created_follow_ups.append({
+                    "id_project": item_data["id_project"],
+                    "id_action": item_data["id_action"],
+                    "scheduled_for": eta_datetime.isoformat(),
+                    "actors": scheduled_actors
+                })
+                
+            except Exception as e:
+                # Si une erreur survient, annuler toutes les tâches déjà créées
+                for follow_up_data in created_follow_ups:
+                    for actor in follow_up_data.get("actors", []):
+                        if actor.get("task_id"): 
+                            current_app.control.revoke(actor["task_id"], terminate=True)
+                
+                return Response(
+                    {
+                        "message": "Une erreur est survenue lors du traitement",
+                        "status": "error",
+                        "error": str(e),
+                    },
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        
+        return Response(
+            {
+                "message": "Follow Up créée avec succès",
+                "status": "success",
+                "code": 201,
+                "data": {
+                    "total_created": len(created_follow_ups),
+                    "follow_ups": created_follow_ups
+                }
+            },
+            status=status.HTTP_201_CREATED
+        )
+    
+
+def delete_follow_up(id_project,  id_action  ):
+    inst_filter = FollowUp.objects.filter(
+        id_project=id_project,
+        id_action=id_action
+    )
+    for inst in inst_filter:
+        actors = ActorFollow.objects.filter(follow_up=inst)
+        for actor in actors:
+            try:
+                current_app.control.revoke(actor.task_id, terminate=True)
+              
+            except Exception as e:
+                print(f"Impossible d'annuler la tâche {actor.task_id}: {str(e)}")
+            actor.delete()
+        inst.delete()
+    return True
