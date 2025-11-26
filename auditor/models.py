@@ -299,6 +299,13 @@ class Task(models.Model):
         blank=True,
         help_text="Code d'accès temporaire si nécessaire"
     )
+    audit_method = models.CharField(
+        max_length=255,
+        verbose_name="Code d'accès",
+        null=True,
+        blank=True,
+        help_text="Code d'accès temporaire si nécessaire"
+    )
     
     
     expires_code_at = models.DateTimeField(default=timezone.now)

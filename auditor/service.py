@@ -222,16 +222,22 @@ def service_demand( object, title, description, dest_email, dest_name, company, 
 
 
 
-def service_test( object, title, description, dest_email, dest_name, company, url, test, perimeter, test_type, test_type_label, lieu,  end_date="", lang=None ):
+def service_test( object, title, description, dest_email, dest_name, company, url, test, perimeter, test_type, test_type_label, lieu,  audit_method, end_date="", lang=None ):
     # object and description
     if test_type == "path_test":
-        template_test_question( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
-        template_test_entretien( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lieu, lang )
-        template_test_doc( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+        if audit_method=="questionnaire":
+            template_test_question( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+        if audit_method=="interview":
+            template_test_entretien( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lieu, lang )
+        if audit_method=="document_analysis":
+            template_test_doc( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
     elif test_type == "design_effectiveness_test":
-        template_test_question( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
-        template_test_entretien( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lieu, lang )
-        template_test_doc( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+        if audit_method=="questionnaire":
+            template_test_question( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+        if audit_method=="interview":
+            template_test_entretien( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lieu, lang )
+        if audit_method=="document_analysis":
+            template_test_doc( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
     elif test_type == "operational_test":
         template_test_operationnel( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
           

@@ -452,6 +452,7 @@ class TestCreateView(APIView):
                     is_test=True,
                     id_test = data.get("id_test", None ),
                     id_client = data.get("id_client", None),
+                    audit_method = data.get("audit_method", ""),
                     lieu = data.get("lieu", "")
 
                 )
@@ -475,6 +476,7 @@ class TestCreateView(APIView):
                         type.get("code", ""),
                         type.get("label", ""),
                         data.get("lieu", ""), 
+                        data.get("audit_method", ""),
                         data.get("date", ''),  
                         data.get("language", 'fr-FR'),
                 ) 
