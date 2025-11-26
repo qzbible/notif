@@ -61,8 +61,6 @@ class MissionAuditCreateView(APIView):
         tags=["Missions d'Audit"],
     )
     def post(self, request):
-        
-        
         try:
             # Créer la mission 
             data = request.data

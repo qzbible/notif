@@ -159,6 +159,8 @@ class Task(models.Model):
     )
      
     start_date = models.DateTimeField(
+        null=True,
+        blank=True,
         verbose_name="Date de début",
         help_text="Date de lancement de la mission"
     )
