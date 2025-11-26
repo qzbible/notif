@@ -1,0 +1,25 @@
+COMPLIANCE AUDIT
+
+Nature: Test
+Deadline: {{deadline}}
+
+Dear {{name}},
+
+Please respond immediately to the questionnaire related to an audit on: {{item}}
+
+[Start now] {{url}}
+
+---
+
+TEST DETAILS:
+
+{{title}}
+
+{{description}}
+
+Type: {{type}}
+
+---
+
+Thank you in advance,
+Your {{company}} team

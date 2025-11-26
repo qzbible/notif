@@ -1216,7 +1216,8 @@ class FollowUpView(APIView):
         # Valider toutes les données en une fois
         # 
         if id_project and id_action:
-            delete_follow_up(id_project,  id_action  )
+            delete_follow_up(id_project,  id_action)
+            
         serializer = FollowUpSerializer(data=request.data, many=True)
         
         if not serializer.is_valid():

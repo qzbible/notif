@@ -1,0 +1,27 @@
+AUDIT DE CONFORMITÉ
+
+Nature : Test
+Date : {{date}}
+
+Cher {{name}},
+
+Vous êtes invité(e) à participer à un entretien associé à un audit sur le périmètre {{ item }}. Veuillez réaliser les actions ou fournir les informations demandées.
+
+[Commencer maintenant] {{url}}
+
+---
+
+DÉTAIL DU TEST :
+
+{{title}}
+
+{{description}}
+
+Type : {{type}}
+
+Lieu de l'entretien : {{lieu}}
+
+---
+
+Merci d'avance,
+Votre équipe {{company}}

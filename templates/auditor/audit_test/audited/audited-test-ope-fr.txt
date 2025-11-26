@@ -1,0 +1,25 @@
+AUDIT DE CONFORMITÉ
+
+Nature : Test
+Date : {{date}}
+
+Cher {{name}},
+
+Vous serez audité sur le périmètre {{ item }}. Veuillez réaliser les actions ou fournir les informations demandées.
+
+[Commencer maintenant] {{url}}
+
+---
+
+DÉTAIL DU TEST :
+
+{{title}}
+
+{{description}}
+
+Type : {{type}}
+
+---
+
+Merci d'avance,
+Votre équipe {{company}}

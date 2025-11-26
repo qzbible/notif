@@ -1,0 +1,27 @@
+COMPLIANCE AUDIT
+
+Nature: Test
+Date: {{date}}
+
+Dear {{name}},
+
+You are invited to participate in an interview related to an audit on the scope {{ item }}. Please perform the requested actions or provide the required information.
+
+[Start now] {{url}}
+
+---
+
+TEST DETAILS:
+
+{{title}}
+
+{{description}}
+
+Type: {{type}}
+
+Interview location: {{lieu}}
+
+---
+
+Thank you in advance,
+Your {{company}} team

@@ -1,0 +1,25 @@
+AUDIT DE CONFORMITÉ
+
+Nature : Test
+Date limite : {{deadline}}
+
+Cher {{name}},
+
+Veuillez répondre dès maintenant au questionnaire associé à un audit sur : {{item}}
+
+[Commencer maintenant] {{url}}
+
+---
+
+DÉTAIL DU TEST :
+
+{{title}}
+
+{{description}}
+
+Type : {{type}}
+
+---
+
+Merci d'avance,
+Votre équipe {{company}}

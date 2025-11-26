@@ -1,0 +1,25 @@
+COMPLIANCE AUDIT
+
+Nature: Test
+Date: {{date}}
+
+Dear {{name}},
+
+You will be audited on the scope {{ item }}. Please perform the requested actions or provide the required information.
+
+[Start now] {{url}}
+
+---
+
+TEST DETAILS:
+
+{{title}}
+
+{{description}}
+
+Type: {{type}}
+
+---
+
+Thank you in advance,
+Your {{company}} team

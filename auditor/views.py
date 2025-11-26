@@ -4,7 +4,7 @@ import random
 # Create your views here.
 from auditor.models import Task
 from auditor.serializers import  MissionAuditSerializer
-from auditor.service import service_demand, service_mission
+from auditor.service import service_demand, service_mission, service_test
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -379,3 +379,124 @@ class ValidateAuthCodeView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+
+class TestCreateView(APIView):
+    permission_classes = [AllowAny]
+    """Vue pour créer et lancer une mission d'audit"""
+    
+    @extend_schema(
+        request=MissionAuditSerializer,
+        responses={
+            201: MissionAuditSerializer,
+            400: serializers.Serializer,  # Erreurs de validation
+        },
+        examples=[
+            OpenApiExample(
+                'Exemple de mission d\'audit',
+                value={ 
+                    'title': 'Évaluation de conformité RGPD - Premier trimestre',
+                    'description': 'Audit complet de la conformité RGPD incluant l\'analyse des traitements de données personnelles et des mesures de sécurité.', 
+                    'date': '2025-02-01T09:00:00Z',
+                    "type":{
+                        "code": "COMPLIANCE",
+                        "label": "Conformité"
+                    },
+                    'actors': [
+                        {
+                            "name": "Jean Martin",
+                            "email": "samyfabiol@gmail.com"
+                        }
+                    ],
+                    'perimeter': 'Contrôle', 
+                    'audit_method': 'Contrôle', 
+                    'company': 'Entreprise ABC', 
+                    'access_url': 'https://app.klivar.com/audit/123', 
+                    'language': 'fr-FR',
+                    'jwt_token': 'yrtyrgtryugh ytoton jwt', 
+                    "test": "Ceci est un test",
+                    "lieu": "Ceci est un test",
+                    'id_client': 456,
+                    'id_test': 789
+                },
+                request_only=True,
+            ),
+        ],
+        description="Crée une nouvelle mission d'audit et envoie une notification de lancement",
+        summary="Créer une mission d'audit",
+        tags=["Missions d'Audit"],
+    )
+    def post(self, request):
+        try:
+            # Créer la mission 
+            data = request.data 
+            type = data.get("type", None)
+            actors = data.get("actors", [])
+            for act in actors:
+
+                instance = Task.objects.create(
+                    title=data.get("title"),
+                    description=data.get("description"),
+                    type_test=type.get("code", ""),
+                    type_test_label=type.get("label", ""),  
+
+                    end_date=data.get("date"),
+                    auditor_name=act.get("name"),
+                    auditor_email=act.get("email"),
+
+                    scope_test = data.get("perimeter", ""),
+                    company=data.get("company"),
+                    access_url=data.get("access_url"),
+                    base_url=data.get("base_url", None),
+                    test=data.get("test", ""),
+                    jwt_token=data.get("jwt_token", ""),
+                    is_test=True,
+                    id_test = data.get("id_test", None ),
+                    id_client = data.get("id_client", None),
+                    lieu = data.get("lieu", "")
+
+                )
+                # Ici vous pourriez déclencher l'envoi d'email
+                # launch_mission_email.delay(mission.id)
+                if 'fr' in request.data.get('language', 'fr-FR'): 
+                    prefix_object = "[TEST]"
+                else: 
+                    prefix_object = "[TEST]"
+                print('urls', os.environ.get("BACK_HOST_URL", ""))
+                task = service_test(
+                        prefix_object + " "+data.get("title"),
+                        data.get("title"),
+                        data.get("description"),
+                        act.get("email"),
+                        act.get("name"), 
+                        data.get("company"), 
+                        data.get("access_url"),
+                        data.get("test"), 
+                        data.get("perimeter", ''),
+                        type.get("code", ""),
+                        type.get("label", ""),
+                        data.get("lieu", ""), 
+                        data.get("date", ''),  
+                        data.get("language", 'fr-FR'),
+                ) 
+            # Sauvegarder l'ID de la tâche 
+            return Response(
+                {
+                    "message": "Mission d'audit créée avec succès",
+                    "status": "success",
+                    "code": 201,
+                    "mission_id": instance.id
+                },
+                status=status.HTTP_201_CREATED
+            )
+            
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Erreur lors de la création de la mission " + str(e),
+                    "status": "error"
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        

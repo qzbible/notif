@@ -235,6 +235,12 @@ class Task(models.Model):
         null=True,
         blank=True
     )
+
+    id_test = models.BigIntegerField(
+        verbose_name="ID Projet",
+        null=True,
+        blank=True
+    )
      
     # === CONFIGURATION ===
     language = models.CharField(
@@ -255,17 +261,43 @@ class Task(models.Model):
     )
     is_mission =  models.BooleanField(default=False)
     is_demande =  models.BooleanField(default=False)
+    is_test =  models.BooleanField(default=False)
 
     test = models.CharField(
         max_length=255,
         null=True,
         blank=True
     )
-    # jwt_token = models.CharField(
-    #     max_length=255,
-    #     null=True,
-    #     blank=True
-    # )
+    type_test = models.CharField(
+        max_length=50,
+        verbose_name="Code d'accès",
+        null=True,
+        blank=True,
+        help_text="Code d'accès temporaire si nécessaire"
+    )
+    type_test_label = models.CharField(
+        max_length=50,
+        verbose_name="Code d'accès",
+        null=True,
+        blank=True,
+        help_text="Code d'accès temporaire si nécessaire"
+    )
+
+    scope_test = models.CharField(
+        max_length=255,
+        verbose_name="Code d'accès",
+        null=True,
+        blank=True,
+        help_text="Code d'accès temporaire si nécessaire"
+    )
+    lieu = models.CharField(
+        max_length=255,
+        verbose_name="Code d'accès",
+        null=True,
+        blank=True,
+        help_text="Code d'accès temporaire si nécessaire"
+    )
+    
     
     expires_code_at = models.DateTimeField(default=timezone.now)
 
@@ -280,3 +312,21 @@ class Task(models.Model):
     
 
  
+
+
+class FollowUp(models.Model): 
+    unit = models.CharField(max_length=255, null=True, blank=True)  
+    value =  models.IntegerField(default=0)
+    type =  models.CharField(max_length=255, null=True, blank=True) #before/after
+    id_test = models.BigIntegerField(null=True, blank=True) 
+    deadline = models.DateTimeField(null=True, blank=True)
+    
+
+class ActorFollow(models.Model):
+    role = models.TextField(null=True, blank=True) #responsable/approver/notification
+    id_user = models.BigIntegerField(null=True, blank=True)
+    full_name = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(null=True, blank=True) 
+    follow_up = models.ForeignKey(FollowUp, on_delete=models.CASCADE, related_name="actor_follow_up", null=True)
+    task_id = models.CharField(max_length=255, null=True, blank=True)
+    jwt_token = models.TextField(null=True, blank=True)

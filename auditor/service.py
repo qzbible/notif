@@ -162,8 +162,8 @@ def service_demand( object, title, description, dest_email, dest_name, company, 
     # else: 
     #     end_new_deadline = end_date+"T07:30:00.000Z"
 
-    if is_valid_date_string(new_deadline):
-        start_date = new_deadline.split(" ")[0]
+    if is_valid_date_string(start_date):
+        # start_date = new_deadline.split(" ")[0]
         # Analyser la date ISO 8601
         parsed_date = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.%fZ")
         # Reformater au format souhaité
@@ -219,6 +219,259 @@ def service_demand( object, title, description, dest_email, dest_name, company, 
         x.start() 
     
     return True
+
+
+
+def service_test( object, title, description, dest_email, dest_name, company, url, test, perimeter, test_type, test_type_label, lieu,  end_date="", lang=None ):
+    # object and description
+    if test_type == "path_test":
+        template_test_question( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+        template_test_entretien( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lieu, lang )
+        template_test_doc( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+    elif test_type == "design_effectiveness_test":
+        template_test_question( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+        template_test_entretien( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lieu, lang )
+        template_test_doc( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+    elif test_type == "operational_test":
+        template_test_operationnel( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang )
+          
+    return True
+
+
+def template_test_doc( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lang=None ):
+    filename = None
+    if is_valid_date_string(end_date): 
+        # Analyser la date ISO 8601
+        parsed_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        # Reformater au format souhaité
+        formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+        date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
+        date_end = date_begin - timedelta(minutes=int(30)) 
+        # configuration iCalendar
+        if company != None: 
+            filename = add_calendar(
+                    title, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        else:
+            filename = add_calendar(
+                title, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+    
+    if 'fr' in  lang  :
+        path = "auditor/audit_test/audited/audited-test-doc-fr.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-doc-fr.txt" 
+    elif "en" in lang:
+        path = "auditor/audit_test/audited/audited-test-doc-en.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-doc-en.txt" 
+    else:
+        path = "auditor/audit_test/audited/audited-test-doc-fr.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-doc-fr.txt"
+    
+    context = { 
+        "name": dest_name,
+        "title": title, 
+        "test" :test,
+        "url": url,
+        "type": test_type_label,
+        "description":description,
+        "item": perimeter, 
+        "date": format_date_string_short(end_date, lang ),
+        "company": company, 
+        "back_url" : os.environ.get("BACK_HOST_URL", "")
+    }
+    
+    body_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+   
+    if filename != None:
+        x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
+        x.start() 
+    else:
+        x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+        x.start() 
+
+
+
+def template_test_entretien( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label, lieu, lang=None ):
+    filename = None
+    if is_valid_date_string(end_date): 
+        # Analyser la date ISO 8601
+        parsed_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        # Reformater au format souhaité
+        formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+        date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
+        date_end = date_begin - timedelta(minutes=int(30)) 
+        # configuration iCalendar
+        if company != None: 
+            filename = add_calendar(
+                    title, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        else:
+            filename = add_calendar(
+                title, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+            
+    if 'fr' in  lang  :
+        path = "auditor/audit_test/audited/audited-test-entre-fr.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-entre-fr.txt" 
+    elif "en" in lang:
+        path = "auditor/audit_test/audited/audited-test-entre-en.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-entre-en.txt" 
+    else:
+        path = "auditor/audit_test/audited/audited-test-entre-fr.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-entre-fr.txt"
+    
+    context = { 
+        "name": dest_name,
+        "title": title, 
+        "test" :test,
+        "url": url,
+        "type": test_type_label,
+        "description":description,
+        "item": perimeter, 
+        "lieu": lieu,
+        "date": format_date_string_short(end_date, lang ),
+        "company": company, 
+        "back_url" : os.environ.get("BACK_HOST_URL", "")
+    }
+    
+    body_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+    if filename != None:
+        x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
+        x.start() 
+    else:
+        x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+        x.start() 
+
+
+
+def template_test_operationnel( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label,  lang=None ):
+    filename = None
+    if is_valid_date_string(end_date): 
+        # Analyser la date ISO 8601
+        parsed_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        # Reformater au format souhaité
+        formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+        date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
+        date_end = date_begin - timedelta(minutes=int(30)) 
+        # configuration iCalendar
+        if company != None: 
+            filename = add_calendar(
+                    title, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        else:
+            filename = add_calendar(
+                title, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+         
+    if 'fr' in  lang  :
+        path = "auditor/audit_test/audited/audited-test-ope-fr.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-ope-fr.txt" 
+    elif "en" in lang:
+        path = "auditor/audit_test/audited/audited-test-ope-en.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-ope-en.txt" 
+    else:
+        path = "auditor/audit_test/audited/audited-test-ope-fr.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-ope-fr.txt"
+    
+    context = { 
+        "name": dest_name,
+        "title": title, 
+        "test" :test,
+        "url": url,
+        "type": test_type_label,
+        "description":description,
+        "item": perimeter, 
+        
+        "date": format_date_string_short(end_date, lang ),
+        "company": company, 
+        "back_url" : os.environ.get("BACK_HOST_URL", "")
+    }
+    
+    body_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+   
+    if filename != None:
+        x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
+        x.start() 
+    else:
+        x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+        x.start()
+
+
+# #######
+    
+def template_test_question( object, title, description, dest_email, dest_name, company, url, test, end_date, perimeter, test_type_label,  lang=None ):
+    filename = None
+    if is_valid_date_string(end_date): 
+        # Analyser la date ISO 8601
+        parsed_date = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+        # Reformater au format souhaité
+        formatted_date = parsed_date.strftime("%Y-%m-%d %H:%M")
+        date_begin = datetime.strptime(formatted_date,  "%Y-%m-%d %H:%M")
+        date_end = date_begin - timedelta(minutes=int(30)) 
+        # configuration iCalendar
+        if company != None: 
+            filename = add_calendar(
+                    title, description, str(date_begin), str(date_end), company) # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+        else:
+            filename = add_calendar(
+                title, description, str(date_begin), str(date_end), "Klivar") # add_calendar(title, description, date_begin, date_end, company_denomination) construction du icalenda avec le nom de la compagnie
+         
+    if 'fr' in  lang  :
+        path = "auditor/audit_test/audited/audited-test-ques-fr.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-ques-fr.txt" 
+    elif "en" in lang:
+        path = "auditor/audit_test/audited/audited-test-ques-en.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-ques-en.txt" 
+    else:
+        path = "auditor/audit_test/audited/audited-test-ques-fr.html" 
+        path_txt = "auditor/audit_test/audited/audited-test-ques-fr.txt"
+    
+    context = { 
+        "name": dest_name,
+        "title": title, 
+        "test" :test,
+        "url": url,
+        "type": test_type_label,
+        "description":description,
+        "item": perimeter, 
+        
+        "date": format_date_string_short(end_date, lang ),
+        "company": company, 
+        "back_url" : os.environ.get("BACK_HOST_URL", "")
+    }
+    
+    body_content = render_to_string(
+        path,
+        context
+    )
+    text_content = render_to_string(
+            path_txt,
+            context
+    )
+   
+    if filename != None:
+        x = threading.Thread(target= send_mail_with_ics, args=([dest_email], object, text_content, body_content, filename, company,))
+        x.start() 
+    else:
+        x = threading.Thread(target= send_mail_created, args=([dest_email], object, text_content, body_content, company,))
+        x.start()
+
+
 
 
 def exigence_approver( object, title, type_task, description, dest_email, sender_name, dest_name, company, url, scope=[],  time="", deadline="", start_date="", back_url=None, lang=None ):
