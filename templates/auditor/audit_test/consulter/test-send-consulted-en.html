@@ -163,18 +163,19 @@
 														 
 															<td width="50%" class="pad"  align="left" style="color:#000; font-family:'Poppins', sans-serif;font-size:14px;font-weight:400;letter-spacing:0px;line-height:150%;text-align:left;mso-line-height-alt:21px;">
 																<p style="margin: 0; word-break: break-word;">
-																<strong>Nature</strong> : Validation
+																<strong>Nature</strong> : Notification
 																</p>
 															</td>
 															<td width="50%" class="pad"  align="right" style="color:#000; font-family:'Poppins', sans-serif;font-size:14px;font-weight:400;letter-spacing:0px;line-height:150%;text-align:right;mso-line-height-alt:21px;">
 																<p style="margin: 0; word-break: break-word;">
-																<strong>Date limite</strong> : {{deadline}}
+																<strong>Deadline</strong> : {{deadline}}
 																</p>
 															</td>
 															</tr>
 														 
 												</table>
-													 
+
+													
 													<table border="0" cellpadding="0" cellspacing="0"
 														class="heading_block block-1" role="presentation"
 														style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;"
@@ -184,7 +185,7 @@
 																style="padding-bottom:5px;padding-left:30px;padding-right:10px;padding-top:20px;text-align:center;width:100%;">
 																<h1
 																	style="margin: 0; color: #000000; direction: ltr; font-family: 'Poppins', sans-serif; font-size: 25px; font-weight: 700; letter-spacing: normal; line-height: 120%; text-align: left; margin-top: 0; margin-bottom: 0; mso-line-height-alt: 34.8px;">
-																	Validation d’une évaluation de conformité</h1>
+																	Compliance audit notification</h1>
 															</td>
 														</tr>
 													</table>
@@ -198,28 +199,16 @@
 																<div
 																	style="color:#393d47;font-family:'Poppins', sans-serif;font-size:15px;line-height:150%;text-align:left;mso-line-height-alt:24px;">
 																	<p style="margin: 0; word-break: break-word;"><span
-																			style="word-break: break-word;">Cher {{name}},</span></p>
+																			style="word-break: break-word;">Dear {{name}},</span></p>
 																	<p style="margin: 0; word-break: break-word;"> </p>
 																	<p style="margin: 0; word-break: break-word;">
-																		Veuillez dès maintenant vérifier l’évaluation de conformité  
-																		
-																		{% if scope %}
-																		sur :
-																				<ul style="margin-top: 8px; padding-left: 20px;">
-																					{% for item in scope %}
-																						<li style="margin-bottom: 4px;">{{ item }}</li>
-																					{% endfor %}
-																				</ul>
-																			{% else %}
-																				
-																			{% endif %} 
-																		 
-																		 effectuée par {{ sender_name }}</p>
+																		We would like to inform you that a test has been sent to {{ auditee }}, which will be audited on the scope {{item}}.
+																	</p>
+																	
 																	</div>
 															</td>
 														</tr>
 													</table>
-													 
 													<table border="0" cellpadding="0" cellspacing="0"
 													class="button_block block-3" role="presentation"
 													style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;"
@@ -239,27 +228,14 @@
 																		style="word-break: break-word; line-height: 32px;">
 																		
 																		<a href="{{url}}" class="btn" style="display: inline-block; color: #ffffff; text-decoration: none;">
-																			Vérifier l’évaluation
+																			View the audit
 																		</a>
 																	</span></span><!--[if mso]></center></v:textbox></v:roundrect><![endif]-->
 															</div>
 														</td>
 													</tr>
 												</table>
-													<table border="0" cellpadding="0" cellspacing="0"
-														class="paragraph_block block-4" role="presentation"
-														style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;"
-														width="100%">
-														<tr>
-															<td class="pad"
-																style="padding-bottom:10px;padding-left:30px;padding-right:10px;padding-top:5px;">
-																<div
-																	style="color:#000000;font-family:'Poppins', sans-serif;font-size:10px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:13.2px;">
-																	<p style="margin: 0;">Temps moyen : {{time}} minutes</p>
-																</div>
-															</td>
-														</tr>
-													</table>
+													 
 													<table cellpadding="0" cellspacing="0" class="table_block block-5"
 														role="presentation"
 														style="border-top-right-radius: 10px; border-top-left-radius: 10px; mso-table-lspace: 0pt; mso-table-rspace: 0pt;"
@@ -274,7 +250,7 @@
 																		style="border-top-right-radius: 10px; border-top-left-radius: 10px; vertical-align: top;  color: #4C0C84;  font-size: 17px; line-height: 120%;">
 
 																		<th style="display: flex; border-top-right-radius: 10px; border-bottom: 1px solid #E0E0E0; border-top-left-radius: 10px; margin: 5px 10px; padding-top: 10px; padding-bottom: 5px; word-break: break-word; font-weight: 600; text-align: left;"
-																			width="95%">Détail de l’action : </th>
+																			width="95%">Test details : </th>
 																	</thead>
 																	
 																	<tbody
@@ -289,11 +265,17 @@
 																		<tr>
 																			<td style="padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 10px; word-break: break-word; font-size: 12px; font-weight: 400; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; "
 																				width="100%">
-																				
 																				{{description|safe}}
-																			
 																			</td>
 																		</tr>
+
+																		<tr>
+																			<td style="padding-left: 10px; padding-right: 10px; padding-top: 2px; padding-bottom: 10px; word-break: break-word; font-size: 12px; font-weight: 400; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;"
+																				width="100%">
+																				<strong>Type :</strong> {{type}}
+																			</td>
+																		</tr>
+
 																	</tbody>
 																</table>
 															</td>
@@ -308,8 +290,7 @@
 																style="padding-bottom:30px;padding-left:30px;padding-right:30px;padding-top:20px; border-radius: 100px;">
 																<div
 																	style="color:#000000;font-family:'Poppins', sans-serif;font-size:15px;font-weight:400;line-height:150%;text-align:left;mso-line-height-alt:24px;">
-																	<p style="margin: 0; word-break: break-word;">Merci
-																		d’avance,<br />Votre équipe {{company}}</p>
+																	<p style="margin: 0; word-break: break-word;">Thanks in advance,<br />Your team {{company}}</p>
 																</div>
 															</td>
 														</tr>
