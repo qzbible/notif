@@ -237,6 +237,7 @@ class sendMailAuthCodeView(APIView):
         Envoie un code d'authentification à 2 facteurs par email
         """
         try:  
+            print("request.headers", request.headers)
             auth_header = request.headers.get('Authorization')
             jwt_token = None
             
@@ -258,8 +259,9 @@ class sendMailAuthCodeView(APIView):
             custom_ins.access_code=verification_code
             custom_ins.expires_code_at=expires_at
             custom_ins.save()
-             
-             # Sauvegarder le code d'authentification dans la base de données
+
+            print(f"Generated verification code: {verification_code} (expires at {expires_at})") 
+            # Sauvegarder le code d'authentification dans la base de données
             
             if 'fr' in custom_ins.language:
                 path = "user-management/2fa_auth/2FA-auth-fr.html"
