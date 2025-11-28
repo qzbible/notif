@@ -262,7 +262,7 @@ class sendMailAuthCodeView(APIView):
 
            
             # Sauvegarder le code d'authentification dans la base de données
-            
+            print("custom_ins language", custom_ins.language)
             if custom_ins.language=='fr' or custom_ins.language=='fr-FR':
                 path = "user-management/2fa_auth/2FA-auth-fr.html"
                 object = "Code d'authentification" + " " + get_formatted_date(custom_ins.language)
