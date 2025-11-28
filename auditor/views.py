@@ -246,7 +246,7 @@ class sendMailAuthCodeView(APIView):
             # Générer le code de vérification
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
             expires_at =  timezone.now() + timezone.timedelta(minutes=3)
-            custom_ins = Task.objects.all().filter(jwt_token=jwt_token, is_demande=True).first()
+            custom_ins = Task.objects.all().filter(jwt_token=jwt_token).first()
             if custom_ins == None:
                 return  Response({
                     "message": "Token not found",
