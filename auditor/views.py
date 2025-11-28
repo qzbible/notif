@@ -263,10 +263,10 @@ class sendMailAuthCodeView(APIView):
             print(f"Generated verification code: {verification_code} (expires at {expires_at})") 
             # Sauvegarder le code d'authentification dans la base de données
             
-            if 'fr' in custom_ins.language:
+            if custom_ins.language=='fr' or custom_ins.language=='fr-FR':
                 path = "user-management/2fa_auth/2FA-auth-fr.html"
                 object = "Code d'authentification" + " " + get_formatted_date(custom_ins.lang)
-            elif  'en' in  custom_ins.language :
+            elif  custom_ins.language=='en' or custom_ins.language=='en-EN':
                 path = "user-management/2fa_auth/2FA-auth-en.html"
                 object = "Authentication code" + " " +  get_formatted_date(custom_ins.lang)
 
