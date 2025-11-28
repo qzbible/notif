@@ -278,13 +278,13 @@ class sendMailAuthCodeView(APIView):
                 "user_name": '',
                 "code_auth": verification_code,
                 "company": custom_ins.company,
-                "name" : custom_ins.dest_name,
+                "name" : custom_ins.auditor_name,
                 "back_url" :  os.getenv("BACK_HOST_URL", "")
             } 
             html_content = render_to_string(path, context)
             text_content = render_to_string(path_txt, context)  
             send_mail_created(
-                [custom_ins.dest_email], 
+                [custom_ins.auditor_email], 
                 object, 
                 text_content, 
                 html_content,
