@@ -260,7 +260,7 @@ class sendMailAuthCodeView(APIView):
             custom_ins.expires_code_at=expires_at
             custom_ins.save()
 
-            print(f"Generated verification code: {verification_code} (expires at {expires_at})") 
+           
             # Sauvegarder le code d'authentification dans la base de données
             
             if custom_ins.language=='fr' or custom_ins.language=='fr-FR':
@@ -275,7 +275,7 @@ class sendMailAuthCodeView(APIView):
                 object = "Code d'authentification" + " "  +get_formatted_date(custom_ins.language)
 
             path_txt = "user-management/2fa_auth/2FA-auth.txt"
-            
+            print(f"Generated verification code: {verification_code} (expires at {expires_at})") 
             context = {  
                 "user_name": '',
                 "code_auth": verification_code,
@@ -311,6 +311,8 @@ class sendMailAuthCodeView(APIView):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+
         
 # Vue API
 class ValidateAuthCodeView(APIView):
