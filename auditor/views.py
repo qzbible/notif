@@ -265,14 +265,14 @@ class sendMailAuthCodeView(APIView):
             
             if custom_ins.language=='fr' or custom_ins.language=='fr-FR':
                 path = "user-management/2fa_auth/2FA-auth-fr.html"
-                object = "Code d'authentification" + " " + get_formatted_date(custom_ins.lang)
+                object = "Code d'authentification" + " " + get_formatted_date(custom_ins.language)
             elif  custom_ins.language=='en' or custom_ins.language=='en-EN':
                 path = "user-management/2fa_auth/2FA-auth-en.html"
-                object = "Authentication code" + " " +  get_formatted_date(custom_ins.lang)
+                object = "Authentication code" + " " +  get_formatted_date(custom_ins.language)
 
             else:
                 path = "user-management/2fa_auth/2FA-auth-fr.html"
-                object = "Code d'authentification" + " "  +get_formatted_date(custom_ins.lang)
+                object = "Code d'authentification" + " "  +get_formatted_date(custom_ins.language)
 
             path_txt = "user-management/2fa_auth/2FA-auth.txt"
             
