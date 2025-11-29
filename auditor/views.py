@@ -349,7 +349,7 @@ class ValidateAuthCodeView(APIView):
             
             # Vérification de l'expiration
             now = timezone.now() 
-            if auth_code_instance.expires_at < now:
+            if auth_code_instance.expires_code_at < now:
                 return Response(
                     {
                         "message": "Le code d'authentification a expiré",
