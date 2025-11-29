@@ -361,21 +361,21 @@ class ValidateAuthCodeView(APIView):
             if auth_code_instance.is_test:
                 return Response(
                 {
-                    "id": auth_code_instance.is_test, 
+                    "id": auth_code_instance.id_test, 
                 }, 
                 status=status.HTTP_200_OK
             )
             elif auth_code_instance.is_mission:
                 return Response(
                 {
-                    "id": auth_code_instance.is_mission, 
+                    "id":  auth_code_instance.id_project, 
                 }, 
                 status=status.HTTP_200_OK
             )
             elif auth_code_instance.is_demande: 
                 return Response(
                     {
-                        "id": auth_code_instance.is_demande, 
+                        "id": auth_code_instance.id_demande, 
                     }, 
                     status=status.HTTP_200_OK
                 )  
