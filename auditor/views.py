@@ -274,8 +274,7 @@ class sendMailAuthCodeView(APIView):
                 path = "user-management/2fa_auth/2FA-auth-fr.html"
                 object = "Code d'authentification" + " "  +get_formatted_date('fr')
 
-            path_txt = "user-management/2fa_auth/2FA-auth.txt"
-            print(f"Generated verification code: {verification_code} (expires at {expires_at})") 
+            path_txt = "user-management/2fa_auth/2FA-auth.txt" 
             context = {  
                 "user_name": '',
                 "code_auth": verification_code,
@@ -313,7 +312,6 @@ class sendMailAuthCodeView(APIView):
             )
         
 
-        
 # Vue API
 class ValidateAuthCodeView(APIView):
     permission_classes = [AllowAny]
@@ -359,17 +357,28 @@ class ValidateAuthCodeView(APIView):
                         "code": status.HTTP_408_REQUEST_TIMEOUT,
                     },
                     status=status.HTTP_408_REQUEST_TIMEOUT,
-                )
-            
-            # Suppression du code d'authentification après utilisation
-            # auth_code_instance.delete() 
-            return Response(
+                ) 
+            if auth_code_instance.is_test:
+                return Response(
                 {
-                   
-                    "id_demande": auth_code_instance.is_demande, 
+                    "id": auth_code_instance.is_test, 
                 }, 
                 status=status.HTTP_200_OK
-            )  
+            )
+            elif auth_code_instance.is_mission:
+                return Response(
+                {
+                    "id": auth_code_instance.is_mission, 
+                }, 
+                status=status.HTTP_200_OK
+            )
+            elif auth_code_instance.is_demande: 
+                return Response(
+                    {
+                        "id": auth_code_instance.is_demande, 
+                    }, 
+                    status=status.HTTP_200_OK
+                )  
                 
         except Exception as e:
             return Response(
