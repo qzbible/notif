@@ -1,10 +1,3 @@
 ---
-backend_app_hostname: dev-notif.back.klivar.com
-front_app_manager_hostname: dev.app.klivar.com
-front_app_admin_hostname: dev.admin.klivar.com
-front_app_staff_hostname: dev.staff.klivar.com
-backend_main_hostname: dev-backend.app.klivar.com
-
-deployer_app_hostname: dev-deployer.back.klivar.com
-
-kafka_hostname: kafka.klivar.com
+backend_app_hostname: dev-notif.qzbible.com
+ 

@@ -1,7 +1,7 @@
 ENGINE=django_tenants.postgresql_backend
 POSTGRES_HOST=postgres
 POSTGRES_PORT=5432
-POSTGRES_DB=tmp
+POSTGRES_DB=qznotif
 POSTGRES_USER=alphaogilo
 POSTGRES_PASSWORD=admin123456
 DEBUG=false

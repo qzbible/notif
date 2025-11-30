@@ -46,17 +46,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     # 'drf_yasg',
-    'authClient',
-    'alert_security',
-    'mailing', 
-    'exigence',
-    'updateMaster',
+    
+    # 'mailing', 
+    
     'projet', 
     'file',
-    'board',
-    'messaging',
-    'cartographie',
-    'auditor',
+    # 'board',
+    
 
     # Healthchecks
     'health_check',  # required
@@ -227,7 +223,7 @@ CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_RESULT_EXPIRES = 18000
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-CELERY_IMPORTS = ["mailing.utils", "exigence.service"]
+# CELERY_IMPORTS = ["mailing.utils", "exigence.service"]
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
 REDIS_URL = os.environ.get("REDIS_URL", "redis://redis:6379/0")

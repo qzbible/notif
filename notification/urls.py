@@ -32,16 +32,13 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
+    
     path('admin/', admin.site.urls),
-    path('board/', include('board.urls')),
-    path('exigence/', include('exigence.urls')),
+        
     path('file/', include('file.urls')),
-    path('update/', include('updateMaster.urls')),
-    path('auth-client/', include('authClient.urls')),
-    path('security/', include('alert_security.urls')),
-    path('notif/', include('mailing.urls')),
+
     path('projet/', include('projet.urls')),
-    path('auditor/', include('auditor.urls')),
+   
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),  # Endpoint pour le schéma JSON/YAML
     
     # Interface Swagger UI

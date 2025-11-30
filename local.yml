@@ -68,7 +68,7 @@ services:
 
   celery_beat:
     <<: *api
-    image: klivar-backend-celerybeat
+    image: qzbiblz-backend-celerybeat
     command: /start-beat
     healthcheck:
       test: []
