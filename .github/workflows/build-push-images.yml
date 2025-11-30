@@ -5,9 +5,7 @@ on:
   push:
     branches:
       - develop
-      - play
-      - main
-      - beta
+     
     tags:
       - "*"
 
@@ -64,7 +62,7 @@ jobs:
 
     environment:
       name: dev
-      url: https://dev-tmp.back.klivar.com/ 
+      url: https://dev-notif.qzbible.com/ 
 
     env:
       IMAGE_TAG: ${{needs.build-images.outputs.api-image-tags}}
@@ -73,7 +71,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup ansible
-        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v3.2.0
+        uses: qzbible/config-server/.github/actions/setup-ansible@v1.0.7
         with:
           ssh_private_key: ${{ secrets.OVH_MANAGER_SSH_PRIVATE_KEY }}
           ansible_vault_pass: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
@@ -86,72 +84,4 @@ jobs:
         working-directory: deploy
         run: |
           ansible-playbook -e env=dev -e tmp_back_image=${IMAGE_TAG} deploy.yml
-
-  beta:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/beta' || startsWith(github.ref, 'refs/tags/')
-    needs:
-      - build-images
-    concurrency:
-      group: beta
-      cancel-in-progress: false
-
-    environment:
-      name: beta
-      url: https://beta-notify.back.klivar.com/ 
-
-    env:
-      IMAGE_TAG: ${{needs.build-images.outputs.api-image-tags}}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup ansible
-        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v2.1.1
-        with:
-          ssh_private_key: ${{ secrets.OVH_MANAGER_SSH_PRIVATE_KEY }}
-          ansible_vault_pass: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-          working_directory: deploy
-
-      - name: Display the image being deployed
-        run: echo "Deploying the image ${IMAGE_TAG}"
-
-      - name: Running ansible
-        working-directory: deploy
-        run: |
-          ansible-playbook -e env=beta -e tmp_back_image=${IMAGE_TAG} deploy-beta.yml
-
-  play:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/play' || startsWith(github.ref, 'refs/tags/')
-    needs:
-      - build-images
-    concurrency:
-      group: play
-      cancel-in-progress: false
-    environment:
-      name: play
-      url: https://play-tmp.back.klivar.com/
-    env:
-      IMAGE_TAG: ${{needs.build-images.outputs.api-image-tags}}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup ansible
-        uses: klivar-gdpr/config-server/.github/actions/setup-ansible@v3.1.0
-        with:
-          ssh_private_key: ${{ secrets.OVH_MANAGER_SSH_PRIVATE_KEY }}
-          ansible_vault_pass: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
-          working_directory: deploy
-
-      - name: Display the image being deployed
-        run: echo "Deploying the image ${IMAGE_TAG}"
-
-      - name: Running ansible
-        working-directory: deploy
-        run: |
-          ansible-playbook -e env=play -e tmp_back_image=${IMAGE_TAG} deploy.yml
-
  
