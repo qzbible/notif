@@ -36,6 +36,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
         
     path('file/', include('file.urls')),
+    path('firebase/', include('firebase.urls')),
 
     path('projet/', include('projet.urls')),
    

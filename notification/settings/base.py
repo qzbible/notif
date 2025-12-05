@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     
     'projet', 
     'file',
+    'firebase',
     # 'board',
     
 
@@ -289,3 +290,11 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
+
+
+FIREBASE_SERVER_KEY = os.getenv('FIREBASE_SERVER_KEY', 'dl2foAR5SguPDiWfIMQb8X:APA91bE8sZIphYCmmtr_vwdIHvOvt7f6g5NInj2_Xh3e1l2nyzvZub4MY37-ymeooG014MSpN2RQ1R1zrVoZDdxEtCjHlF1tA6_C2O4d_rBwr8hiTT0oDeU')
+
+FIREBASE_PROJECT_ID = 'evangelists-febb9'
+
+ 
+FIREBASE_SERVICE_ACCOUNT_PATH = os.path.join(BASE_DIR, 'evangelists-febb9-firebase-adminsdk-fbsvc-1aef63e5e5.json')

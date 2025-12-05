@@ -67,3 +67,5 @@ npm-debug.log*
 # Logs
 *.log
 
+*firebase-adminsdk*.json
+firebase-service-account.json
