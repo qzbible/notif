@@ -8,26 +8,24 @@
     group: ubuntu
   become: yes
 
-- name: Create Firebase service account file (outside repo)
+- name: Create Firebase service account file with proper escaping
   copy:
     content: |
       {
-        "type": "{{ firebase_type }}",
-        "project_id": "{{ firebase_project_id }}",
-        "private_key_id": "{{ firebase_private_key_id }}",
-        "private_key": "{{ firebase_private_key }}",
-        "client_email": "{{ firebase_client_email }}",
-        "client_id": "{{ firebase_client_id }}",
-        "auth_uri": "{{ firebase_auth_uri }}",
-        "token_uri": "{{ firebase_token_uri }}",
-        "auth_provider_x509_cert_url": "{{ firebase_auth_provider_x509_cert_url }}",
-        "client_x509_cert_url": "{{ firebase_client_x509_cert_url }}",
-        "universe_domain": "{{ firebase_universe_domain }}"
+        "type": {{ firebase_type | to_json }},
+        "project_id": {{ firebase_project_id | to_json }},
+        "private_key_id": {{ firebase_private_key_id | to_json }},
+        "private_key": {{ firebase_private_key | to_json }},
+        "client_email": {{ firebase_client_email | to_json }},
+        "client_id": {{ firebase_client_id | to_json }},
+        "auth_uri": {{ firebase_auth_uri | to_json }},
+        "token_uri": {{ firebase_token_uri | to_json }},
+        "auth_provider_x509_cert_url": {{ firebase_auth_provider_x509_cert_url | to_json }},
+        "client_x509_cert_url": {{ firebase_client_x509_cert_url | to_json }},
+        "universe_domain": {{ firebase_universe_domain | to_json }}
       }
     dest: /apps/firebase-secrets/evangelists-febb9-firebase-adminsdk-fbsvc-1aef63e5e5.json
     mode: '0600'
-    owner: ubuntu
-    group: ubuntu
   become: yes
 
 - name: Create nginx configuration
