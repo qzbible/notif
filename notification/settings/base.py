@@ -297,4 +297,4 @@ FIREBASE_SERVER_KEY = os.getenv('FIREBASE_SERVER_KEY', 'dl2foAR5SguPDiWfIMQb8X:A
 FIREBASE_PROJECT_ID = 'evangelists-febb9'
 
  
-FIREBASE_SERVICE_ACCOUNT_PATH = os.path.join(BASE_DIR, 'secrets', 'evangelists-febb9-firebase-adminsdk-fbsvc-1aef63e5e5.json')
+FIREBASE_SERVICE_ACCOUNT_PATH = '/app/secrets/evangelists-febb9-firebase-adminsdk-fbsvc-1aef63e5e5.json'
