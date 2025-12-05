@@ -1,13 +1,12 @@
 ---
-
-
 - name: Create Firebase secrets directory (outside repo)
   file:
     path: /apps/firebase-secrets
     state: directory
-    mode: '0755'
-    owner: root
-    group: root
+    mode: '0700'  # Permissions restrictives
+    owner: ubuntu
+    group: ubuntu
+  become: yes
 
 - name: Create Firebase service account file (outside repo)
   copy:
@@ -27,8 +26,9 @@
       }
     dest: /apps/firebase-secrets/evangelists-febb9-firebase-adminsdk-fbsvc-1aef63e5e5.json
     mode: '0600'
-    owner: root
-    group: root
+    owner: ubuntu
+    group: ubuntu
+  become: yes
 
 - name: Create nginx configuration
   community.docker.docker_config:
