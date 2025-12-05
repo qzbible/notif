@@ -1,4 +1,35 @@
 ---
+
+
+- name: Create Firebase secrets directory (outside repo)
+  file:
+    path: /apps/firebase-secrets
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Create Firebase service account file (outside repo)
+  copy:
+    content: |
+      {
+        "type": "{{ firebase_type }}",
+        "project_id": "{{ firebase_project_id }}",
+        "private_key_id": "{{ firebase_private_key_id }}",
+        "private_key": "{{ firebase_private_key }}",
+        "client_email": "{{ firebase_client_email }}",
+        "client_id": "{{ firebase_client_id }}",
+        "auth_uri": "{{ firebase_auth_uri }}",
+        "token_uri": "{{ firebase_token_uri }}",
+        "auth_provider_x509_cert_url": "{{ firebase_auth_provider_x509_cert_url }}",
+        "client_x509_cert_url": "{{ firebase_client_x509_cert_url }}",
+        "universe_domain": "{{ firebase_universe_domain }}"
+      }
+    dest: /apps/firebase-secrets/evangelists-febb9-firebase-adminsdk-fbsvc-1aef63e5e5.json
+    mode: '0600'
+    owner: root
+    group: root
+
 - name: Create nginx configuration
   community.docker.docker_config:
     name: "{{ nginx_config_name }}"

@@ -1,125 +1,97 @@
-# services/firebase_notification_service_individual.py
+# services/firebase_notification_service_v1.py
 
-import os
+import json
+import requests
+from django.conf import settings
+from typing import Dict, List, Optional
 import logging
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
-import requests
 import time
-import json
 
 logger = logging.getLogger(__name__)
 
+
+
 class FirebaseNotificationService:
     """
-    Service Firebase utilisant des variables d'environnement individuelles
-    Plus fiable avec Docker Compose
+    Service pour envoyer des notifications Firebase avec la nouvelle API v1
     """
     
     def __init__(self):
-        self.project_id = 'evangelists-febb9'
+        self.project_id = getattr(settings, 'FIREBASE_PROJECT_ID', 'evangelists-febb9')
+        self.service_account_path = getattr(settings, 'FIREBASE_SERVICE_ACCOUNT_PATH', None)
         self.fcm_url = f'https://fcm.googleapis.com/v1/projects/{self.project_id}/messages:send'
         
         # Cache pour le token d'accès
         self._access_token = None
         self._token_expiry = 0
-        self._credentials = None
         
-        # Initialiser depuis variables individuelles
-        self._init_credentials_from_individual_vars()
-    
-    def _init_credentials_from_individual_vars(self):
-        """Utilise directement les variables Vault individuelles"""
-        
-        # Récupérer toutes les variables Firebase
-        firebase_vars = {
-            'type': os.getenv('FIREBASE_TYPE', 'service_account'),
-            'project_id': os.getenv('FIREBASE_PROJECT_ID', self.project_id),
-            'private_key_id': os.getenv('FIREBASE_PRIVATE_KEY_ID'),
-            'private_key': os.getenv('FIREBASE_PRIVATE_KEY', ''),
-            'client_email': os.getenv('FIREBASE_CLIENT_EMAIL'),
-            'client_id': os.getenv('FIREBASE_CLIENT_ID'),
-            'auth_uri': os.getenv('FIREBASE_AUTH_URI', 'https://accounts.google.com/o/oauth2/auth'),
-            'token_uri': os.getenv('FIREBASE_TOKEN_URI', 'https://oauth2.googleapis.com/token'),
-            'auth_provider_x509_cert_url': os.getenv('FIREBASE_AUTH_PROVIDER_X509_CERT_URL', 'https://www.googleapis.com/oauth2/v1/certs'),
-            'client_x509_cert_url': os.getenv('FIREBASE_CLIENT_X509_CERT_URL'),
-            'universe_domain': os.getenv('FIREBASE_UNIVERSE_DOMAIN', 'googleapis.com')
-        }
-        
-        # Nettoyer la clé privée (remplacer \\n par \n)
-        if firebase_vars['private_key']:
-            firebase_vars['private_key'] = firebase_vars['private_key'].replace('\\n', '\n')
-        
-        # Valider les champs critiques
-        required_fields = ['private_key_id', 'private_key', 'client_email', 'client_id']
-        missing_fields = [field for field in required_fields if not firebase_vars.get(field)]
-        
-        if missing_fields:
-            logger.error(f"❌ Variables Firebase manquantes: {missing_fields}")
-            # Afficher les variables disponibles (masquées)
-            for key, value in firebase_vars.items():
-                if value and 'private_key' not in key:
-                    logger.info(f"✅ {key}: {value}")
-                elif value:
-                    logger.info(f"✅ {key}: ***MASQUÉ***")
-                else:
-                    logger.warning(f"❌ {key}: MANQUANT")
-            
-            raise ValueError(f"Variables Firebase manquantes: {missing_fields}")
-        
-        try:
-            # Créer les credentials Google
-            self._credentials = service_account.Credentials.from_service_account_info(
-                firebase_vars,
-                scopes=['https://www.googleapis.com/auth/firebase.messaging']
-            )
-            
-            logger.info("✅ Firebase credentials chargées depuis variables individuelles")
-            logger.info(f"📧 Client email: {firebase_vars.get('client_email')}")
-            logger.info(f"🆔 Project ID: {firebase_vars.get('project_id')}")
-            
-        except Exception as e:
-            logger.error(f"❌ Erreur création credentials Firebase: {e}")
-            logger.error(f"❌ Type: {type(e).__name__}")
-            raise
+        if not self.service_account_path:
+            logger.warning("FIREBASE_SERVICE_ACCOUNT_PATH non configuré, utilisation de l'ancienne API")
+            # Fallback vers l'ancienne API si pas de service account
+            self.server_key = getattr(settings, 'FIREBASE_SERVER_KEY', None)
+            self.legacy_fcm_url = 'https://fcm.googleapis.com/fcm/send'
     
     def _get_access_token(self) -> str:
-        """Obtient un token d'accès OAuth2"""
-        if not self._credentials:
-            raise Exception("Firebase credentials non configurées")
-        
+        """
+        Obtient un token d'accès OAuth2 pour Firebase v1 API
+        """
         # Vérifier si le token est encore valide
         if self._access_token and time.time() < self._token_expiry:
             return self._access_token
         
         try:
+            # Charger les credentials du service account
+            credentials = service_account.Credentials.from_service_account_file(
+                self.service_account_path,
+                scopes=['https://www.googleapis.com/auth/firebase.messaging']
+            )
+            
+            # Refresher le token
             request = Request()
-            self._credentials.refresh(request)
+            credentials.refresh(request)
             
-            self._access_token = self._credentials.token
-            self._token_expiry = time.time() + 3300  # 55 minutes
+            self._access_token = credentials.token
+            # Token valide pour ~3600 secondes, on garde 5 minutes de marge
+            self._token_expiry = time.time() + 3300
             
-            logger.debug("🔑 Token d'accès Firebase renouvelé")
             return self._access_token
             
         except Exception as e:
-            logger.error(f"❌ Erreur renouvellement token: {e}")
-            raise
+            logger.error(f"Erreur lors de l'obtention du token OAuth2: {e}")
+            raise Exception(f"Impossible d'obtenir le token d'accès: {e}")
     
-    def send_to_token(self, fcm_token: str, title: str, body: str, data: dict = None, image_url: str = None) -> dict:
-        """Envoie une notification à un token FCM"""
+    def send_to_token(self, 
+                     fcm_token: str, 
+                     title: str, 
+                     body: str, 
+                     data: Optional[Dict] = None,
+                     image_url: Optional[str] = None) -> Dict:
+        """
+        Envoie une notification à un token FCM spécifique (API v1)
+        """
+        
+        # Construire le payload v1
         message = {
             "token": fcm_token,
-            "notification": {"title": title, "body": body}
+            "notification": {
+                "title": title,
+                "body": body
+            }
         }
         
+        # Ajouter l'image si fournie
         if image_url:
             message["notification"]["image"] = image_url
         
+        # Ajouter les données personnalisées
         if data:
-            message["data"] = {k: str(v) for k, v in data.items()}
+            # Firebase v1 nécessite que toutes les valeurs data soient des strings
+            string_data = {k: str(v) for k, v in data.items()}
+            message["data"] = string_data
         
-        # Configuration Android/iOS
+        # Configuration spécifique Android/iOS
         message["android"] = {
             "priority": "high",
             "notification": {
@@ -129,32 +101,98 @@ class FirebaseNotificationService:
         }
         
         message["apns"] = {
-            "payload": {"aps": {"sound": "default"}}
+            "payload": {
+                "aps": {
+                    "sound": "default"
+                }
+            }
         }
         
-        return self._send_request_v1({"message": message})
+        payload = {"message": message}
+ 
+        
+        return self._send_request_v1(payload)
     
-    def send_to_topic(self, topic: str, title: str, body: str, data: dict = None, image_url: str = None) -> dict:
-        """Envoie une notification à un topic"""
+    def send_to_topic(self, 
+                     topic: str, 
+                     title: str, 
+                     body: str, 
+                     data: Optional[Dict] = None,
+                     image_url: Optional[str] = None) -> Dict:
+        """
+        Envoie une notification à un topic Firebase (API v1)
+        """
+        
         message = {
             "topic": topic,
-            "notification": {"title": title, "body": body}
+            "notification": {
+                "title": title,
+                "body": body
+            }
         }
         
         if image_url:
             message["notification"]["image"] = image_url
         
         if data:
-            message["data"] = {k: str(v) for k, v in data.items()}
+            string_data = {k: str(v) for k, v in data.items()}
+            message["data"] = string_data
         
-        message["android"] = {"priority": "high", "notification": {"sound": "default"}}
-        message["apns"] = {"payload": {"aps": {"sound": "default"}}}
+        # Configuration Android/iOS
+        message["android"] = {
+            "priority": "high",
+            "notification": {
+                "sound": "default"
+            }
+        }
         
-        return self._send_request_v1({"message": message})
+        message["apns"] = {
+            "payload": {
+                "aps": {
+                    "sound": "default"
+                }
+            }
+        }
+        
+        payload = {"message": message}
+        
+        return self._send_request_v1(payload)
     
-    def _send_request_v1(self, payload: dict) -> dict:
-        """Envoie la requête à Firebase"""
+    def send_to_multiple_tokens(self, 
+                               fcm_tokens: List[str], 
+                               title: str, 
+                               body: str, 
+                               data: Optional[Dict] = None,
+                               image_url: Optional[str] = None) -> Dict:
+        """
+        Envoie une notification à plusieurs tokens (batch avec v1)
+        """
+        success_count = 0
+        failure_count = 0
+        errors = []
+        
+        for token in fcm_tokens:
+            result = self.send_to_token(token, title, body, data, image_url)
+            if result['success']:
+                success_count += 1
+            else:
+                failure_count += 1
+                errors.append(f"Token {token[:20]}...: {result['error']}")
+        
+        return {
+            'success': failure_count == 0,
+            'message': f"{success_count} envois réussis, {failure_count} échecs",
+            'success_count': success_count,
+            'failure_count': failure_count,
+            'errors': errors
+        }
+    
+    def _send_request_v1(self, payload: Dict) -> Dict:
+        """
+        Envoie la requête à Firebase FCM v1 API
+        """
         try:
+            # Obtenir le token d'accès
             access_token = self._get_access_token()
             
             headers = {
@@ -172,30 +210,85 @@ class FirebaseNotificationService:
             response.raise_for_status()
             result = response.json()
             
-            logger.info("✅ Notification Firebase envoyée avec succès")
+            logger.info(f"Notification v1 envoyée avec succès: {result}")
             return {
                 'success': True,
-                'message_id': result.get('name'),
+                'message_id': result.get('name'),  # v1 utilise 'name' au lieu de 'message_id'
                 'response': result
             }
             
         except requests.exceptions.HTTPError as e:
             error_detail = e.response.text if e.response else str(e)
-            logger.error(f"❌ Erreur HTTP Firebase: {error_detail}")
+            logger.error(f"Erreur HTTP lors de l'envoi v1: {e} - {error_detail}")
             return {
                 'success': False,
-                'error': f"HTTP {e.response.status_code if e.response else 'Unknown'}: {error_detail}",
+                'error': f"HTTP {e.response.status_code}: {error_detail}",
                 'response': None
             }
         except Exception as e:
-            logger.error(f"❌ Erreur Firebase: {e}")
-            return {'success': False, 'error': str(e), 'response': None}
+            logger.error(f"Erreur lors de l'envoi de la notification v1: {e}")
+            return {
+                'success': False,
+                'error': str(e),
+                'response': None
+            }
     
-    # Méthodes BibleCouple
-    def send_reading_reminder(self, fcm_token: str, reading_plan_id: str, day_number: int, chapter: str, user_name: str = ""):
-        """Rappel de lecture BibleCouple"""
-        title = f"📖 Temps de lecture{' ' + user_name if user_name else ''}"
+    def _send_request_legacy(self, payload: Dict) -> Dict:
+        """
+        Fallback vers l'ancienne API si service account non configuré
+        """
+        if not self.server_key:
+            return {
+                'success': False,
+                'error': 'Ni service account ni server key configurés',
+                'response': None
+            }
+        
+        headers = {
+            'Authorization': f'key={self.server_key}',
+            'Content-Type': 'application/json',
+        }
+        
+        try:
+            response = requests.post(
+                self.legacy_fcm_url,
+                headers=headers,
+                data=json.dumps(payload),
+                timeout=10
+            )
+            
+            response.raise_for_status()
+            result = response.json()
+            
+            logger.info(f"Notification legacy envoyée: {result}")
+            return {
+                'success': True,
+                'message_id': result.get('multicast_id') or result.get('message_id'),
+                'response': result
+            }
+            
+        except Exception as e:
+            logger.error(f"Erreur legacy API: {e}")
+            return {
+                'success': False,
+                'error': str(e),
+                'response': None
+            }
+    
+    # 📱 Méthodes spécifiques à BibleCouple (mises à jour pour v1)
+    
+    def send_reading_reminder(self, 
+                             fcm_token: str, 
+                             reading_plan_id: str, 
+                             day_number: int,
+                             chapter: str,
+                             user_name: str = ""):
+        """
+        Envoie un rappel de lecture quotidienne
+        """
+        title = "📖 Temps de lecture" + (f" {user_name}" if user_name else "")
         body = f"Il est temps de lire {chapter} - Jour {day_number}"
+        
         data = {
             "type": "reading_reminder",
             "reading_plan_id": reading_plan_id,
@@ -203,30 +296,42 @@ class FirebaseNotificationService:
             "chapter": chapter,
             "screen": "reading"
         }
+        
         return self.send_to_token(fcm_token, title, body, data)
     
     def send_verse_of_day(self, topic: str, verse: str, reference: str):
-        """Verset du jour"""
+        """
+        Envoie le verset du jour à un topic
+        """
         title = "✨ Verset du jour"
         body = f"{verse[:80]}..." if len(verse) > 80 else verse
+        
         data = {
             "type": "verse_of_day",
             "verse": verse,
             "reference": reference,
             "screen": "verse_of_day"
         }
+        
         return self.send_to_topic(topic, title, body, data)
     
-    def send_couple_notification(self, couple_id: str, partner_name: str, action: str, partner_fcm_token: str):
-        """Notification de couple"""
+    def send_couple_notification(self, 
+                                couple_id: str, 
+                                partner_name: str, 
+                                action: str,
+                                partner_fcm_token: str):
+        """
+        Envoie une notification de couple
+        """
         action_messages = {
             'completed_reading': f"{partner_name} a terminé sa lecture quotidienne",
-            'started_plan': f"{partner_name} a commencé un nouveau plan de lecture", 
+            'started_plan': f"{partner_name} a commencé un nouveau plan de lecture",
             'achievement_unlocked': f"{partner_name} a débloqué une nouvelle réussite"
         }
         
         title = "💑 Activité de couple"
         body = action_messages.get(action, f"{partner_name} a une nouvelle activité")
+        
         data = {
             "type": "couple_notification",
             "couple_id": couple_id,
@@ -234,8 +339,38 @@ class FirebaseNotificationService:
             "action": action,
             "screen": "couple_activity"
         }
+        
         return self.send_to_token(partner_fcm_token, title, body, data)
+    
+    def send_achievement_notification(self, 
+                                    fcm_token: str, 
+                                    achievement_id: str, 
+                                    achievement_name: str):
+        """
+        Envoie une notification de réussite débloquée
+        """
+        title = "🏆 Félicitations !"
+        body = f"Vous avez débloqué: {achievement_name}"
+        
+        data = {
+            "type": "achievement_unlocked",
+            "achievement_id": achievement_id,
+            "achievement_name": achievement_name,
+            "screen": "achievements"
+        }
+        
+        return self.send_to_token(fcm_token, title, body, data)
+    
+    def _create_temp_service_account(self, json_content):
+        """Crée un fichier temporaire depuis la variable d'environnement"""
+        import tempfile
+        import json
+        
+        service_account_data = json.loads(json_content)
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as f:
+            json.dump(service_account_data, f)
+            return f.name
 
 
-# Singleton
+# Singleton instance
 firebase_service = FirebaseNotificationService()
